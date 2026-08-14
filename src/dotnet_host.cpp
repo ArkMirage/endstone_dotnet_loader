@@ -132,7 +132,7 @@ std::wstring findHostfxrDll()
     return scan_roots(roots);
 }
 
-void loadHostfxr()
+void loadHostfxr(std::wstring &out_path)
 {
     if (init_for_config) {
         return;
@@ -142,6 +142,7 @@ void loadHostfxr()
     if (path.empty()) {
         throw std::runtime_error("Unable to locate hostfxr.dll: no nethost.dll found and no .NET installation detected.");
     }
+    out_path = path;
 
     HMODULE lib = ::LoadLibraryW(path.c_str());
     if (!lib) {
@@ -169,7 +170,15 @@ void DotNetHost::start(LogFn log_fn, const void *bridge_table)
         return;
     }
 
-    loadHostfxr();
+    std::wstring fxr_path;
+    loadHostfxr(fxr_path);
+
+    // TEMP DEBUG: print the .NET installation being used
+    const auto fxr_dir = fs::path(fxr_path).parent_path();
+    const auto dotnet_root = fxr_dir.parent_path().parent_path().parent_path();
+    const auto debug_msg = "[dotnet-loader] using hostfxr: " + ws2s(fxr_path) +
+                           " (dotnet root: " + ws2s(dotnet_root.wstring()) + ")";
+    log_fn(nullptr, 2, debug_msg.c_str());
 
     const auto config_path = runtime_dir_ / L"Endstone.Loader.runtimeconfig.json";
     const auto assembly_path = runtime_dir_ / L"Endstone.Loader.dll";
