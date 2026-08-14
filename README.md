@@ -33,7 +33,6 @@ Version: v0.1.0 (built against Endstone 0.11.8 / Minecraft 26.40)
      plugins\
        endstone_dotnet_loader.dll
        dotnet_loader\
-         endstone_dotnet_loader.dll
          runtime\
            Endstone.Loader.dll
            Endstone.Loader.runtimeconfig.json
