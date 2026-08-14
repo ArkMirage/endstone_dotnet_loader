@@ -78,10 +78,13 @@ struct BridgeTable {
     bool (*server_dispatch_command)(void *, void *, const char *);
 
     // ---- events: common ----
-    void *(*event_get_player)(void *);
-    void *(*event_get_actor)(void *);
-    bool (*event_is_cancelled)(void *);
-    void (*event_set_cancelled)(void *, bool);
+    // event_name identifies the concrete event class (see bridge.cpp); it is
+    // required because multi-type accessors must not rely on RTTI (typeinfo is
+    // not shared across DSOs on Linux due to hidden visibility).
+    void *(*event_get_player)(void *, const char *);
+    void *(*event_get_actor)(void *, const char *);
+    bool (*event_is_cancelled)(void *, const char *);
+    void (*event_set_cancelled)(void *, const char *, bool);
 
     // ---- events: chat/command ----
     const char *(*chat_get_message)(void *);
@@ -119,7 +122,7 @@ struct BridgeTable {
     // ---- events: actor ----
     float (*actor_damage_get_damage)(void *);
     void (*actor_damage_set_damage)(void *, float);
-    void *(*event_get_damage_source)(void *);
+    void *(*event_get_damage_source)(void *, const char *);
     void (*actor_explode_get_location)(void *, float *);
     int (*actor_explode_get_block_count)(void *);
     void *(*actor_explode_get_block)(void *, int);
@@ -130,7 +133,7 @@ struct BridgeTable {
     // ---- events: player ----
     const char *(*death_get_message)(void *);
     void (*death_set_message)(void *, const char *);
-    void *(*bed_get_bed)(void *);
+    void *(*bed_get_bed)(void *, const char *);
     const char *(*dim_change_get_from)(void *);
     const char *(*dim_change_get_to)(void *);
     void *(*drop_get_item)(void *);
@@ -161,28 +164,28 @@ struct BridgeTable {
     void *(*cook_get_result)(void *);
     int (*block_explode_get_block_count)(void *);
     void *(*block_explode_get_block)(void *, int);
-    void *(*grow_get_new_state)(void *);
+    void *(*grow_get_new_state)(void *, const char *);
     void *(*from_to_get_to_block)(void *);
     int (*piston_get_direction)(void *);
     void *(*place_get_placed_state)(void *);
     void *(*place_get_against)(void *);
 
     // ---- events: chunk ----
-    int (*chunk_get_x)(void *);
-    int (*chunk_get_z)(void *);
-    const char *(*chunk_get_dimension_name)(void *);
+    int (*chunk_get_x)(void *, const char *);
+    int (*chunk_get_z)(void *, const char *);
+    const char *(*chunk_get_dimension_name)(void *, const char *);
 
     // ---- events: server ----
     const char *(*broadcast_get_message)(void *);
     void (*broadcast_set_message)(void *, const char *);
     int (*broadcast_get_recipient_count)(void *);
-    int (*packet_get_id)(void *);
-    const char *(*packet_get_payload)(void *, int *);
-    void (*packet_set_payload)(void *, const void *, int);
-    void *(*packet_get_player)(void *);
-    const char *(*packet_get_address)(void *);
-    int (*packet_get_sub_client_id)(void *);
-    const char *(*plugin_event_get_plugin_name)(void *);
+    int (*packet_get_id)(void *, const char *);
+    const char *(*packet_get_payload)(void *, const char *, int *);
+    void (*packet_set_payload)(void *, const char *, const void *, int);
+    void *(*packet_get_player)(void *, const char *);
+    const char *(*packet_get_address)(void *, const char *);
+    int (*packet_get_sub_client_id)(void *, const char *);
+    const char *(*plugin_event_get_plugin_name)(void *, const char *);
     const char *(*script_get_message_id)(void *);
     const char *(*script_get_message)(void *);
     const char *(*script_get_sender_name)(void *);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <format>
 #include <iterator>
 #include <memory>
 #include <optional>
@@ -187,59 +188,203 @@ bool serverDispatchCommand(void *p, void *sender, const char *cmd)
 }
 
 // ---- events ----
+//
+// The managed side always knows the exact event type (the server dispatches
+// handlers by event name, 1:1 with the concrete class), so multi-type
+// accessors classify the event by name and static_cast from the original
+// object pointer. dynamic_cast is deliberately avoided: typeinfo objects are
+// not shared across DSO boundaries on Linux (both the server and plugins are
+// built with hidden visibility), which makes cross-module RTTI checks fail.
+// All event classes are single-inheritance chains rooted at Event at offset 0,
+// so casting the object pointer back to the concrete type is always identity.
 
-void *eventGetPlayer(void *e)
+namespace event_names {
+
+// endstone::PlayerEvent and every subclass the managed side exposes.
+bool isPlayerEvent(std::string_view name)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PlayerEvent *>(event)) {
-        return &pe->getPlayer();
+    return name == "PlayerBedEnterEvent" || name == "PlayerCommandEvent" || name == "PlayerDimensionChangeEvent" ||
+           name == "PlayerEmoteEvent" || name == "PlayerGameModeChangeEvent" || name == "PlayerInteractActorEvent" ||
+           name == "PlayerInteractEvent" || name == "PlayerJoinEvent" || name == "PlayerJumpEvent" ||
+           name == "PlayerKickEvent" || name == "PlayerLoginEvent" || name == "PlayerMoveEvent" ||
+           name == "PlayerPickupItemEvent" || name == "PlayerPortalEvent" || name == "PlayerQuitEvent" ||
+           name == "PlayerRespawnEvent" || name == "PlayerSkinChangeEvent" || name == "PlayerTeleportEvent" ||
+           name == "PlayerChatEvent" || name == "PlayerDropItemEvent" || name == "PlayerItemHeldEvent" ||
+           name == "PlayerItemConsumeEvent";
+}
+
+// endstone::ActorEvent<Actor> subclasses.
+bool isActorEvent(std::string_view name)
+{
+    return name == "ActorExplodeEvent" || name == "ActorRemoveEvent" || name == "ActorSpawnEvent" ||
+           name == "ActorTeleportEvent";
+}
+
+// endstone::ActorEvent<Mob> subclasses.
+bool isMobEvent(std::string_view name)
+{
+    return name == "ActorDamageEvent" || name == "ActorDeathEvent" || name == "PlayerDeathEvent" ||
+           name == "ActorKnockbackEvent";
+}
+
+// Every event type implementing endstone::ICancellable.
+bool isCancellableEvent(std::string_view name)
+{
+    return name == "ActorDamageEvent" || name == "ActorExplodeEvent" || name == "ActorKnockbackEvent" ||
+           name == "ActorSpawnEvent" || name == "ActorTeleportEvent" || name == "BlockBreakEvent" ||
+           name == "BlockCookEvent" || name == "BlockExplodeEvent" || name == "BlockFromToEvent" ||
+           name == "BlockGrowEvent" || name == "BlockPistonExtendEvent" || name == "BlockPistonRetractEvent" ||
+           name == "BlockPlaceEvent" || name == "LeavesDecayEvent" || name == "PlayerBedEnterEvent" ||
+           name == "PlayerChatEvent" || name == "PlayerCommandEvent" || name == "PlayerDropItemEvent" ||
+           name == "PlayerEmoteEvent" || name == "PlayerGameModeChangeEvent" || name == "PlayerInteractActorEvent" ||
+           name == "PlayerInteractEvent" || name == "PlayerItemConsumeEvent" || name == "PlayerItemHeldEvent" ||
+           name == "PlayerJumpEvent" || name == "PlayerKickEvent" || name == "PlayerLoginEvent" ||
+           name == "PlayerMoveEvent" || name == "PlayerPickupItemEvent" || name == "PlayerPortalEvent" ||
+           name == "PlayerSkinChangeEvent" || name == "PlayerTeleportEvent" || name == "BroadcastMessageEvent" ||
+           name == "PacketReceiveEvent" || name == "PacketSendEvent" || name == "ScriptMessageEvent" ||
+           name == "ServerCommandEvent" || name == "ServerListPingEvent" || name == "ThunderChangeEvent" ||
+           name == "WeatherChangeEvent";
+}
+
+}  // namespace event_names
+
+void *eventGetPlayer(void *e, const char *event_name)
+{
+    const std::string_view name = event_name ? event_name : "";
+    if (event_names::isPlayerEvent(name)) {
+        return &static_cast<endstone::PlayerEvent *>(e)->getPlayer();
     }
-    if (auto *ade = dynamic_cast<endstone::ActorDeathEvent *>(event)) {
-        return dynamic_cast<endstone::Player *>(&ade->getActor());
+    if (name == "PlayerDeathEvent") {
+        return &static_cast<endstone::PlayerDeathEvent *>(e)->getPlayer();
     }
-    if (auto *bde = dynamic_cast<endstone::BlockBreakEvent *>(event)) {
-        return &bde->getPlayer();
+    if (name == "ActorDeathEvent") {
+        return static_cast<endstone::ActorDeathEvent *>(e)->getActor().asPlayer();
     }
-    if (auto *bpe = dynamic_cast<endstone::BlockPlaceEvent *>(event)) {
-        return &bpe->getPlayer();
+    if (name == "BlockBreakEvent") {
+        return &static_cast<endstone::BlockBreakEvent *>(e)->getPlayer();
     }
-    if (auto *pr = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        return pr->getPlayer();
+    if (name == "BlockPlaceEvent") {
+        return &static_cast<endstone::BlockPlaceEvent *>(e)->getPlayer();
     }
-    if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        return ps->getPlayer();
+    if (name == "PacketReceiveEvent") {
+        return static_cast<endstone::PacketReceiveEvent *>(e)->getPlayer();
+    }
+    if (name == "PacketSendEvent") {
+        return static_cast<endstone::PacketSendEvent *>(e)->getPlayer();
     }
     return nullptr;
 }
 
-void *eventGetActor(void *e)
+void *eventGetActor(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *ae = dynamic_cast<endstone::ActorEvent<endstone::Actor> *>(event)) {
-        return &ae->getActor();
+    const std::string_view name = event_name ? event_name : "";
+    if (event_names::isActorEvent(name)) {
+        return &static_cast<endstone::ActorEvent<endstone::Actor> *>(e)->getActor();
     }
-    if (auto *me = dynamic_cast<endstone::ActorEvent<endstone::Mob> *>(event)) {
-        return &me->getActor();
+    if (event_names::isMobEvent(name)) {
+        return &static_cast<endstone::ActorEvent<endstone::Mob> *>(e)->getActor();
     }
-    if (auto *ia = dynamic_cast<endstone::PlayerInteractActorEvent *>(event)) {
-        return &ia->getActor();
+    if (name == "PlayerInteractActorEvent") {
+        return &static_cast<endstone::PlayerInteractActorEvent *>(e)->getActor();
     }
     return nullptr;
 }
 
-bool eventIsCancelled(void *e)
+bool eventIsCancelled(void *e, const char *event_name)
 {
-    if (auto *c = dynamic_cast<endstone::ICancellable *>(asEvent(e))) {
-        return c->isCancelled();
-    }
+    const std::string_view name = event_name ? event_name : "";
+#define ENDSTONE_CASE_IS_CANCELLED(T) \
+    if (name == #T) { return static_cast<endstone::T *>(e)->isCancelled(); }
+    ENDSTONE_CASE_IS_CANCELLED(ActorDamageEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ActorExplodeEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ActorKnockbackEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ActorSpawnEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ActorTeleportEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockBreakEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockCookEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockExplodeEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockFromToEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockGrowEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockPistonExtendEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockPistonRetractEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BlockPlaceEvent)
+    ENDSTONE_CASE_IS_CANCELLED(LeavesDecayEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerBedEnterEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerChatEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerCommandEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerDropItemEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerEmoteEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerGameModeChangeEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerInteractActorEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerInteractEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerItemConsumeEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerItemHeldEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerJumpEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerKickEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerLoginEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerMoveEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerPickupItemEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerPortalEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerSkinChangeEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PlayerTeleportEvent)
+    ENDSTONE_CASE_IS_CANCELLED(BroadcastMessageEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PacketReceiveEvent)
+    ENDSTONE_CASE_IS_CANCELLED(PacketSendEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ScriptMessageEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ServerCommandEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ServerListPingEvent)
+    ENDSTONE_CASE_IS_CANCELLED(ThunderChangeEvent)
+    ENDSTONE_CASE_IS_CANCELLED(WeatherChangeEvent)
+#undef ENDSTONE_CASE_IS_CANCELLED
     return false;
 }
 
-void eventSetCancelled(void *e, bool v)
+void eventSetCancelled(void *e, const char *event_name, bool v)
 {
-    if (auto *c = dynamic_cast<endstone::ICancellable *>(asEvent(e))) {
-        c->setCancelled(v);
-    }
+    const std::string_view name = event_name ? event_name : "";
+#define ENDSTONE_CASE_SET_CANCELLED(T) \
+    if (name == #T) { static_cast<endstone::T *>(e)->setCancelled(v); return; }
+    ENDSTONE_CASE_SET_CANCELLED(ActorDamageEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ActorExplodeEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ActorKnockbackEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ActorSpawnEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ActorTeleportEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockBreakEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockCookEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockExplodeEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockFromToEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockGrowEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockPistonExtendEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockPistonRetractEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BlockPlaceEvent)
+    ENDSTONE_CASE_SET_CANCELLED(LeavesDecayEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerBedEnterEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerChatEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerCommandEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerDropItemEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerEmoteEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerGameModeChangeEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerInteractActorEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerInteractEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerItemConsumeEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerItemHeldEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerJumpEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerKickEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerLoginEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerMoveEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerPickupItemEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerPortalEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerSkinChangeEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PlayerTeleportEvent)
+    ENDSTONE_CASE_SET_CANCELLED(BroadcastMessageEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PacketReceiveEvent)
+    ENDSTONE_CASE_SET_CANCELLED(PacketSendEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ScriptMessageEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ServerCommandEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ServerListPingEvent)
+    ENDSTONE_CASE_SET_CANCELLED(ThunderChangeEvent)
+    ENDSTONE_CASE_SET_CANCELLED(WeatherChangeEvent)
+#undef ENDSTONE_CASE_SET_CANCELLED
 }
 
 const char *chatGetMessage(void *e)
@@ -377,14 +522,14 @@ void *interactActorGetActor(void *e)
 
 float actorDamageGetDamage(void *e) { return static_cast<endstone::ActorDamageEvent *>(e)->getDamage(); }
 void actorDamageSetDamage(void *e, float v) { static_cast<endstone::ActorDamageEvent *>(e)->setDamage(v); }
-void *eventGetDamageSource(void *e)
+void *eventGetDamageSource(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *de = dynamic_cast<endstone::ActorDamageEvent *>(event)) {
-        return &de->getDamageSource();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "ActorDamageEvent") {
+        return &static_cast<endstone::ActorDamageEvent *>(e)->getDamageSource();
     }
-    if (auto *ae = dynamic_cast<endstone::ActorDeathEvent *>(event)) {
-        return &ae->getDamageSource();
+    if (name == "ActorDeathEvent" || name == "PlayerDeathEvent") {
+        return &static_cast<endstone::ActorDeathEvent *>(e)->getDamageSource();
     }
     return nullptr;
 }
@@ -430,14 +575,14 @@ void deathSetMessage(void *e, const char *msg)
 {
     static_cast<endstone::PlayerDeathEvent *>(e)->setDeathMessage(std::string(msg));
 }
-void *bedGetBed(void *e)
+void *bedGetBed(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *be = dynamic_cast<endstone::PlayerBedEnterEvent *>(event)) {
-        return &be->getBed();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PlayerBedEnterEvent") {
+        return &static_cast<endstone::PlayerBedEnterEvent *>(e)->getBed();
     }
-    if (auto *bl = dynamic_cast<endstone::PlayerBedLeaveEvent *>(event)) {
-        return &bl->getBed();
+    if (name == "PlayerBedLeaveEvent") {
+        return &static_cast<endstone::PlayerBedLeaveEvent *>(e)->getBed();
     }
     return nullptr;
 }
@@ -511,14 +656,14 @@ void *blockExplodeGetBlock(void *e, int idx)
     auto &list = static_cast<endstone::BlockExplodeEvent *>(e)->getBlockList();
     return (idx >= 0 && static_cast<size_t>(idx) < list.size()) ? list[static_cast<size_t>(idx)].get() : nullptr;
 }
-void *growGetNewState(void *e)
+void *growGetNewState(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *ge = dynamic_cast<endstone::BlockGrowEvent *>(event)) {
-        return &ge->getNewState();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "BlockGrowEvent") {
+        return &static_cast<endstone::BlockGrowEvent *>(e)->getNewState();
     }
-    if (auto *fe = dynamic_cast<endstone::BlockFormEvent *>(event)) {
-        return &fe->getNewState();
+    if (name == "BlockFormEvent") {
+        return &static_cast<endstone::BlockFormEvent *>(e)->getNewState();
     }
     return nullptr;
 }
@@ -530,36 +675,36 @@ void *placeGetPlacedState(void *e)
 }
 void *placeGetAgainst(void *e) { return &static_cast<endstone::BlockPlaceEvent *>(e)->getBlockAgainst(); }
 
-int chunkGetX(void *e)
+int chunkGetX(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *ce = dynamic_cast<endstone::ChunkLoadEvent *>(event)) {
-        return ce->getChunk().getX();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "ChunkLoadEvent") {
+        return static_cast<endstone::ChunkLoadEvent *>(e)->getChunk().getX();
     }
-    if (auto *cu = dynamic_cast<endstone::ChunkUnloadEvent *>(event)) {
-        return cu->getChunk().getX();
+    if (name == "ChunkUnloadEvent") {
+        return static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk().getX();
     }
     return 0;
 }
-int chunkGetZ(void *e)
+int chunkGetZ(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *ce = dynamic_cast<endstone::ChunkLoadEvent *>(event)) {
-        return ce->getChunk().getZ();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "ChunkLoadEvent") {
+        return static_cast<endstone::ChunkLoadEvent *>(e)->getChunk().getZ();
     }
-    if (auto *cu = dynamic_cast<endstone::ChunkUnloadEvent *>(event)) {
-        return cu->getChunk().getZ();
+    if (name == "ChunkUnloadEvent") {
+        return static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk().getZ();
     }
     return 0;
 }
-const char *chunkGetDimensionName(void *e)
+const char *chunkGetDimensionName(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *ce = dynamic_cast<endstone::ChunkLoadEvent *>(event)) {
-        return strOut(ce->getChunk().getDimension().getName());
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "ChunkLoadEvent") {
+        return strOut(static_cast<endstone::ChunkLoadEvent *>(e)->getChunk().getDimension().getName());
     }
-    if (auto *cu = dynamic_cast<endstone::ChunkUnloadEvent *>(event)) {
-        return strOut(cu->getChunk().getDimension().getName());
+    if (name == "ChunkUnloadEvent") {
+        return strOut(static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk().getDimension().getName());
     }
     return nullptr;
 }
@@ -576,26 +721,26 @@ int broadcastGetRecipientCount(void *e)
 {
     return static_cast<int>(static_cast<endstone::BroadcastMessageEvent *>(e)->getRecipients().size());
 }
-int packetGetId(void *e)
+int packetGetId(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        return pe->getPacketId();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PacketReceiveEvent") {
+        return static_cast<endstone::PacketReceiveEvent *>(e)->getPacketId();
     }
-    if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        return ps->getPacketId();
+    if (name == "PacketSendEvent") {
+        return static_cast<endstone::PacketSendEvent *>(e)->getPacketId();
     }
     return 0;
 }
-const char *packetGetPayload(void *e, int *len)
+const char *packetGetPayload(void *e, const char *event_name, int *len)
 {
     std::string_view payload;
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        payload = pe->getPayload();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PacketReceiveEvent") {
+        payload = static_cast<endstone::PacketReceiveEvent *>(e)->getPayload();
     }
-    else if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        payload = ps->getPayload();
+    else if (name == "PacketSendEvent") {
+        payload = static_cast<endstone::PacketSendEvent *>(e)->getPayload();
     }
     g_payload_buffer.assign(payload.data(), payload.size());
     if (len) {
@@ -603,59 +748,60 @@ const char *packetGetPayload(void *e, int *len)
     }
     return g_payload_buffer.c_str();
 }
-void packetSetPayload(void *e, const void *data, int len)
+void packetSetPayload(void *e, const char *event_name, const void *data, int len)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        pe->setPayload(std::string_view(static_cast<const char *>(data), static_cast<size_t>(len)));
+    const std::string_view name = event_name ? event_name : "";
+    const auto payload = std::string_view(static_cast<const char *>(data), static_cast<size_t>(len));
+    if (name == "PacketReceiveEvent") {
+        static_cast<endstone::PacketReceiveEvent *>(e)->setPayload(payload);
     }
-    else if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        ps->setPayload(std::string_view(static_cast<const char *>(data), static_cast<size_t>(len)));
+    else if (name == "PacketSendEvent") {
+        static_cast<endstone::PacketSendEvent *>(e)->setPayload(payload);
     }
 }
-void *packetGetPlayer(void *e)
+void *packetGetPlayer(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        return pe->getPlayer();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PacketReceiveEvent") {
+        return static_cast<endstone::PacketReceiveEvent *>(e)->getPlayer();
     }
-    if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        return ps->getPlayer();
+    if (name == "PacketSendEvent") {
+        return static_cast<endstone::PacketSendEvent *>(e)->getPlayer();
     }
     return nullptr;
 }
-const char *packetGetAddress(void *e)
+const char *packetGetAddress(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        const auto addr = pe->getAddress();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PacketReceiveEvent") {
+        const auto addr = static_cast<endstone::PacketReceiveEvent *>(e)->getAddress();
         return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
     }
-    if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        const auto addr = ps->getAddress();
+    if (name == "PacketSendEvent") {
+        const auto addr = static_cast<endstone::PacketSendEvent *>(e)->getAddress();
         return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
     }
     return nullptr;
 }
-int packetGetSubClientId(void *e)
+int packetGetSubClientId(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PacketReceiveEvent *>(event)) {
-        return pe->getSubClientId();
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PacketReceiveEvent") {
+        return static_cast<endstone::PacketReceiveEvent *>(e)->getSubClientId();
     }
-    if (auto *ps = dynamic_cast<endstone::PacketSendEvent *>(event)) {
-        return ps->getSubClientId();
+    if (name == "PacketSendEvent") {
+        return static_cast<endstone::PacketSendEvent *>(e)->getSubClientId();
     }
     return 0;
 }
-const char *pluginEventGetPluginName(void *e)
+const char *pluginEventGetPluginName(void *e, const char *event_name)
 {
-    auto *event = asEvent(e);
-    if (auto *pe = dynamic_cast<endstone::PluginEnableEvent *>(event)) {
-        return strOut(pe->getPlugin().getName());
+    const std::string_view name = event_name ? event_name : "";
+    if (name == "PluginEnableEvent") {
+        return strOut(static_cast<endstone::PluginEnableEvent *>(e)->getPlugin().getName());
     }
-    if (auto *pd = dynamic_cast<endstone::PluginDisableEvent *>(event)) {
-        return strOut(pd->getPlugin().getName());
+    if (name == "PluginDisableEvent") {
+        return strOut(static_cast<endstone::PluginDisableEvent *>(e)->getPlugin().getName());
     }
     return nullptr;
 }
@@ -1055,12 +1201,13 @@ uint32_t canvasGetBasePixel(void *c, int x, int y) { return static_cast<endstone
 bool itemHasMapView(void *i)
 {
     const auto meta = itemMeta(i);
-    return meta && dynamic_cast<endstone::MapMeta *>(meta.get()) && static_cast<endstone::MapMeta *>(meta.get())->hasMapView();
+    const auto *map_meta = meta ? meta->as<endstone::MapMeta>() : nullptr;
+    return map_meta && map_meta->hasMapView();
 }
 void *itemGetMapView(void *i)
 {
     const auto meta = itemMeta(i);
-    auto *map_meta = meta ? dynamic_cast<endstone::MapMeta *>(meta.get()) : nullptr;
+    const auto *map_meta = meta ? meta->as<endstone::MapMeta>() : nullptr;
     return map_meta && map_meta->hasMapView() ? map_meta->getMapView() : nullptr;
 }
 bool itemSetMapView(void *i, void *map)
@@ -1069,7 +1216,7 @@ bool itemSetMapView(void *i, void *map)
         return false;
     }
     auto meta = itemMeta(i);
-    auto *map_meta = meta ? dynamic_cast<endstone::MapMeta *>(meta.get()) : nullptr;
+    auto *map_meta = meta ? meta->as<endstone::MapMeta>() : nullptr;
     if (!map_meta) {
         return false;
     }
@@ -1708,7 +1855,7 @@ bool senderHasPermission(void *s, const char *perm)
 }
 void *senderAsPlayer(void *s)
 {
-    return dynamic_cast<endstone::Player *>(static_cast<endstone::CommandSender *>(s));
+    return static_cast<endstone::CommandSender *>(s)->asPlayer();
 }
 
 }  // namespace
