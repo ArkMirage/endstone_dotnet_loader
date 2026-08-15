@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 
 namespace Endstone.Loader;
 
@@ -14,6 +15,13 @@ public static class Bootstrap
     private static unsafe delegate* unmanaged[Cdecl]<void*, int, byte*, void> _logFn;
 
     private static IntPtr _serverPtr;
+
+    // Shared serializer options: the native side parses plugin info as JSON with
+    // camelCase keys, e.g. {"name","version","description","authors","commands"}.
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    };
 
     internal static IntPtr ServerPtr => _serverPtr;
 
@@ -47,8 +55,9 @@ public static class Bootstrap
 
     /// <summary>
     /// Loads a plugin assembly, finds the [Plugin]-annotated PluginBase subclass,
-    /// instantiates it and returns a GCHandle. Writes "name\nversion\ndescription\na1;a2"
-    /// (or an error message on failure) into the caller-provided UTF-8 buffer.
+    /// instantiates it and returns a GCHandle. Writes JSON plugin info
+    /// ({"name","version","description","authors","commands"}) — or an error
+    /// message on failure — into the caller-provided UTF-8 buffer.
     /// </summary>
     [UnmanagedCallersOnly]
     public static IntPtr LoadPlugin(IntPtr assemblyPathUtf8, IntPtr infoBuffer, int bufferSize)
@@ -82,12 +91,12 @@ public static class Bootstrap
             }
 
             var instance = (PluginBase)Activator.CreateInstance(pluginType)!;
-            var info = $"{meta.Name}\n{meta.Version}\n{meta.Description}\n{string.Join(';', meta.Authors)}";
-            var commandLines = instance.SerializeCommands().ToList();
-            if (commandLines.Count > 0)
-            {
-                info += "\n" + string.Join("\n", commandLines);
-            }
+
+            var info = JsonSerializer.Serialize(
+                new PluginInfo(meta.Name, meta.Version, meta.Description, meta.Authors,
+                               instance.CommandDefinitions.ToArray()),
+                JsonOptions);
+
             WriteUtf8(infoBuffer, bufferSize, info);
             return GCHandle.ToIntPtr(GCHandle.Alloc(instance));
         }
@@ -97,6 +106,8 @@ public static class Bootstrap
             return IntPtr.Zero;
         }
     }
+
+    record class PluginInfo(string Name, string Version, string Description, string[] Authors, CommandDefinition[] Commands);
 
     [UnmanagedCallersOnly]
     public static void Attach(IntPtr gcHandle, IntPtr nativePlugin)
@@ -148,7 +159,7 @@ public static class Bootstrap
         }
     }
 
-        /// <summary>Native form callback entry: dispatches submit/close to the managed form.</summary>
+    /// <summary>Native form callback entry: dispatches submit/close to the managed form.</summary>
     [UnmanagedCallersOnly]
     public static void FormDispatch(IntPtr playerPtr, int resultKind, ulong formId, int buttonIndex,
                                     IntPtr payloadUtf8)
@@ -175,7 +186,9 @@ public static class Bootstrap
         }
     }
 
-    /// <summary>Re-queries command declarations (called by native side after OnLoad).</summary>
+    /// <summary>Re-queries command declarations (called by native side after OnLoad).
+    /// Writes a JSON array of command definitions; returns 1 when the buffer was
+    /// written, 0 when the plugin handle is unknown.</summary>
     [UnmanagedCallersOnly]
     public static int QueryCommands(IntPtr gcHandle, IntPtr buffer, int bufferSize)
     {
@@ -183,13 +196,9 @@ public static class Bootstrap
         {
             return 0;
         }
-        var lines = plugin.SerializeCommands().ToList();
-        if (lines.Count == 0)
-        {
-            return 0;
-        }
-        WriteUtf8(buffer, bufferSize, string.Join("\n", lines));
-        return lines.Count;
+        var info = JsonSerializer.Serialize(plugin.CommandDefinitions, JsonOptions);
+        WriteUtf8(buffer, bufferSize, info);
+        return 1;
     }
 
     /// <summary>Native command entry: dispatches to the managed command handler.</summary>

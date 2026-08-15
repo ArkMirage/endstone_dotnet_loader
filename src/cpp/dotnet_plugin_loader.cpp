@@ -1,8 +1,10 @@
 #include "dotnet_plugin_loader.h"
 
 #include <cstdio>
-#include <sstream>
+#include <optional>
 #include <unordered_map>
+
+#include <nlohmann/json.hpp>
 
 #include "bridge.h"
 
@@ -30,17 +32,43 @@ DotNetPluginLoader::DotNetPluginLoader(endstone::Server &server, DotNetHost &hos
     s_host = &host;
 }
 
-std::vector<std::string> split(const std::string &s, char sep)
+// Converts a JSON command object into an endstone::Command.
+endstone::Command parseCommand(const nlohmann::json &obj)
 {
-    std::vector<std::string> out;
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, sep)) {
-        if (!item.empty()) {
-            out.push_back(item);
+    return endstone::Command(obj.value("name", std::string{}), obj.value("description", std::string{}),
+                             obj.value("usages", std::vector<std::string>{}),
+                             obj.value("aliases", std::vector<std::string>{}),
+                             obj.value("permissions", std::vector<std::string>{}));
+}
+
+// Parses a JSON array of command objects.
+std::vector<endstone::Command> parseCommands(const nlohmann::json &arr)
+{
+    std::vector<endstone::Command> commands;
+    if (arr.is_array()) {
+        for (const auto &item : arr) {
+            commands.push_back(parseCommand(item));
         }
     }
-    return out;
+    return commands;
+}
+
+// Parses the JSON plugin info object into an endstone::PluginDescription.
+// Returns nullopt on malformed input.
+std::optional<endstone::PluginDescription> parseDescription(const char *info)
+{
+    const auto doc = nlohmann::json::parse(info, nullptr, false);
+    if (doc.is_discarded()) {
+        return std::nullopt;
+    }
+    return endstone::PluginDescription(
+        doc.value("name", std::string{}), doc.value("version", std::string{}),
+        doc.value("description", std::string{}),
+        /*load=*/endstone::PluginLoadOrder::PostWorld,
+        /*authors=*/doc.value("authors", std::vector<std::string>{}),
+        /*contributors=*/{}, /*website=*/"", /*prefix=*/"", /*provides=*/{}, /*depend=*/{}, /*soft_depend=*/{},
+        /*load_before=*/{}, /*default_permission=*/endstone::PermissionDefault::Operator,
+        /*commands=*/parseCommands(doc.value("commands", nlohmann::json::array())));
 }
 
 DotNetPlugin::~DotNetPlugin()
@@ -74,24 +102,20 @@ void DotNetPlugin::refreshCommands()
     if (host_.query_commands(gc_handle_, buffer, sizeof(buffer)) <= 0) {
         return;
     }
-    std::vector<endstone::Command> commands;
-    const auto cmd_lines = split(buffer, '\n');
-    for (const auto &line : cmd_lines) {
-        const auto parts = split(line, '|');
-        if (parts.empty()) {
-            continue;
-        }
-        auto usages = parts.size() > 2 ? split(parts[2], ';') : std::vector<std::string>{};
-        auto aliases = parts.size() > 3 ? split(parts[3], ';') : std::vector<std::string>{};
-        auto permissions = parts.size() > 4 ? split(parts[4], ';') : std::vector<std::string>{};
-        commands.emplace_back(parts[0], parts.size() > 1 ? parts[1] : "", std::move(usages), std::move(aliases),
-                              std::move(permissions));
+    // The managed side writes a JSON array of command objects
+    // [{"name","description","usages","aliases","permissions"}, ...].
+    const auto doc = nlohmann::json::parse(buffer, nullptr, false);
+    if (doc.is_discarded()) {
+        // Keep the previously loaded description (commands registered in OnLoad).
+        getServer().getLogger().error("Failed to parse command JSON from plugin '{}'.", description_.getName());
+        return;
     }
+    const auto commands = parseCommands(doc);
     description_ = endstone::PluginDescription(
         description_.getName(), description_.getVersion(), description_.getDescription(), description_.getLoad(),
         description_.getAuthors(), /*contributors=*/{}, /*website=*/"", description_.getPrefix(),
         /*provides=*/{}, /*depend=*/{}, /*soft_depend=*/{}, /*load_before=*/{},
-        endstone::PermissionDefault::Operator, std::move(commands));
+        endstone::PermissionDefault::Operator, commands);
 }
 
 void DotNetPlugin::flushEventListeners()
@@ -183,7 +207,8 @@ endstone::Plugin *DotNetPluginLoader::loadPlugin(std::string file)
         return nullptr;
     }
 
-    // Managed side writes "name\nversion\ndescription\nauthor1;author2"
+    // Managed side writes a JSON object:
+    // {"name","version","description","authors","commands":[...]}
     char info[4096] = {};
     void *gc_handle = host_.load_plugin(file.c_str(), info, sizeof(info));
     if (!gc_handle) {
@@ -191,38 +216,14 @@ endstone::Plugin *DotNetPluginLoader::loadPlugin(std::string file)
         return nullptr;
     }
 
-    const auto lines = split(info, '\n');
-    if (lines.size() < 2) {
+    auto description = parseDescription(info);
+    if (!description) {
         logger_.error("Managed plugin '{}' returned malformed metadata.", file);
         host_.release(gc_handle);
         return nullptr;
     }
 
-    // lines[4..] (optional) are command definitions:
-    //   "name|description|usage1;usage2|alias1;alias2|permission1;permission2"
-    std::vector<endstone::Command> commands;
-    for (size_t i = 4; i < lines.size(); ++i) {
-        const auto parts = split(lines[i], '|');
-        if (parts.empty()) {
-            continue;
-        }
-        auto usages = parts.size() > 2 ? split(parts[2], ';') : std::vector<std::string>{};
-        auto aliases = parts.size() > 3 ? split(parts[3], ';') : std::vector<std::string>{};
-        auto permissions = parts.size() > 4 ? split(parts[4], ';') : std::vector<std::string>{};
-        commands.emplace_back(parts[0], parts.size() > 1 ? parts[1] : "", std::move(usages), std::move(aliases),
-                              std::move(permissions));
-    }
-
-    endstone::PluginDescription description(
-        lines[0], lines[1],
-        /*description=*/lines.size() > 2 ? lines[2] : "",
-        /*load=*/endstone::PluginLoadOrder::PostWorld,
-        /*authors=*/lines.size() > 3 ? split(lines[3], ';') : std::vector<std::string>{},
-        /*contributors=*/{}, /*website=*/"", /*prefix=*/"", /*provides=*/{}, /*depend=*/{}, /*soft_depend=*/{},
-        /*load_before=*/{}, /*default_permission=*/endstone::PermissionDefault::Operator,
-        /*commands=*/std::move(commands));
-
-    auto plugin = std::make_unique<DotNetPlugin>(host_, gc_handle, std::move(description));
+    auto plugin = std::make_unique<DotNetPlugin>(host_, gc_handle, std::move(*description));
     host_.attach(gc_handle, plugin.get());
     host_.set_server(&getServer());
     pluginLookup()[gc_handle] = plugin.get();
