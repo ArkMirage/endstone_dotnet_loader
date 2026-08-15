@@ -1,0 +1,68 @@
+name: build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        shell: cmd
+        run: |
+          for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set "VSROOT=%%i"
+          if not defined VSROOT exit /b 1
+          call "%VSROOT%\Common7\Tools\VsDevCmd.bat" -arch=x64 -host_arch=x64
+          where clang-cl >nul 2>nul
+          if errorlevel 1 choco install llvm -y --no-progress
+          set "PATH=C:\Program Files\LLVM\bin;%PATH%"
+          call build.bat
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $v = (Select-String -Path 'src\csharp\Endstone.Loader.csproj' -Pattern '<Version>([^<]+)</Version>').Matches[0].Groups[1].Value
+          Compress-Archive -Path 'artifacts\win-x64' -DestinationPath "endstone_dotnet_loader_${v}_win-x64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: endstone_dotnet_loader_win-x64
+          path: endstone_dotnet_loader_*_win-x64.zip
+
+  linux:
+    name: Linux x64
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake clang-18 libc++-18-dev libc++abi-18-dev zip
+
+      - name: Build
+        run: CC=clang-18 CXX=clang++-18 bash build.sh
+
+      - name: Package
+        run: |
+          v=$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' src/csharp/Endstone.Loader.csproj)
+          (
+            cd artifacts/
+            zip -r -q "../endstone_dotnet_loader_${v}_linux-x64.zip" linux-x64
+          )
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: endstone_dotnet_loader_linux-x64
+          path: endstone_dotnet_loader_*_linux-x64.zip
