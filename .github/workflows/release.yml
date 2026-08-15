@@ -31,10 +31,15 @@ jobs:
           fi
           echo "new version: ${new}"
           bash scripts/bump_version.sh "$new"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "Publish ${new}"
-          git push origin "HEAD:${branch}"
+          if git diff --quiet; then
+            echo "version files already at ${new}; skipping commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -am "Publish ${new}"
+            git push origin "HEAD:${branch}"
+            echo "pushed ${new}"
+          fi
           echo "version=${new}" >> "$GITHUB_OUTPUT"
 
   windows:
