@@ -340,6 +340,12 @@ struct BridgeTable {
     int (*item_get_enchant_count)(void *);
     const char *(*item_get_enchant_name)(void *, int);
     int (*item_get_enchant_level)(void *, int);
+    bool (*item_has_enchant)(void *, const char *);
+    int (*item_get_enchant_level_by_id)(void *, const char *);
+    bool (*item_add_enchant)(void *, const char *, int, bool);
+    bool (*item_remove_enchant)(void *, const char *);
+    void (*item_remove_enchants)(void *);
+    bool (*item_has_conflicting_enchant)(void *, const char *);
     const char *(*block_get_type)(void *);
     int (*block_get_x)(void *);
     int (*block_get_y)(void *);
@@ -365,6 +371,15 @@ struct BridgeTable {
     void *(*damage_source_get_actor)(void *);
     void *(*damage_source_get_damaging_actor)(void *);
     bool (*damage_source_is_indirect)(void *);
+
+    // ---- objects: enchantment ----
+    // Registry lookups use ids of the form "namespace:key"; a bare key implies the minecraft namespace.
+    const void *(*enchant_get_by_id)(const char *);
+    const char *(*enchant_get_id)(const void *);
+    int (*enchant_get_max_level)(const void *);
+    int (*enchant_get_start_level)(const void *);
+    bool (*enchant_conflicts_with)(const void *, const void *);
+    bool (*enchant_can_enchant_item)(const void *, void *);
 
     // ---- objects: sender ----
     const char *(*sender_get_name)(void *);

@@ -1457,6 +1457,74 @@ int itemGetEnchantLevel(void *i, int index)
     }
     return 0;
 }
+
+// Enchantment ids are "namespace:key" strings; a bare key implies the minecraft namespace.
+endstone::EnchantmentId enchantId(const char *text) { return endstone::EnchantmentId{text ? text : ""}; }
+
+bool itemHasEnchant(void *i, const char *id)
+{
+    const auto meta = itemMeta(i);
+    return meta && meta->hasEnchant(enchantId(id));
+}
+int itemGetEnchantLevelById(void *i, const char *id)
+{
+    const auto meta = itemMeta(i);
+    return meta ? meta->getEnchantLevel(enchantId(id)) : 0;
+}
+bool itemAddEnchant(void *i, const char *id, int level, bool force)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    const bool changed = meta->addEnchant(enchantId(id), level, force);
+    return changed && asItem(i)->setItemMeta(meta.get());
+}
+bool itemRemoveEnchant(void *i, const char *id)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    const bool changed = meta->removeEnchant(enchantId(id));
+    return changed && asItem(i)->setItemMeta(meta.get());
+}
+void itemRemoveEnchants(void *i)
+{
+    const auto meta = itemMeta(i);
+    if (meta && meta->hasEnchants()) {
+        meta->removeEnchants();
+        asItem(i)->setItemMeta(meta.get());
+    }
+}
+bool itemHasConflictingEnchant(void *i, const char *id)
+{
+    const auto meta = itemMeta(i);
+    return meta && meta->hasConflictingEnchant(enchantId(id));
+}
+
+const endstone::Enchantment *asEnchantment(const void *e) { return static_cast<const endstone::Enchantment *>(e); }
+
+const void *enchantGetById(const char *id)
+{
+    try {
+        return endstone::Enchantment::get(enchantId(id));
+    }
+    catch (const std::exception &) {
+        return nullptr;
+    }
+}
+const char *enchantGetId(const void *e) { return strOut(static_cast<std::string>(asEnchantment(e)->getId())); }
+int enchantGetMaxLevel(const void *e) { return asEnchantment(e)->getMaxLevel(); }
+int enchantGetStartLevel(const void *e) { return asEnchantment(e)->getStartLevel(); }
+bool enchantConflictsWith(const void *e, const void *other)
+{
+    return other && asEnchantment(e)->conflictsWith(*asEnchantment(other));
+}
+bool enchantCanEnchantItem(const void *e, void *item)
+{
+    return item && asEnchantment(e)->canEnchantItem(*asItem(item));
+}
 const char *blockGetType(void *b) { return strOut(asBlock(b)->getType()); }
 int blockGetX(void *b) { return asBlock(b)->getX(); }
 int blockGetY(void *b) { return asBlock(b)->getY(); }
@@ -2085,6 +2153,12 @@ const BridgeTable &getBridgeTable()
         .item_get_enchant_count = &itemGetEnchantCount,
         .item_get_enchant_name = &itemGetEnchantName,
         .item_get_enchant_level = &itemGetEnchantLevel,
+        .item_has_enchant = &itemHasEnchant,
+        .item_get_enchant_level_by_id = &itemGetEnchantLevelById,
+        .item_add_enchant = &itemAddEnchant,
+        .item_remove_enchant = &itemRemoveEnchant,
+        .item_remove_enchants = &itemRemoveEnchants,
+        .item_has_conflicting_enchant = &itemHasConflictingEnchant,
         .block_get_type = &blockGetType,
         .block_get_x = &blockGetX,
         .block_get_y = &blockGetY,
@@ -2110,6 +2184,12 @@ const BridgeTable &getBridgeTable()
         .damage_source_get_actor = &damageSourceGetActor,
         .damage_source_get_damaging_actor = &damageSourceGetDamagingActor,
         .damage_source_is_indirect = &damageSourceIsIndirect,
+        .enchant_get_by_id = &enchantGetById,
+        .enchant_get_id = &enchantGetId,
+        .enchant_get_max_level = &enchantGetMaxLevel,
+        .enchant_get_start_level = &enchantGetStartLevel,
+        .enchant_conflicts_with = &enchantConflictsWith,
+        .enchant_can_enchant_item = &enchantCanEnchantItem,
         .sender_get_name = &senderGetName,
         .sender_send_message = &senderSendMessage,
         .sender_send_error_message = &senderSendErrorMessage,

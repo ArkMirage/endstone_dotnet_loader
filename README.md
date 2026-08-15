@@ -69,6 +69,7 @@ The bundled example plugin `Example.Plugin.dll` provides the following commands 
 | `/ex hello` | Greeting message |
 | `/ex whoami` | Shows info about you / the console |
 | `/ex item` | Inspects the full attributes of the item in hand |
+| `/ex enchant <list\|info\|add\|remove\|clear> [id] [level] [force]` | Enchantments on the held item: list them, inspect an enchantment, add one (level limited unless `force`), remove one, or clear all |
 | `/ex tag <show\|hide\|always\|score\|sb>` | Name tag and scoreboard tag operations |
 | `/ex mob <type> [name] [health]` | Spawns a mob |
 | `/ex form <message\|action\|modal>` | The three form types (player only) |
@@ -245,6 +246,7 @@ The example plugin demonstrates the full feature list:
 - Maps: `Server.CreateMap(dimension)`, `MapView.AddRenderer(MapRenderer)`, `player.SendMap(map)`
 - Inventory: `player.Inventory` (read / add / remove / armor slots)
 - Items: `ItemStack.Create("minecraft:diamond", 1)`
+- Enchantments: `Enchantment.Get("minecraft:sharpness")` (or the static constants like `Enchantment.Sharpness`), `item.AddEnchant(id, level, force: false)`, `item.RemoveEnchant(id)`, `item.RemoveEnchants()`, `item.GetEnchantLevel(id)`, `item.HasEnchant(id)`, `item.HasConflictingEnchant(id)`, `item.Enchantments` (list of `(enchantment, level)` pairs), `enchant.CanEnchantItem(item)`, `enchant.ConflictsWith(other)`, `enchant.StartLevel` / `enchant.MaxLevel`
 - Blocks and block states: `dimension.GetBlockAt(x, y, z)`, `block.CaptureState()`
 - Actors: `dimension.SpawnActor(type, location)`, `player.SpawnMob(type)`
 - Level: `Server.Level`, `level.GetDimension("overworld")`, `dimension.GetLoadedChunks()`
