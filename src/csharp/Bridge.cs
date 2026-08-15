@@ -470,6 +470,19 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, bool> TaskIsSync;
         public delegate* unmanaged[Cdecl]<void*, bool> TaskIsCancelled;
         public delegate* unmanaged[Cdecl]<ulong, void> SchedulerTaskCallback;
+
+        // ---- service manager ----
+        // A provider holder is a heap-allocated std::shared_ptr<endstone::Service>
+        // owned by the managed side (release with ServiceProviderRelease).
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerGetServiceManager;
+        public delegate* unmanaged[Cdecl]<void*> ServiceProviderCreate;
+        public delegate* unmanaged[Cdecl]<void*, void*> ServiceProviderGetPtr;
+        public delegate* unmanaged[Cdecl]<void*, void> ServiceProviderRelease;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*, void*, int, void> ServiceManagerRegister;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> ServiceManagerUnregisterAll;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*, void> ServiceManagerUnregister;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> ServiceManagerUnregisterProvider;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> ServiceManagerGet;
     }
 #pragma warning restore CS0649
 

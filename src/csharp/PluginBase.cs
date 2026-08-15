@@ -58,6 +58,7 @@ public abstract class PluginBase
     private Logger? _logger;
     private Server? _server;
     private Scheduler? _scheduler;
+    private ServiceManager? _serviceManager;
 
     public Logger Logger => _logger ??= new Logger(this);
 
@@ -66,6 +67,10 @@ public abstract class PluginBase
     /// <summary>Plugin-scoped scheduler facade over the server's native scheduler.
     /// All tasks are cancelled automatically when the plugin is disabled.</summary>
     public Scheduler Scheduler => _scheduler ??= new Scheduler(Bootstrap.ServerPtr, NativeHandle);
+
+    /// <summary>Plugin-scoped service manager facade over the server's native service
+    /// manager. All registrations are dropped automatically when the plugin is disabled.</summary>
+    public ServiceManager ServiceManager => _serviceManager ??= new ServiceManager(Bootstrap.ServerPtr, NativeHandle);
 
     /// <summary>Declares a plugin command (registered when the plugin is loaded). Fluent chain:
     /// <c>Command("hello").Description(...).Usage(...).Alias(...).Permission(...).Handler(handler)</c>.</summary>

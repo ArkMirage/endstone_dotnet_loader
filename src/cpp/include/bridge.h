@@ -549,6 +549,22 @@ struct BridgeTable {
     bool (*task_is_cancelled)(void *);
     // Filled by installEventBridge: fires into managed code by managed task id.
     void (*scheduler_task_callback)(uint64_t);
+
+    // ---- service manager ----
+    // A provider holder is a heap-allocated std::shared_ptr<endstone::Service>;
+    // the managed side owns it (release with service_provider_release). A
+    // dotnet service provider is a plain endstone::Service proxy created with
+    // service_provider_create; registering copies the shared_ptr so the proxy
+    // stays alive while any registration (or holder) references it.
+    void *(*server_get_service_manager)(void *);
+    void *(*service_provider_create)(void);
+    void *(*service_provider_get_ptr)(void *);
+    void (*service_provider_release)(void *);
+    void (*service_manager_register)(void *, const char *, void *, void *, int);
+    void (*service_manager_unregister_all)(void *, void *);
+    void (*service_manager_unregister)(void *, const char *, void *);
+    void (*service_manager_unregister_provider)(void *, void *);
+    void *(*service_manager_get)(void *, const char *);
 };
 
 }  // namespace dotnet_loader

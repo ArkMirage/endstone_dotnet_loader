@@ -1357,6 +1357,69 @@ uint32_t taskGetId(void *t) { return static_cast<endstone::Task *>(t)->getTaskId
 bool taskIsSync(void *t) { return static_cast<endstone::Task *>(t)->isSync(); }
 bool taskIsCancelled(void *t) { return static_cast<endstone::Task *>(t)->isCancelled(); }
 
+// ---- service manager ----
+
+endstone::ServiceManager *asServiceManager(void *s) { return static_cast<endstone::ServiceManager *>(s); }
+
+// Holder = heap-allocated std::shared_ptr<endstone::Service>; the managed side
+// owns the allocation and must release it with serviceProviderRelease once the
+// wrapper is no longer needed.
+using ServiceHolder = std::shared_ptr<endstone::Service>;
+
+ServiceHolder *asServiceHolder(void *h) { return static_cast<ServiceHolder *>(h); }
+
+void *serverGetServiceManager(void *s) { return &asServer(s)->getServiceManager(); }
+
+void *serviceProviderCreate()
+{
+    return new ServiceHolder(std::make_shared<endstone::Service>());
+}
+void *serviceProviderGetPtr(void *holder)
+{
+    auto *h = asServiceHolder(holder);
+    return h && *h ? h->get() : nullptr;
+}
+void serviceProviderRelease(void *holder) { delete asServiceHolder(holder); }
+
+void serviceManagerRegister(void *sm, const char *name, void *provider_holder, void *plugin, int priority)
+{
+    auto *holder = asServiceHolder(provider_holder);
+    if (!holder || !*holder || !plugin) {
+        return;
+    }
+    asServiceManager(sm)->registerService(name ? name : "", *holder, *static_cast<endstone::Plugin *>(plugin),
+                                          static_cast<endstone::ServicePriority>(priority));
+}
+void serviceManagerUnregisterAll(void *sm, void *plugin)
+{
+    if (!plugin) {
+        return;
+    }
+    asServiceManager(sm)->unregisterAll(*static_cast<endstone::Plugin *>(plugin));
+}
+void serviceManagerUnregister(void *sm, const char *name, void *provider_ptr)
+{
+    if (!provider_ptr) {
+        return;
+    }
+    asServiceManager(sm)->unregister(name ? name : "", *static_cast<endstone::Service *>(provider_ptr));
+}
+void serviceManagerUnregisterProvider(void *sm, void *provider_ptr)
+{
+    if (!provider_ptr) {
+        return;
+    }
+    asServiceManager(sm)->unregister(*static_cast<endstone::Service *>(provider_ptr));
+}
+void *serviceManagerGet(void *sm, const char *name)
+{
+    auto provider = asServiceManager(sm)->get(name ? name : "");
+    if (!provider) {
+        return nullptr;
+    }
+    return new ServiceHolder(std::move(provider));
+}
+
 const char *itemGetType(void *i)
 {
     const auto &type = asItem(i)->getType();
@@ -2326,6 +2389,15 @@ const BridgeTable &getBridgeTable()
         .task_is_sync = &taskIsSync,
         .task_is_cancelled = &taskIsCancelled,
         .scheduler_task_callback = nullptr,  // filled by DotNetPluginLoader
+        .server_get_service_manager = &serverGetServiceManager,
+        .service_provider_create = &serviceProviderCreate,
+        .service_provider_get_ptr = &serviceProviderGetPtr,
+        .service_provider_release = &serviceProviderRelease,
+        .service_manager_register = &serviceManagerRegister,
+        .service_manager_unregister_all = &serviceManagerUnregisterAll,
+        .service_manager_unregister = &serviceManagerUnregister,
+        .service_manager_unregister_provider = &serviceManagerUnregisterProvider,
+        .service_manager_get = &serviceManagerGet,
     };
     return table;
 }

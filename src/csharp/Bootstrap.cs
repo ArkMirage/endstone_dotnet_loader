@@ -128,6 +128,7 @@ public static class Bootstrap
     public static void OnDisable(IntPtr gcHandle) => Invoke(gcHandle, p =>
     {
         p.Scheduler.CancelAll();
+        p.ServiceManager.UnregisterAll();
         p.OnDisable();
     });
 
