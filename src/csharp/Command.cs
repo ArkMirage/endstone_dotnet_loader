@@ -73,10 +73,7 @@ public sealed class CommandBuilder
         return this;
     }
 
-    internal string Serialize()
-    {
-        return $"{_name}|{_description}|{string.Join(';', _usages)}|{string.Join(';', _aliases)}|{string.Join(';', _permissions)}";
-    }
+    internal CommandDefinition CommandDefinition => new(_name, _description, _usages.ToArray(), _aliases.ToArray(), _permissions.ToArray());
 
     internal bool TryExecute(CommandSender sender, IReadOnlyList<string> args)
     {
@@ -96,10 +93,12 @@ internal sealed class CommandManager
         return builder;
     }
 
-    internal IEnumerable<string> SerializeLines() => _commands.Values.Select(c => c.Serialize());
+    internal IEnumerable<CommandDefinition> Definitions => _commands.Values.Select(c => c.CommandDefinition);
 
     internal bool Dispatch(string name, CommandSender sender, IReadOnlyList<string> args)
     {
         return _commands.TryGetValue(name, out var builder) && builder.TryExecute(sender, args);
     }
 }
+
+internal record CommandDefinition(string Name, string Description, string[] Usages, string[] Aliases, string[] Permissions);

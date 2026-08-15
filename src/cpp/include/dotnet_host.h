@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <filesystem>
-#include <string>
 
 namespace dotnet_loader {
 
@@ -12,8 +11,9 @@ using LogFn = void (*)(void *plugin, int level, const char *message);
 
 // Managed entry points (UnmanagedCallersOnly, Cdecl on x64 is the default calling convention)
 using InitFn = int (*)(LogFn log_fn, const void *bridge_table);
-// Loads plugin assembly, returns GCHandle (0 on failure) and writes
-// "name\nversion\ndescription\nauthor1;author2" into buffer (utf8).
+// Loads plugin assembly, returns GCHandle (0 on failure) and writes a JSON
+// plugin info object {"name","version","description","authors","commands"}
+// into buffer (utf8); on failure writes a plain-text error message.
 using LoadPluginFn = void *(*)(const char *assembly_path_utf8, char *info_buffer, int32_t buffer_size);
 // Associates the managed plugin instance with its native proxy pointer (for logging).
 using AttachFn = void (*)(void *gc_handle, void *native_plugin);
@@ -26,7 +26,8 @@ using DispatchEventFn = void (*)(void *gc_handle, void *cb_handle, void *event_p
 using DispatchCommandFn = int (*)(void *gc_handle, void *sender, const char *command_name,
                                   const char *const *args, int32_t arg_count);
 // Re-queries the commands declared by a managed plugin (e.g. after OnLoad);
-// writes one "name|desc|usages|aliases|permissions" line per command.
+// writes a JSON array of command objects {"name","description","usages",
+// "aliases","permissions"}; returns 1 on success, 0 when the handle is unknown.
 using QueryCommandsFn = int (*)(void *gc_handle, char *buffer, int32_t buffer_size);
 // Form submit/close dispatched back to managed code.
 // result_kind: 0 = submit (button_index for message/action forms, 0 for modal),
