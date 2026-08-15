@@ -1,0 +1,155 @@
+name: release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    name: Bump version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bump minor version, update sources, commit and push
+        id: bump
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="${{ github.ref_name }}"
+          last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName // ""' 2>/dev/null || true)
+          echo "last release tag: ${last:-<none>}"
+          if [[ -n "$last" ]]; then
+            IFS=. read -r maj min pat <<< "${last#v}"
+            new="${maj}.$((min + 1)).0"
+          else
+            new=$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' src/csharp/Endstone.Loader.csproj)
+          fi
+          echo "new version: ${new}"
+          bash scripts/bump_version.sh "$new"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Publish ${new}"
+          git push origin "HEAD:${branch}"
+          echo "version=${new}" >> "$GITHUB_OUTPUT"
+
+  windows:
+    name: Windows x64
+    runs-on: windows-latest
+    needs: bump-version
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        shell: cmd
+        run: |
+          for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set "VSROOT=%%i"
+          if not defined VSROOT exit /b 1
+          call "%VSROOT%\Common7\Tools\VsDevCmd.bat" -arch=x64 -host_arch=x64
+          where clang-cl >nul 2>nul
+          if errorlevel 1 choco install llvm -y --no-progress
+          set "PATH=C:\Program Files\LLVM\bin;%PATH%"
+          call build.bat
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $v = "${{ needs.bump-version.outputs.version }}"
+          Compress-Archive -Path 'artifacts\win-x64' -DestinationPath "endstone_dotnet_loader_${v}_win-x64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: endstone_dotnet_loader_win-x64
+          path: endstone_dotnet_loader_*_win-x64.zip
+
+  linux:
+    name: Linux x64
+    runs-on: ubuntu-24.04
+    needs: bump-version
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake clang-18 libc++-18-dev libc++abi-18-dev zip
+
+      - name: Build
+        run: CC=clang-18 CXX=clang++-18 bash build.sh
+
+      - name: Package
+        run: |
+          v=${{ needs.bump-version.outputs.version }}
+          (
+            cd artifacts/
+            zip -r -q "../endstone_dotnet_loader_${v}_linux-x64.zip" linux-x64
+          )
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: endstone_dotnet_loader_linux-x64
+          path: endstone_dotnet_loader_*_linux-x64.zip
+
+  release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs: [bump-version, windows, linux]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Download zips
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Build changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.bump-version.outputs.version }}
+        run: |
+          repo="$GITHUB_REPOSITORY"
+          head="$(git rev-parse HEAD)"
+          last=$(gh release list --limit 1 --json tagName --jq '.[0].tagName // ""' 2>/dev/null || true)
+          echo "last release tag: ${last:-<none>}"
+
+          jqfilter='.commits[] | select((.commit.message | split("\n")[0]) | test("^(Merge|Publish)") | not) | "- `" + (.commit.message | split("\n")[0]) + "` (" + .sha[0:7] + ")"'
+          if [[ -n "$last" ]]; then
+            gh api "repos/${repo}/compare/${last}...${head}" --jq "$jqfilter" > changes.txt
+          else
+            gh api "repos/${repo}/commits?per_page=100" --jq "$jqfilter" > changes.txt
+          fi
+
+          {
+            printf '## What\x27s Changed\n\n'
+            cat changes.txt
+          } > notes.md
+          sed -n '1,40p' notes.md
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.bump-version.outputs.version }}
+        run: |
+          gh release create "${VERSION}" dist/*/*.zip \
+            --title "${VERSION}" \
+            --notes-file notes.md \
+            --target "$(git rev-parse HEAD)" \
+            --repo "$GITHUB_REPOSITORY"

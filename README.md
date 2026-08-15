@@ -1,37 +1,42 @@
 # endstone-dotnet-loader Tutorial
 
-A loader that runs .NET (C#) plugins on an Endstone BDS server. This document is intended for both server administrators and plugin developers.
+> **简体中文**: [中文文档](./README.zh-CN.md)
 
-Version: v0.1.1 (built against Endstone 0.11.8 / Minecraft 26.40)
+A loader that runs .NET (C#) plugins on an Endstone BDS server. This document is intended for both server administrators and plugin developers. It covers **Windows x64** and **Linux x64**.
+
+> **Note**: **.NET 10 only** — plugins targeting other framework versions will not run.
 
 ---
 
 ## 1. Requirements
 
-- Windows x64
-- An Endstone BDS server (Windows), Endstone 0.11.x recommended
+- **Windows x64** or **Linux x64**
+- An Endstone BDS server for the matching OS (Endstone 0.11.x recommended)
 - .NET 10 Runtime, satisfied by either:
   - .NET 10 installed on the system (run `dotnet --list-runtimes` and look for `Microsoft.NETCore.App 10.x`), or
   - A copy of a .NET 10 installation folder, with the following environment variable set before the server starts:
 
     ```
-    set ENDSTONE_DOTNET_PATH=D:\server\dotnet10
+    set ENDSTONE_DOTNET_PATH=D:\server\dotnet10          # Windows
+    export ENDSTONE_DOTNET_PATH=/opt/dotnet10            # Linux
     ```
 
   The loader looks for a .NET runtime in this order: the `ENDSTONE_DOTNET_PATH` environment variable, then the system-wide installation. If neither exists, the loader is not started and .NET plugins are skipped (the server still boots normally and an error is printed).
-- VC++ 14.x redistributable (preinstalled on virtually all Windows systems; if missing, the plugin fails to load with an error such as "msvcp140.dll not found").
+- Windows: VC++ 14.x redistributable (preinstalled on virtually all Windows systems; if missing, the plugin fails to load with an error such as "msvcp140.dll not found").
+- Linux: required shared libraries for the Endstone native runtime (e.g. `libc++` when the server was built against it); missing libraries produce a load error naming the specific `lib*.so`.
 
 ---
 
 ## 2. Installation
 
-1. Extract the release zip and copy the `plugins` and `plugins.net` folders into the server root directory (next to `bedrock_server.exe`). The final layout is:
+1. Extract the release zip for your OS and copy the `plugins` and `plugins.net` folders into the server root directory (next to `bedrock_server`). The final layout is:
 
    ```
    <server root>\
-     bedrock_server.exe
+     bedrock_server
      plugins\
-       endstone_dotnet_loader.dll
+       endstone_dotnet_loader.dll        # Windows
+       endstone_dotnet_loader.so         # Linux
        dotnet_loader\
          runtime\
            Endstone.Loader.dll
@@ -41,17 +46,17 @@ Version: v0.1.1 (built against Endstone 0.11.8 / Minecraft 26.40)
        Example.Plugin.dll
    ```
 
-   Note: `endstone_dotnet_loader.dll` exists in two places under `plugins\` (`plugins\` and `plugins\dotnet_loader\`). Both are required.
+   Note: `endstone_dotnet_loader.dll` / `.so` exists in two places under `plugins\` (`plugins\` and `plugins\dotnet_loader\`). Both are required.
 
 2. (Optional but recommended) Clear the `plugins\.local\` folder. It is the plugin loading cache; stale cache entries can cause problems after an upgrade.
 
 3. Start the server. A successful startup looks like this:
 
    ```
-   [DotNetLoader] Loading dotnet_loader v0.1.0
+   [DotNetLoader] Loading dotnet_loader
    [DotNetLoader] .NET runtime started.
    [ExamplePlugin] Loading example_plugin v1.0.0
-   [DotNetLoader] Loaded 1 .NET plugin(s) from 'D:\endstone_bds\bedrock_server\plugins.net'.
+   [DotNetLoader] Loaded 1 .NET plugin(s) from '.../plugins.net'.
    [ExamplePlugin] Enabling example_plugin v1.0.0
    ```
 
@@ -263,41 +268,49 @@ Copy `*.Plugin.dll` from `bin\Release\net10.0\` (the file whose assembly name en
 
 ---
 
-## 5. Updating and uninstalling
+## 5. Building from source
+
+The loader is compiled against the Endstone SDK fetched from GitHub at build time (CMake `FetchContent`), so a network connection is required on the first configure. Both build scripts produce the same output layout under `artifacts\<rid>\`:
+
+```
+artifacts\<rid>\
+  plugins\
+    endstone_dotnet_loader.dll / .so
+    dotnet_loader\
+      runtime\
+        Endstone.Loader.dll
+        Endstone.Loader.runtimeconfig.json
+        Endstone.Loader.deps.json
+```
+
+### Windows (`build.bat`)
+
+Requires the Visual Studio MSVC environment: launch a **Developer PowerShell** (or run `VsDevCmd.bat` first). The toolchain is taken from the environment — nothing is discovered or redefined by the script. Needed on `PATH`: `clang-cl` (CLang tools component or LLVM), `ninja`, `cmake`, `dotnet` SDK 10.
+
+```
+build.bat
+```
+
+Outputs to `artifacts\win-x64\`.
+
+### Linux (`build.sh`)
+
+Requires `cmake`, `ninja`, a Clang/LLVM 18+ with `libc++` and `libc++abi`, and the .NET SDK 10. `CC`/`CXX`/`DOTNET_ROOT` are taken from the environment (distributions that only ship versioned compilers, e.g. `clang-20`, must set them explicitly):
+
+```
+CC=clang-18 CXX=clang++-18 ./build.sh
+```
+
+Outputs to `artifacts/linux-x64/`.
+
+### GitHub Actions
+
+`.github/workflows/build.yml` builds both platforms and uploads the packaged zips (`endstone_dotnet_loader_<version>_win-x64.zip` / `..._linux-x64.zip`) as workflow artifacts. The workflow is **manually triggered** via the *Actions* tab (workflow_dispatch).
+
+---
+
+## 6. Updating and uninstalling
 
 Update: stop the server, overwrite the matching files in `plugins\` and `plugins.net\`, clear `plugins\.local\`, restart.
 
-Uninstall: stop the server, delete `endstone_dotnet_loader.dll` from `plugins\`, delete the whole `plugins\dotnet_loader\` folder and the corresponding `*.Plugin.dll` files from `plugins.net\`, restart.
-
----
-
-## 6. Troubleshooting
-
-**Q1: Log shows "Failed to start the .NET runtime" / "Unable to locate hostfxr.dll"**
-The .NET 10 runtime was not found. Install the .NET 10 Runtime, or point `ENDSTONE_DOTNET_PATH` at a directory containing .NET 10 and start the server again.
-
-**Q2: "Failed to start the .NET runtime" complaining about missing files in the runtime dir**
-`Endstone.Loader.dll` or `Endstone.Loader.runtimeconfig.json` is missing under `plugins\dotnet_loader\runtime\`. Re-extract the full release package.
-
-**Q3: A plugin fails to load ("cannot load plugins.net\xxx.Plugin.dll")**
-Check that the file name ends with `.Plugin.dll`, the plugin targets net10.0, and a matching .NET 10 runtime exists on the server.
-
-**Q4: The plugin still behaves like an old version after an upgrade**
-Clear the `plugins\.local\` cache and restart the server.
-
-**Q5: "msvcp140.dll / vcruntime140.dll not found" in the console**
-Install the Microsoft Visual C++ 14.x Redistributable.
-
-**Q6: Some `.test` self-test items fail**
-Some checks depend on player state (e.g. the "item in hand" item requires holding an item). For anything else, report the `[AutoTest] FAIL` lines from the log.
-
-**Q7: The server crashes when an async scheduled task calls game APIs**
-Async callbacks run off the main thread and BDS APIs are not thread-safe. Keep async callbacks pure-managed, or use sync tasks instead.
-
----
-
-## 7. Known limitations
-
-- Windows x64 only
-- The loader is compiled against a specific Endstone SDK snapshot fetched from GitHub at build time; if the server's Endstone moves to an incompatible major version, the loader must be rebuilt
-- Plugins run on .NET 10 (the runtimeconfig is pinned)
+Uninstall: stop the server, delete `endstone_dotnet_loader.dll` (Windows) / `endstone_dotnet_loader.so` (Linux) from `plugins\`, delete the whole `plugins\dotnet_loader\` folder and the corresponding `*.Plugin.dll` files from `plugins.net\`, restart.
