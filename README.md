@@ -2,7 +2,7 @@
 
 A loader that runs .NET (C#) plugins on an Endstone BDS server. This document is intended for both server administrators and plugin developers.
 
-Version: v0.1.0 (built against Endstone 0.11.8 / Minecraft 26.40)
+Version: v0.1.1 (built against Endstone 0.11.8 / Minecraft 26.40)
 
 ---
 
