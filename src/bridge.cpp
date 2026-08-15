@@ -191,110 +191,83 @@ bool serverDispatchCommand(void *p, void *sender, const char *cmd)
 //
 // The managed side always knows the exact event type (the server dispatches
 // handlers by event name, 1:1 with the concrete class), so multi-type
-// accessors classify the event by name and static_cast from the original
-// object pointer. dynamic_cast is deliberately avoided: typeinfo objects are
-// not shared across DSO boundaries on Linux (both the server and plugins are
-// built with hidden visibility), which makes cross-module RTTI checks fail.
-// All event classes are single-inheritance chains rooted at Event at offset 0,
-// so casting the object pointer back to the concrete type is always identity.
+// accessors classify the event by kind (the managed side maps the name to an
+// EventKind exactly once per event instance) and static_cast from the
+// original object pointer. dynamic_cast is deliberately avoided: typeinfo
+// objects are not shared across DSO boundaries on Linux (both the server and
+// plugins are built with hidden visibility), which makes cross-module RTTI
+// checks fail. All event classes are single-inheritance chains rooted at
+// Event at offset 0, so casting the object pointer back to the concrete type
+// is always identity.
 
-namespace event_names {
-
-// endstone::PlayerEvent and every subclass the managed side exposes.
-bool isPlayerEvent(std::string_view name)
+void *eventGetPlayer(void *e, int kind)
 {
-    return name == "PlayerBedEnterEvent" || name == "PlayerCommandEvent" || name == "PlayerDimensionChangeEvent" ||
-           name == "PlayerEmoteEvent" || name == "PlayerGameModeChangeEvent" || name == "PlayerInteractActorEvent" ||
-           name == "PlayerInteractEvent" || name == "PlayerJoinEvent" || name == "PlayerJumpEvent" ||
-           name == "PlayerKickEvent" || name == "PlayerLoginEvent" || name == "PlayerMoveEvent" ||
-           name == "PlayerPickupItemEvent" || name == "PlayerPortalEvent" || name == "PlayerQuitEvent" ||
-           name == "PlayerRespawnEvent" || name == "PlayerSkinChangeEvent" || name == "PlayerTeleportEvent" ||
-           name == "PlayerChatEvent" || name == "PlayerDropItemEvent" || name == "PlayerItemHeldEvent" ||
-           name == "PlayerItemConsumeEvent";
-}
-
-// endstone::ActorEvent<Actor> subclasses.
-bool isActorEvent(std::string_view name)
-{
-    return name == "ActorExplodeEvent" || name == "ActorRemoveEvent" || name == "ActorSpawnEvent" ||
-           name == "ActorTeleportEvent";
-}
-
-// endstone::ActorEvent<Mob> subclasses.
-bool isMobEvent(std::string_view name)
-{
-    return name == "ActorDamageEvent" || name == "ActorDeathEvent" || name == "PlayerDeathEvent" ||
-           name == "ActorKnockbackEvent";
-}
-
-// Every event type implementing endstone::ICancellable.
-bool isCancellableEvent(std::string_view name)
-{
-    return name == "ActorDamageEvent" || name == "ActorExplodeEvent" || name == "ActorKnockbackEvent" ||
-           name == "ActorSpawnEvent" || name == "ActorTeleportEvent" || name == "BlockBreakEvent" ||
-           name == "BlockCookEvent" || name == "BlockExplodeEvent" || name == "BlockFromToEvent" ||
-           name == "BlockGrowEvent" || name == "BlockPistonExtendEvent" || name == "BlockPistonRetractEvent" ||
-           name == "BlockPlaceEvent" || name == "LeavesDecayEvent" || name == "PlayerBedEnterEvent" ||
-           name == "PlayerChatEvent" || name == "PlayerCommandEvent" || name == "PlayerDropItemEvent" ||
-           name == "PlayerEmoteEvent" || name == "PlayerGameModeChangeEvent" || name == "PlayerInteractActorEvent" ||
-           name == "PlayerInteractEvent" || name == "PlayerItemConsumeEvent" || name == "PlayerItemHeldEvent" ||
-           name == "PlayerJumpEvent" || name == "PlayerKickEvent" || name == "PlayerLoginEvent" ||
-           name == "PlayerMoveEvent" || name == "PlayerPickupItemEvent" || name == "PlayerPortalEvent" ||
-           name == "PlayerSkinChangeEvent" || name == "PlayerTeleportEvent" || name == "BroadcastMessageEvent" ||
-           name == "PacketReceiveEvent" || name == "PacketSendEvent" || name == "ScriptMessageEvent" ||
-           name == "ServerCommandEvent" || name == "ServerListPingEvent" || name == "ThunderChangeEvent" ||
-           name == "WeatherChangeEvent";
-}
-
-}  // namespace event_names
-
-void *eventGetPlayer(void *e, const char *event_name)
-{
-    const std::string_view name = event_name ? event_name : "";
-    if (event_names::isPlayerEvent(name)) {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PlayerBedEnterEvent:
+    case EventKind::PlayerCommandEvent:
+    case EventKind::PlayerDimensionChangeEvent:
+    case EventKind::PlayerEmoteEvent:
+    case EventKind::PlayerGameModeChangeEvent:
+    case EventKind::PlayerInteractActorEvent:
+    case EventKind::PlayerInteractEvent:
+    case EventKind::PlayerJoinEvent:
+    case EventKind::PlayerJumpEvent:
+    case EventKind::PlayerKickEvent:
+    case EventKind::PlayerLoginEvent:
+    case EventKind::PlayerMoveEvent:
+    case EventKind::PlayerPickupItemEvent:
+    case EventKind::PlayerPortalEvent:
+    case EventKind::PlayerQuitEvent:
+    case EventKind::PlayerRespawnEvent:
+    case EventKind::PlayerSkinChangeEvent:
+    case EventKind::PlayerTeleportEvent:
+    case EventKind::PlayerChatEvent:
+    case EventKind::PlayerDropItemEvent:
+    case EventKind::PlayerItemHeldEvent:
+    case EventKind::PlayerItemConsumeEvent:
         return &static_cast<endstone::PlayerEvent *>(e)->getPlayer();
-    }
-    if (name == "PlayerDeathEvent") {
+    case EventKind::PlayerDeathEvent:
         return &static_cast<endstone::PlayerDeathEvent *>(e)->getPlayer();
-    }
-    if (name == "ActorDeathEvent") {
+    case EventKind::ActorDeathEvent:
         return static_cast<endstone::ActorDeathEvent *>(e)->getActor().asPlayer();
-    }
-    if (name == "BlockBreakEvent") {
+    case EventKind::BlockBreakEvent:
         return &static_cast<endstone::BlockBreakEvent *>(e)->getPlayer();
-    }
-    if (name == "BlockPlaceEvent") {
+    case EventKind::BlockPlaceEvent:
         return &static_cast<endstone::BlockPlaceEvent *>(e)->getPlayer();
-    }
-    if (name == "PacketReceiveEvent") {
+    case EventKind::PacketReceiveEvent:
         return static_cast<endstone::PacketReceiveEvent *>(e)->getPlayer();
-    }
-    if (name == "PacketSendEvent") {
+    case EventKind::PacketSendEvent:
         return static_cast<endstone::PacketSendEvent *>(e)->getPlayer();
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 
-void *eventGetActor(void *e, const char *event_name)
+void *eventGetActor(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (event_names::isActorEvent(name)) {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ActorExplodeEvent:
+    case EventKind::ActorRemoveEvent:
+    case EventKind::ActorSpawnEvent:
+    case EventKind::ActorTeleportEvent:
         return &static_cast<endstone::ActorEvent<endstone::Actor> *>(e)->getActor();
-    }
-    if (event_names::isMobEvent(name)) {
+    case EventKind::ActorDamageEvent:
+    case EventKind::ActorDeathEvent:
+    case EventKind::PlayerDeathEvent:
+    case EventKind::ActorKnockbackEvent:
         return &static_cast<endstone::ActorEvent<endstone::Mob> *>(e)->getActor();
-    }
-    if (name == "PlayerInteractActorEvent") {
+    case EventKind::PlayerInteractActorEvent:
         return &static_cast<endstone::PlayerInteractActorEvent *>(e)->getActor();
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 
-bool eventIsCancelled(void *e, const char *event_name)
+bool eventIsCancelled(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
+    switch (static_cast<EventKind>(kind)) {
 #define ENDSTONE_CASE_IS_CANCELLED(T) \
-    if (name == #T) { return static_cast<endstone::T *>(e)->isCancelled(); }
+    case EventKind::T: return static_cast<endstone::T *>(e)->isCancelled();
     ENDSTONE_CASE_IS_CANCELLED(ActorDamageEvent)
     ENDSTONE_CASE_IS_CANCELLED(ActorExplodeEvent)
     ENDSTONE_CASE_IS_CANCELLED(ActorKnockbackEvent)
@@ -336,14 +309,16 @@ bool eventIsCancelled(void *e, const char *event_name)
     ENDSTONE_CASE_IS_CANCELLED(ThunderChangeEvent)
     ENDSTONE_CASE_IS_CANCELLED(WeatherChangeEvent)
 #undef ENDSTONE_CASE_IS_CANCELLED
-    return false;
+    default:
+        return false;
+    }
 }
 
-void eventSetCancelled(void *e, const char *event_name, bool v)
+void eventSetCancelled(void *e, int kind, bool v)
 {
-    const std::string_view name = event_name ? event_name : "";
+    switch (static_cast<EventKind>(kind)) {
 #define ENDSTONE_CASE_SET_CANCELLED(T) \
-    if (name == #T) { static_cast<endstone::T *>(e)->setCancelled(v); return; }
+    case EventKind::T: static_cast<endstone::T *>(e)->setCancelled(v); return;
     ENDSTONE_CASE_SET_CANCELLED(ActorDamageEvent)
     ENDSTONE_CASE_SET_CANCELLED(ActorExplodeEvent)
     ENDSTONE_CASE_SET_CANCELLED(ActorKnockbackEvent)
@@ -385,6 +360,9 @@ void eventSetCancelled(void *e, const char *event_name, bool v)
     ENDSTONE_CASE_SET_CANCELLED(ThunderChangeEvent)
     ENDSTONE_CASE_SET_CANCELLED(WeatherChangeEvent)
 #undef ENDSTONE_CASE_SET_CANCELLED
+    default:
+        return;
+    }
 }
 
 const char *chatGetMessage(void *e)
@@ -522,16 +500,17 @@ void *interactActorGetActor(void *e)
 
 float actorDamageGetDamage(void *e) { return static_cast<endstone::ActorDamageEvent *>(e)->getDamage(); }
 void actorDamageSetDamage(void *e, float v) { static_cast<endstone::ActorDamageEvent *>(e)->setDamage(v); }
-void *eventGetDamageSource(void *e, const char *event_name)
+void *eventGetDamageSource(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "ActorDamageEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ActorDamageEvent:
         return &static_cast<endstone::ActorDamageEvent *>(e)->getDamageSource();
-    }
-    if (name == "ActorDeathEvent" || name == "PlayerDeathEvent") {
+    case EventKind::ActorDeathEvent:
+    case EventKind::PlayerDeathEvent:
         return &static_cast<endstone::ActorDeathEvent *>(e)->getDamageSource();
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 void actorExplodeGetLocation(void *e, float *out)
 {
@@ -575,16 +554,16 @@ void deathSetMessage(void *e, const char *msg)
 {
     static_cast<endstone::PlayerDeathEvent *>(e)->setDeathMessage(std::string(msg));
 }
-void *bedGetBed(void *e, const char *event_name)
+void *bedGetBed(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PlayerBedEnterEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PlayerBedEnterEvent:
         return &static_cast<endstone::PlayerBedEnterEvent *>(e)->getBed();
-    }
-    if (name == "PlayerBedLeaveEvent") {
+    case EventKind::PlayerBedLeaveEvent:
         return &static_cast<endstone::PlayerBedLeaveEvent *>(e)->getBed();
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 const char *dimChangeGetFrom(void *e)
 {
@@ -656,16 +635,16 @@ void *blockExplodeGetBlock(void *e, int idx)
     auto &list = static_cast<endstone::BlockExplodeEvent *>(e)->getBlockList();
     return (idx >= 0 && static_cast<size_t>(idx) < list.size()) ? list[static_cast<size_t>(idx)].get() : nullptr;
 }
-void *growGetNewState(void *e, const char *event_name)
+void *growGetNewState(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "BlockGrowEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::BlockGrowEvent:
         return &static_cast<endstone::BlockGrowEvent *>(e)->getNewState();
-    }
-    if (name == "BlockFormEvent") {
+    case EventKind::BlockFormEvent:
         return &static_cast<endstone::BlockFormEvent *>(e)->getNewState();
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 void *fromToGetToBlock(void *e) { return &static_cast<endstone::BlockFromToEvent *>(e)->getToBlock(); }
 int pistonGetDirection(void *e) { return static_cast<int>(static_cast<endstone::BlockPistonEvent *>(e)->getDirection()); }
@@ -675,38 +654,38 @@ void *placeGetPlacedState(void *e)
 }
 void *placeGetAgainst(void *e) { return &static_cast<endstone::BlockPlaceEvent *>(e)->getBlockAgainst(); }
 
-int chunkGetX(void *e, const char *event_name)
+int chunkGetX(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "ChunkLoadEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ChunkLoadEvent:
         return static_cast<endstone::ChunkLoadEvent *>(e)->getChunk().getX();
-    }
-    if (name == "ChunkUnloadEvent") {
+    case EventKind::ChunkUnloadEvent:
         return static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk().getX();
+    default:
+        return 0;
     }
-    return 0;
 }
-int chunkGetZ(void *e, const char *event_name)
+int chunkGetZ(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "ChunkLoadEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ChunkLoadEvent:
         return static_cast<endstone::ChunkLoadEvent *>(e)->getChunk().getZ();
-    }
-    if (name == "ChunkUnloadEvent") {
+    case EventKind::ChunkUnloadEvent:
         return static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk().getZ();
+    default:
+        return 0;
     }
-    return 0;
 }
-const char *chunkGetDimensionName(void *e, const char *event_name)
+const char *chunkGetDimensionName(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "ChunkLoadEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ChunkLoadEvent:
         return strOut(static_cast<endstone::ChunkLoadEvent *>(e)->getChunk().getDimension().getName());
-    }
-    if (name == "ChunkUnloadEvent") {
+    case EventKind::ChunkUnloadEvent:
         return strOut(static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk().getDimension().getName());
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 
 const char *broadcastGetMessage(void *e)
@@ -721,26 +700,29 @@ int broadcastGetRecipientCount(void *e)
 {
     return static_cast<int>(static_cast<endstone::BroadcastMessageEvent *>(e)->getRecipients().size());
 }
-int packetGetId(void *e, const char *event_name)
+int packetGetId(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PacketReceiveEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PacketReceiveEvent:
         return static_cast<endstone::PacketReceiveEvent *>(e)->getPacketId();
-    }
-    if (name == "PacketSendEvent") {
+    case EventKind::PacketSendEvent:
         return static_cast<endstone::PacketSendEvent *>(e)->getPacketId();
+    default:
+        return 0;
     }
-    return 0;
 }
-const char *packetGetPayload(void *e, const char *event_name, int *len)
+const char *packetGetPayload(void *e, int kind, int *len)
 {
     std::string_view payload;
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PacketReceiveEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PacketReceiveEvent:
         payload = static_cast<endstone::PacketReceiveEvent *>(e)->getPayload();
-    }
-    else if (name == "PacketSendEvent") {
+        break;
+    case EventKind::PacketSendEvent:
         payload = static_cast<endstone::PacketSendEvent *>(e)->getPayload();
+        break;
+    default:
+        break;
     }
     g_payload_buffer.assign(payload.data(), payload.size());
     if (len) {
@@ -748,62 +730,67 @@ const char *packetGetPayload(void *e, const char *event_name, int *len)
     }
     return g_payload_buffer.c_str();
 }
-void packetSetPayload(void *e, const char *event_name, const void *data, int len)
+void packetSetPayload(void *e, int kind, const void *data, int len)
 {
-    const std::string_view name = event_name ? event_name : "";
     const auto payload = std::string_view(static_cast<const char *>(data), static_cast<size_t>(len));
-    if (name == "PacketReceiveEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PacketReceiveEvent:
         static_cast<endstone::PacketReceiveEvent *>(e)->setPayload(payload);
-    }
-    else if (name == "PacketSendEvent") {
+        break;
+    case EventKind::PacketSendEvent:
         static_cast<endstone::PacketSendEvent *>(e)->setPayload(payload);
+        break;
+    default:
+        break;
     }
 }
-void *packetGetPlayer(void *e, const char *event_name)
+void *packetGetPlayer(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PacketReceiveEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PacketReceiveEvent:
         return static_cast<endstone::PacketReceiveEvent *>(e)->getPlayer();
-    }
-    if (name == "PacketSendEvent") {
+    case EventKind::PacketSendEvent:
         return static_cast<endstone::PacketSendEvent *>(e)->getPlayer();
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
-const char *packetGetAddress(void *e, const char *event_name)
+const char *packetGetAddress(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PacketReceiveEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PacketReceiveEvent: {
         const auto addr = static_cast<endstone::PacketReceiveEvent *>(e)->getAddress();
         return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
     }
-    if (name == "PacketSendEvent") {
+    case EventKind::PacketSendEvent: {
         const auto addr = static_cast<endstone::PacketSendEvent *>(e)->getAddress();
         return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
     }
-    return nullptr;
+    default:
+        return nullptr;
+    }
 }
-int packetGetSubClientId(void *e, const char *event_name)
+int packetGetSubClientId(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PacketReceiveEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PacketReceiveEvent:
         return static_cast<endstone::PacketReceiveEvent *>(e)->getSubClientId();
-    }
-    if (name == "PacketSendEvent") {
+    case EventKind::PacketSendEvent:
         return static_cast<endstone::PacketSendEvent *>(e)->getSubClientId();
+    default:
+        return 0;
     }
-    return 0;
 }
-const char *pluginEventGetPluginName(void *e, const char *event_name)
+const char *pluginEventGetPluginName(void *e, int kind)
 {
-    const std::string_view name = event_name ? event_name : "";
-    if (name == "PluginEnableEvent") {
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::PluginEnableEvent:
         return strOut(static_cast<endstone::PluginEnableEvent *>(e)->getPlugin().getName());
-    }
-    if (name == "PluginDisableEvent") {
+    case EventKind::PluginDisableEvent:
         return strOut(static_cast<endstone::PluginDisableEvent *>(e)->getPlugin().getName());
+    default:
+        return nullptr;
     }
-    return nullptr;
 }
 const char *scriptGetMessageId(void *e)
 {

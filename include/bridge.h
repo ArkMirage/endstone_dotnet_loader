@@ -11,6 +11,71 @@ namespace dotnet_loader {
 //   location: [x, y, z, pitch, yaw]
 //   vector:   [x, y, z]
 
+// Identifies the concrete event class for multi-type event accessors. The
+// managed side resolves the event name to a kind exactly once per event
+// instance (see Endstone.Loader/Events.cs EventFactory/EventKind) and passes
+// the int across the bridge; native accessors switch on it instead of
+// classifying strings or relying on RTTI (typeinfo is not shared across DSOs
+// on Linux due to hidden visibility).
+// Values MUST stay in sync with Endstone.Loader/Events.cs EventKind.
+enum class EventKind : int {
+    PlayerJoinEvent = 0,
+    PlayerQuitEvent = 1,
+    PlayerLoginEvent = 2,
+    PlayerChatEvent = 3,
+    PlayerCommandEvent = 4,
+    PlayerMoveEvent = 5,
+    PlayerTeleportEvent = 6,
+    PlayerPortalEvent = 7,
+    PlayerDeathEvent = 8,
+    PlayerInteractEvent = 9,
+    PlayerInteractActorEvent = 10,
+    PlayerRespawnEvent = 11,
+    PlayerDropItemEvent = 12,
+    PlayerGameModeChangeEvent = 13,
+    PlayerItemHeldEvent = 14,
+    PlayerItemConsumeEvent = 15,
+    PlayerKickEvent = 16,
+    PlayerPickupItemEvent = 17,
+    PlayerJumpEvent = 18,
+    PlayerEmoteEvent = 19,
+    PlayerBedEnterEvent = 20,
+    PlayerBedLeaveEvent = 21,
+    PlayerDimensionChangeEvent = 22,
+    PlayerSkinChangeEvent = 23,
+    ActorDamageEvent = 24,
+    ActorDeathEvent = 25,
+    ActorExplodeEvent = 26,
+    ActorKnockbackEvent = 27,
+    ActorTeleportEvent = 28,
+    ActorSpawnEvent = 29,
+    ActorRemoveEvent = 30,
+    BlockBreakEvent = 31,
+    BlockPlaceEvent = 32,
+    BlockCookEvent = 33,
+    BlockExplodeEvent = 34,
+    BlockFormEvent = 35,
+    BlockGrowEvent = 36,
+    BlockFromToEvent = 37,
+    BlockPistonExtendEvent = 38,
+    BlockPistonRetractEvent = 39,
+    LeavesDecayEvent = 40,
+    ChunkLoadEvent = 41,
+    ChunkUnloadEvent = 42,
+    ServerCommandEvent = 43,
+    ServerLoadEvent = 44,
+    BroadcastMessageEvent = 45,
+    ServerListPingEvent = 46,
+    PacketReceiveEvent = 47,
+    PacketSendEvent = 48,
+    PluginEnableEvent = 49,
+    PluginDisableEvent = 50,
+    ScriptMessageEvent = 51,
+    MapInitializeEvent = 52,
+    ThunderChangeEvent = 53,
+    WeatherChangeEvent = 54,
+};
+
 struct BridgeTable {
     // ---- player ----
     const char *(*player_get_name)(void *);
@@ -78,13 +143,13 @@ struct BridgeTable {
     bool (*server_dispatch_command)(void *, void *, const char *);
 
     // ---- events: common ----
-    // event_name identifies the concrete event class (see bridge.cpp); it is
-    // required because multi-type accessors must not rely on RTTI (typeinfo is
-    // not shared across DSOs on Linux due to hidden visibility).
-    void *(*event_get_player)(void *, const char *);
-    void *(*event_get_actor)(void *, const char *);
-    bool (*event_is_cancelled)(void *, const char *);
-    void (*event_set_cancelled)(void *, const char *, bool);
+    // event kind identifies the concrete event class (see EventKind above); it
+    // is required because multi-type accessors must not rely on RTTI (typeinfo
+    // is not shared across DSOs on Linux due to hidden visibility).
+    void *(*event_get_player)(void *, int);
+    void *(*event_get_actor)(void *, int);
+    bool (*event_is_cancelled)(void *, int);
+    void (*event_set_cancelled)(void *, int, bool);
 
     // ---- events: chat/command ----
     const char *(*chat_get_message)(void *);
@@ -122,7 +187,7 @@ struct BridgeTable {
     // ---- events: actor ----
     float (*actor_damage_get_damage)(void *);
     void (*actor_damage_set_damage)(void *, float);
-    void *(*event_get_damage_source)(void *, const char *);
+    void *(*event_get_damage_source)(void *, int);
     void (*actor_explode_get_location)(void *, float *);
     int (*actor_explode_get_block_count)(void *);
     void *(*actor_explode_get_block)(void *, int);
@@ -133,7 +198,7 @@ struct BridgeTable {
     // ---- events: player ----
     const char *(*death_get_message)(void *);
     void (*death_set_message)(void *, const char *);
-    void *(*bed_get_bed)(void *, const char *);
+    void *(*bed_get_bed)(void *, int);
     const char *(*dim_change_get_from)(void *);
     const char *(*dim_change_get_to)(void *);
     void *(*drop_get_item)(void *);
@@ -164,28 +229,28 @@ struct BridgeTable {
     void *(*cook_get_result)(void *);
     int (*block_explode_get_block_count)(void *);
     void *(*block_explode_get_block)(void *, int);
-    void *(*grow_get_new_state)(void *, const char *);
+    void *(*grow_get_new_state)(void *, int);
     void *(*from_to_get_to_block)(void *);
     int (*piston_get_direction)(void *);
     void *(*place_get_placed_state)(void *);
     void *(*place_get_against)(void *);
 
     // ---- events: chunk ----
-    int (*chunk_get_x)(void *, const char *);
-    int (*chunk_get_z)(void *, const char *);
-    const char *(*chunk_get_dimension_name)(void *, const char *);
+    int (*chunk_get_x)(void *, int);
+    int (*chunk_get_z)(void *, int);
+    const char *(*chunk_get_dimension_name)(void *, int);
 
     // ---- events: server ----
     const char *(*broadcast_get_message)(void *);
     void (*broadcast_set_message)(void *, const char *);
     int (*broadcast_get_recipient_count)(void *);
-    int (*packet_get_id)(void *, const char *);
-    const char *(*packet_get_payload)(void *, const char *, int *);
-    void (*packet_set_payload)(void *, const char *, const void *, int);
-    void *(*packet_get_player)(void *, const char *);
-    const char *(*packet_get_address)(void *, const char *);
-    int (*packet_get_sub_client_id)(void *, const char *);
-    const char *(*plugin_event_get_plugin_name)(void *, const char *);
+    int (*packet_get_id)(void *, int);
+    const char *(*packet_get_payload)(void *, int, int *);
+    void (*packet_set_payload)(void *, int, const void *, int);
+    void *(*packet_get_player)(void *, int);
+    const char *(*packet_get_address)(void *, int);
+    int (*packet_get_sub_client_id)(void *, int);
+    const char *(*plugin_event_get_plugin_name)(void *, int);
     const char *(*script_get_message_id)(void *);
     const char *(*script_get_message)(void *);
     const char *(*script_get_sender_name)(void *);
