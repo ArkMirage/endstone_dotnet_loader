@@ -64,6 +64,10 @@ if(NOT NETHOST_ROOT OR NOT EXISTS "${NETHOST_ROOT}/hostfxr.h")
 endif()
 
 include(FetchContent)
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 FetchContent_Declare(
         endstone
         GIT_REPOSITORY https://github.com/EndstoneMC/endstone.git
@@ -81,6 +85,9 @@ endstone_add_plugin(${PROJECT_NAME}
         dotnet_plugin_loader.cpp
         bridge.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_BINARY_DIR}/include

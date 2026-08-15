@@ -84,7 +84,7 @@ public abstract class PluginBase
     internal bool DispatchCommand(string name, CommandSender sender, IReadOnlyList<string> args)
         => _commands.Dispatch(name, sender, args);
 
-    internal IEnumerable<string> SerializeCommands() => _commands.SerializeLines();
+    internal IEnumerable<CommandDefinition> CommandDefinitions => _commands.Definitions;
 
     internal void SetPluginHandles(IntPtr gcHandle, IntPtr nativeHandle)
     {
