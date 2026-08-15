@@ -14,9 +14,10 @@ public enum ServicePriority
 /// <summary>
 /// Base class for services registered with the server's service manager
 /// (mirrors endstone::Service). A service is a marker interface: providers just
-/// derive from this class and implement their own methods. The plugin must keep
-/// its provider instance alive while it is registered (e.g. a field); the
-/// native side only holds a shared_ptr proxy that forwards to this instance.
+/// derive from this class and implement their own methods. While a provider is
+/// registered it is pinned by the owning ServiceManager, so the plugin does not
+/// need to keep a field reference; keeping one is only useful if the plugin
+/// wants to unregister or reuse the provider later.
 /// </summary>
 public abstract unsafe class Service
 {
@@ -111,12 +112,25 @@ public abstract unsafe class Service
 /// with this plugin; all registrations are dropped automatically when the
 /// plugin is disabled.
 /// </summary>
+/// <remarks>
+/// Registered providers are pinned by this facade for as long as they are
+/// registered (so an inline <c>Register("name", new ...())</c> is safe);
+/// the pin is released when the provider is unregistered or the plugin is
+/// disabled.
+/// </remarks>
 public sealed unsafe class ServiceManager
 {
     private static Bridge.Table* T => Bridge.Raw;
 
     private readonly void* _manager;
     private readonly void* _plugin;
+    private readonly object _lock = new();
+    // Strong pins keyed by the native provider identity. The native side only
+    // refcounts the empty endstone::Service proxy, which carries no managed
+    // reference back -- without this pin an inline-registered provider would be
+    // collected by GC while still registered, and consumers would then get a
+    // fresh Wrapper whose cast to the concrete type fails.
+    private readonly Dictionary<IntPtr, Service> _providers = new();
 
     internal ServiceManager(IntPtr serverPtr, IntPtr pluginPtr)
     {
@@ -124,7 +138,8 @@ public sealed unsafe class ServiceManager
         _plugin = (void*)pluginPtr;
     }
 
-    /// <summary>Registers a provider for the given service name.</summary>
+    /// <summary>Registers a provider for the given service name. The provider is kept
+    /// alive until it is unregistered or the plugin is disabled.</summary>
     public void Register(string name, Service provider, ServicePriority priority = ServicePriority.Normal)
     {
         var buf = Bridge.ToUtf8(name);
@@ -132,12 +147,24 @@ public sealed unsafe class ServiceManager
         {
             T->ServiceManagerRegister(_manager, p, (void*)provider.ProviderPointer, _plugin, (int)priority);
         }
+        lock (_lock)
+        {
+            _providers[provider.ProviderPointer] = provider;
+        }
     }
 
     /// <summary>Unregisters all services registered by this plugin.</summary>
-    public void UnregisterAll() => T->ServiceManagerUnregisterAll(_manager, _plugin);
+    public void UnregisterAll()
+    {
+        T->ServiceManagerUnregisterAll(_manager, _plugin);
+        lock (_lock)
+        {
+            _providers.Clear();
+        }
+    }
 
-    /// <summary>Unregisters a particular provider for a particular service.</summary>
+    /// <summary>Unregisters a particular provider for a particular service. The provider
+    /// stays pinned while it remains registered under any other name.</summary>
     public void Unregister(string name, Service provider)
     {
         var buf = Bridge.ToUtf8(name);
@@ -147,8 +174,16 @@ public sealed unsafe class ServiceManager
         }
     }
 
-    /// <summary>Unregisters a particular provider from every service it is registered for.</summary>
-    public void Unregister(Service provider) => T->ServiceManagerUnregisterProvider(_manager, (void*)provider.ProviderPointer);
+    /// <summary>Unregisters a particular provider from every service it is registered
+    /// for, releasing the pin on it.</summary>
+    public void Unregister(Service provider)
+    {
+        T->ServiceManagerUnregisterProvider(_manager, (void*)provider.ProviderPointer);
+        lock (_lock)
+        {
+            _providers.Remove(provider.ProviderPointer);
+        }
+    }
 
     /// <summary>Queries for a provider. Returns null if no provider has been registered for
     /// the service; otherwise the highest-priority provider is returned.</summary>
