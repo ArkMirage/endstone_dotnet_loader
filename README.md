@@ -1,8 +1,10 @@
 # endstone-dotnet-loader Tutorial
 
-> **简体中文**: [中文文档](./README.zh-CN.md)
+> **简体中文**: [中文](./README.zh-CN.md)
 
 A loader that runs .NET (C#) plugins on an Endstone BDS server. This document is intended for both server administrators and plugin developers. It covers **Windows x64** and **Linux x64**.
+
+> **Documentation**: [https://arkmirage.github.io/endstone_dotnet_loader/](https://arkmirage.github.io/endstone_dotnet_loader/)
 
 > **Note**: **.NET 10 only** — plugins targeting other framework versions will not run.
 

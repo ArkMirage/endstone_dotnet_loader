@@ -1,8 +1,10 @@
 # endstone-dotnet-loader 教程
 
-> **English**: [English Docs](./README.md)
+> **English**: [English](./README.md)
 
 一个在 Endstone BDS 服务器上运行 .NET (C#) 插件的加载器。本文档同时面向服务器管理员与插件开发者，覆盖 **Windows x64** 与 **Linux x64**。
+
+> **文档站点**: [https://arkmirage.github.io/endstone_dotnet_loader/](https://arkmirage.github.io/endstone_dotnet_loader/)
 
 > **注意**：**仅支持 .NET 10** — 面向其他框架版本的插件将无法运行。
 
