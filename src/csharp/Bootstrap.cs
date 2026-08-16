@@ -93,7 +93,13 @@ public static class Bootstrap
             var instance = (PluginBase)Activator.CreateInstance(pluginType)!;
 
             var info = JsonSerializer.Serialize(
+                // New metadata fields are temporarily filled with the C++ side's
+                // default values (empty collections / empty strings) until real
+                // values are wired through PluginAttribute.
                 new PluginInfo(meta.Name, meta.Version, meta.Description, meta.Authors,
+                               /*contributors=*/[], /*website=*/"", /*prefix=*/"",
+                               /*depend=*/[], /*softDepend=*/[], /*loadBefore=*/[],
+                               meta.DefaultPermission,
                                instance.CommandDefinitions.ToArray()),
                 JsonOptions);
 
@@ -107,7 +113,9 @@ public static class Bootstrap
         }
     }
 
-    record class PluginInfo(string Name, string Version, string Description, string[] Authors, CommandDefinition[] Commands);
+    record class PluginInfo(string Name, string Version, string Description, string[] Authors, string[] Contributors,
+        string Website, string Prefix, string[] Depend, string[] SoftDepend, string[] LoadBefore,
+        PermissionDefault DefaultPermission, CommandDefinition[] Commands);
 
     [UnmanagedCallersOnly]
     public static void Attach(IntPtr gcHandle, IntPtr nativePlugin)
@@ -119,7 +127,11 @@ public static class Bootstrap
     }
 
     [UnmanagedCallersOnly]
-    public static void OnLoad(IntPtr gcHandle) => Invoke(gcHandle, p => p.OnLoad());
+    public static void OnLoad(IntPtr gcHandle) => Invoke(gcHandle, p =>
+    {
+        p.RegisterPermissions();
+        p.OnLoad();
+    });
 
     [UnmanagedCallersOnly]
     public static void OnEnable(IntPtr gcHandle) => Invoke(gcHandle, p => p.OnEnable());
@@ -156,7 +168,7 @@ public static class Bootstrap
         }
         catch (Exception e)
         {
-            Log(IntPtr.Zero, LogLevel.Error, $"Error in managed event handler: {e}");
+            Log(IntPtr.Zero, LogLevel.Error, $"Error in managed event handler: \n {e}");
         }
     }
 

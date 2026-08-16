@@ -1,5 +1,6 @@
 #include "dotnet_plugin_loader.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <optional>
 #include <unordered_map>
@@ -53,7 +54,20 @@ std::vector<endstone::Command> parseCommands(const nlohmann::json &arr)
     return commands;
 }
 
+// Parses the numeric default-permission value sent by the managed side. The
+// value must match the C# PermissionDefault enum order, which mirrors the C++
+// endstone::PermissionDefault declaration order (True=0 ... Console=4).
+endstone::PermissionDefault parsePermissionDefault(const nlohmann::json &doc)
+{
+    const auto value =
+        doc.value("defaultPermission", static_cast<int>(endstone::PermissionDefault::Operator));
+    return static_cast<endstone::PermissionDefault>(std::clamp(value, 0, 4));
+}
+
 // Parses the JSON plugin info object into an endstone::PluginDescription.
+// The managed side serializes plugin info with camelCase keys (JsonNamingPolicy.CamelCase),
+// e.g. {"name","version","description","authors","contributors","website","prefix",
+// "depend","softDepend","loadBefore","defaultPermission","commands"}.
 // Returns nullopt on malformed input.
 std::optional<endstone::PluginDescription> parseDescription(const char *info)
 {
@@ -66,8 +80,12 @@ std::optional<endstone::PluginDescription> parseDescription(const char *info)
         doc.value("description", std::string{}),
         /*load=*/endstone::PluginLoadOrder::PostWorld,
         /*authors=*/doc.value("authors", std::vector<std::string>{}),
-        /*contributors=*/{}, /*website=*/"", /*prefix=*/"", /*provides=*/{}, /*depend=*/{}, /*soft_depend=*/{},
-        /*load_before=*/{}, /*default_permission=*/endstone::PermissionDefault::Operator,
+        /*contributors=*/doc.value("contributors", std::vector<std::string>{}),
+        /*website=*/doc.value("website", std::string{}), /*prefix=*/doc.value("prefix", std::string{}),
+        /*provides=*/{}, /*depend=*/doc.value("depend", std::vector<std::string>{}),
+        /*soft_depend=*/doc.value("softDepend", std::vector<std::string>{}),
+        /*load_before=*/doc.value("loadBefore", std::vector<std::string>{}),
+        /*default_permission=*/parsePermissionDefault(doc),
         /*commands=*/parseCommands(doc.value("commands", nlohmann::json::array())));
 }
 
@@ -111,11 +129,14 @@ void DotNetPlugin::refreshCommands()
         return;
     }
     const auto commands = parseCommands(doc);
+    // Rebuild the description with only the commands replaced; every other
+    // field is carried over from the previously parsed plugin info.
     description_ = endstone::PluginDescription(
         description_.getName(), description_.getVersion(), description_.getDescription(), description_.getLoad(),
-        description_.getAuthors(), /*contributors=*/{}, /*website=*/"", description_.getPrefix(),
-        /*provides=*/{}, /*depend=*/{}, /*soft_depend=*/{}, /*load_before=*/{},
-        endstone::PermissionDefault::Operator, commands);
+        description_.getAuthors(), description_.getContributors(), description_.getWebsite(),
+        description_.getPrefix(), description_.getProvides(), description_.getDepend(),
+        description_.getSoftDepend(), description_.getLoadBefore(), description_.getDefaultPermission(), commands,
+        description_.getPermissions());
 }
 
 void DotNetPlugin::flushEventListeners()

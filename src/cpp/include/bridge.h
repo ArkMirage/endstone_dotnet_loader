@@ -386,6 +386,7 @@ struct BridgeTable {
     void (*sender_send_message)(void *, const char *);
     void (*sender_send_error_message)(void *, const char *);
     bool (*sender_has_permission)(void *, const char *);
+    bool (*sender_has_permission_perm)(void *, void *);
     void *(*sender_as_player)(void *);
 
     // ---- objects: form ----
@@ -565,6 +566,40 @@ struct BridgeTable {
     void (*service_manager_unregister)(void *, const char *, void *);
     void (*service_manager_unregister_provider)(void *, void *);
     void *(*service_manager_get)(void *, const char *);
+
+    // ---- objects: permission ----
+    // Creates a heap-allocated Permission owned by the managed side (release
+    // with permission_destroy, unless permission_add transfers ownership to
+    // the plugin manager). Children are managed via permission_set_child.
+    void *(*permission_create)(const char *, const char *, int);
+    void (*permission_destroy)(void *);
+    // Transfers ownership of the given Permission to the server's plugin
+    // manager; returns the registered permission (same address) or nullptr
+    // when a permission with the same name is already registered (ownership
+    // stays with the caller).
+    void *(*permission_add)(void *, void *);
+    // Removes the named permission from the server's plugin manager; the
+    // native object is destroyed by the manager. Returns whether it existed.
+    bool (*permission_remove)(void *, const char *);
+    // Looks up a registered permission by name (lowercased internally by the
+    // plugin manager); first argument is the server pointer. The returned
+    // object is owned by the plugin manager.
+    void *(*permission_get)(void *, const char *);
+    const char *(*permission_get_name)(void *);
+    const char *(*permission_get_description)(void *);
+    void (*permission_set_description)(void *, const char *);
+    int (*permission_get_default)(void *);
+    void (*permission_set_default)(void *, int);
+    int (*permission_get_child_count)(void *);
+    const char *(*permission_get_child_name)(void *, int);
+    bool (*permission_get_child_value)(void *, int);
+    // Mutates the children map and recalculates all subscribed permissibles.
+    void (*permission_set_child)(void *, const char *, bool);
+    void (*permission_remove_child)(void *, const char *);
+    // Adds this permission to a parent (looked up / created by name).
+    void *(*permission_add_parent_name)(void *, const char *, bool);
+    void (*permission_add_parent)(void *, void *, bool);
+    void (*permission_recalculate)(void *);
 };
 
 }  // namespace dotnet_loader

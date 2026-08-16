@@ -23,6 +23,9 @@ public sealed unsafe class CommandSender
 
     public bool HasPermission(string permission) => Bridge.CallBoolStr(T->SenderHasPermission, _ptr, permission);
 
+    /// <summary>Checks whether this sender has the given permission object.</summary>
+    public bool HasPermission(Permission permission) => T->SenderHasPermissionPerm(_ptr, (void*)permission.NativePtr);
+
     public Player? AsPlayer()
     {
         var p = T->SenderAsPlayer(_ptr);

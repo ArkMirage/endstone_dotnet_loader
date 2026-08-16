@@ -45,6 +45,9 @@ public sealed class PluginAttribute(string name, string version) : Attribute
     public string Version { get; } = version;
     public string Description { get; init; } = "";
     public string[] Authors { get; init; } = [];
+
+    /// <summary>Default value for permissions registered by this plugin (Endstone default: Operator).</summary>
+    public PermissionDefault DefaultPermission { get; init; } = PermissionDefault.Operator;
 }
 
 /// <summary>Base class for all .NET Endstone plugins.</summary>
@@ -55,6 +58,7 @@ public abstract class PluginBase
 
     private readonly EventManager _events = new();
     private readonly CommandManager _commands = new();
+    private readonly List<Permission> _permissions = new();
     private Logger? _logger;
     private Server? _server;
     private Scheduler? _scheduler;
@@ -75,6 +79,36 @@ public abstract class PluginBase
     /// <summary>Declares a plugin command (registered when the plugin is loaded). Fluent chain:
     /// <c>Command("hello").Description(...).Usage(...).Alias(...).Permission(...).Handler(handler)</c>.</summary>
     public CommandBuilder Command(string name) => _commands.Create(name);
+
+    /// <summary>Creates a new permission owned by this plugin. Permissions created
+    /// through this factory are registered automatically when the plugin is loaded
+    /// (before OnLoad), mirroring the Python plugin's <c>permissions</c> declaration.
+    /// Configure it with the fluent <c>With...</c> methods, e.g.
+    /// <c>Permission("myplugin.kit").WithDefault(PermissionDefault.True)</c>.
+    /// After registration the wrapper stays usable as a non-owning view of the
+    /// registered permission; keep it in a plugin field to keep modifying it.
+    /// Use <c>new Permission(...)</c> + <c>Register()</c> for permissions created
+    /// at runtime.</summary>
+    public Permission Permission(string name)
+    {
+        var permission = new Permission(name);
+        _permissions.Add(permission);
+        return permission;
+    }
+
+    /// <summary>Registers all permissions created through <c>Permission(name)</c>.
+    /// Called by the loader before OnLoad; duplicate names are skipped with a
+    /// warning and the wrapper keeps ownership (freed when collected).</summary>
+    internal void RegisterPermissions()
+    {
+        foreach (var permission in _permissions)
+        {
+            if (!permission.Register())
+            {
+                Logger.Warning($"Permission '{permission.Name}' is already registered; skipping.");
+            }
+        }
+    }
 
     /// <summary>Registers an event handler for the given Endstone event name.</summary>
     public void RegisterEvent(string eventName, Action<Event> handler,

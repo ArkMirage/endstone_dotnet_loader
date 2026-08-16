@@ -319,6 +319,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void> SenderSendMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> SenderSendErrorMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> SenderHasPermission;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool> SenderHasPermissionPerm;
         public delegate* unmanaged[Cdecl]<void*, void*> SenderAsPlayer;
 
         // ---- objects: form ----
@@ -483,6 +484,26 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void*, void> ServiceManagerUnregister;
         public delegate* unmanaged[Cdecl]<void*, void*, void> ServiceManagerUnregisterProvider;
         public delegate* unmanaged[Cdecl]<void*, byte*, void*> ServiceManagerGet;
+
+        // ---- objects: permission ----
+        public delegate* unmanaged[Cdecl]<byte*, byte*, int, void*> PermissionCreate;
+        public delegate* unmanaged[Cdecl]<void*, void> PermissionDestroy;
+        public delegate* unmanaged[Cdecl]<void*, void*, void*> PermissionAdd;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> PermissionRemove;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> PermissionGet;
+        public delegate* unmanaged[Cdecl]<void*, byte*> PermissionGetName;
+        public delegate* unmanaged[Cdecl]<void*, byte*> PermissionGetDescription;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> PermissionSetDescription;
+        public delegate* unmanaged[Cdecl]<void*, int> PermissionGetDefault;
+        public delegate* unmanaged[Cdecl]<void*, int, void> PermissionSetDefault;
+        public delegate* unmanaged[Cdecl]<void*, int> PermissionGetChildCount;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*> PermissionGetChildName;
+        public delegate* unmanaged[Cdecl]<void*, int, bool> PermissionGetChildValue;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool, void> PermissionSetChild;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> PermissionRemoveChild;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool, void*> PermissionAddParentName;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool, void> PermissionAddParent;
+        public delegate* unmanaged[Cdecl]<void*, void> PermissionRecalculate;
     }
 #pragma warning restore CS0649
 
@@ -623,6 +644,35 @@ internal static unsafe class Bridge
         fixed (byte* pm = molangBuf)
         {
             fn(obj, pn, values, pm);
+        }
+    }
+
+    internal static void CallVoidStrBool(delegate* unmanaged[Cdecl]<void*, byte*, bool, void> fn, void* obj,
+                                         string s, bool v)
+    {
+        var buf = ToUtf8(s);
+        fixed (byte* p = buf)
+        {
+            fn(obj, p, v);
+        }
+    }
+
+    internal static void* CallPtrStrBool(delegate* unmanaged[Cdecl]<void*, byte*, bool, void*> fn, void* obj,
+                                         string s, bool v)
+    {
+        var buf = ToUtf8(s);
+        fixed (byte* p = buf)
+        {
+            return fn(obj, p, v);
+        }
+    }
+
+    internal static void* CallPtrStr(delegate* unmanaged[Cdecl]<void*, byte*, void*> fn, void* obj, string s)
+    {
+        var buf = ToUtf8(s);
+        fixed (byte* p = buf)
+        {
+            return fn(obj, p);
         }
     }
 

@@ -46,6 +46,7 @@ const char *strOut(std::string s)
 endstone::Player *asPlayer(void *p) { return static_cast<endstone::Player *>(p); }
 endstone::Server *asServer(void *p) { return static_cast<endstone::Server *>(p); }
 endstone::Event *asEvent(void *e) { return static_cast<endstone::Event *>(e); }
+endstone::Permission *asPermission(void *p) { return static_cast<endstone::Permission *>(p); }
 endstone::ItemStack *asItem(void *i) { return static_cast<endstone::ItemStack *>(i); }
 std::unique_ptr<endstone::ItemMeta> itemMeta(void *i) { return asItem(i)->getItemMeta(); }
 endstone::Block *asBlock(void *b) { return static_cast<endstone::Block *>(b); }
@@ -1971,10 +1972,100 @@ bool senderHasPermission(void *s, const char *perm)
 {
     return static_cast<endstone::CommandSender *>(s)->hasPermission(perm ? perm : "");
 }
+bool senderHasPermissionPerm(void *s, void *perm)
+{
+    return static_cast<endstone::CommandSender *>(s)->hasPermission(*asPermission(perm));
+}
 void *senderAsPlayer(void *s)
 {
     return static_cast<endstone::CommandSender *>(s)->asPlayer();
 }
+
+// ---- permission ----
+
+void *permissionCreate(const char *name, const char *description, int default_value)
+{
+    return new endstone::Permission(name ? name : "", description ? description : "",
+                                    static_cast<endstone::PermissionDefault>(std::clamp(default_value, 0, 4)));
+}
+void permissionDestroy(void *p) { delete asPermission(p); }
+void *permissionAdd(void *server, void *perm)
+{
+    auto *p = asPermission(perm);
+    auto &pm = asServer(server)->getPluginManager();
+    // Check first so a duplicate name leaves ownership with the caller
+    // (EndstonePluginManager::addPermission would throw and destroy the
+    // unique_ptr, which the managed side still believes it owns).
+    if (pm.getPermission(p->getName()) != nullptr) {
+        return nullptr;
+    }
+    auto &registered = pm.addPermission(std::unique_ptr<endstone::Permission>(p));
+    return &registered;
+}
+bool permissionRemove(void *server, const char *name)
+{
+    auto &pm = asServer(server)->getPluginManager();
+    auto *perm = pm.getPermission(name ? name : "");
+    if (!perm) {
+        return false;
+    }
+    pm.removePermission(*perm);
+    return true;
+}
+void *permissionGet(void *server, const char *name)
+{
+    return asServer(server)->getPluginManager().getPermission(name ? name : "");
+}
+const char *permissionGetName(void *p) { return strOut(asPermission(p)->getName()); }
+const char *permissionGetDescription(void *p) { return strOut(asPermission(p)->getDescription()); }
+void permissionSetDescription(void *p, const char *desc) { asPermission(p)->setDescription(desc ? desc : ""); }
+int permissionGetDefault(void *p) { return static_cast<int>(asPermission(p)->getDefault()); }
+void permissionSetDefault(void *p, int v)
+{
+    asPermission(p)->setDefault(static_cast<endstone::PermissionDefault>(std::clamp(v, 0, 4)));
+}
+int permissionGetChildCount(void *p) { return static_cast<int>(asPermission(p)->getChildren().size()); }
+const char *permissionGetChildName(void *p, int index)
+{
+    const auto &children = asPermission(p)->getChildren();
+    if (index < 0 || index >= static_cast<int>(children.size())) {
+        return nullptr;
+    }
+    auto it = children.begin();
+    std::advance(it, index);
+    return strOut(it->first);
+}
+bool permissionGetChildValue(void *p, int index)
+{
+    const auto &children = asPermission(p)->getChildren();
+    if (index < 0 || index >= static_cast<int>(children.size())) {
+        return false;
+    }
+    auto it = children.begin();
+    std::advance(it, index);
+    return it->second;
+}
+void permissionSetChild(void *p, const char *name, bool value)
+{
+    auto *perm = asPermission(p);
+    perm->getChildren()[name ? name : ""] = value;
+    perm->recalculatePermissibles();
+}
+void permissionRemoveChild(void *p, const char *name)
+{
+    auto *perm = asPermission(p);
+    perm->getChildren().erase(name ? name : "");
+    perm->recalculatePermissibles();
+}
+void *permissionAddParentName(void *p, const char *name, bool value)
+{
+    return asPermission(p)->addParent(name ? name : "", value);
+}
+void permissionAddParent(void *p, void *parent, bool value)
+{
+    asPermission(p)->addParent(*asPermission(parent), value);
+}
+void permissionRecalculate(void *p) { asPermission(p)->recalculatePermissibles(); }
 
 }  // namespace
 
@@ -2257,6 +2348,7 @@ const BridgeTable &getBridgeTable()
         .sender_send_message = &senderSendMessage,
         .sender_send_error_message = &senderSendErrorMessage,
         .sender_has_permission = &senderHasPermission,
+        .sender_has_permission_perm = &senderHasPermissionPerm,
         .sender_as_player = &senderAsPlayer,
         .form_create = &formCreate,
         .form_set_title = &formSetTitle,
@@ -2398,6 +2490,24 @@ const BridgeTable &getBridgeTable()
         .service_manager_unregister = &serviceManagerUnregister,
         .service_manager_unregister_provider = &serviceManagerUnregisterProvider,
         .service_manager_get = &serviceManagerGet,
+        .permission_create = &permissionCreate,
+        .permission_destroy = &permissionDestroy,
+        .permission_add = &permissionAdd,
+        .permission_remove = &permissionRemove,
+        .permission_get = &permissionGet,
+        .permission_get_name = &permissionGetName,
+        .permission_get_description = &permissionGetDescription,
+        .permission_set_description = &permissionSetDescription,
+        .permission_get_default = &permissionGetDefault,
+        .permission_set_default = &permissionSetDefault,
+        .permission_get_child_count = &permissionGetChildCount,
+        .permission_get_child_name = &permissionGetChildName,
+        .permission_get_child_value = &permissionGetChildValue,
+        .permission_set_child = &permissionSetChild,
+        .permission_remove_child = &permissionRemoveChild,
+        .permission_add_parent_name = &permissionAddParentName,
+        .permission_add_parent = &permissionAddParent,
+        .permission_recalculate = &permissionRecalculate,
     };
     return table;
 }
