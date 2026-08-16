@@ -71,3 +71,7 @@ Testing/
 
 # MkDocs output
 site/
+
+# .NET build output
+bin/
+obj/
