@@ -1,0 +1,161 @@
+site_name: Endstone DotNet Loader
+site_url: https://arkmirage.github.io/endstone_dotnet_loader/
+site_author: Ark Mirage
+
+repo_name: ArkMirage/endstone_dotnet_loader
+repo_url: https://github.com/ArkMirage/endstone_dotnet_loader
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 Ark Mirage
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ArkMirage
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+  - i18n:
+      reconfigure_material: true
+      docs_structure: suffix
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: zh
+          name: 简体中文
+          build: true
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    # - navigation.instant
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Your First Plugin: getting-started/your-first-plugin.md
+      - Using EndstoneDotnet.Toolchain: getting-started/toolchain.md
+  - API Reference:
+      - reference/csharp/index.md
+      - Core:
+          - reference/csharp/Server.md
+          - reference/csharp/PluginBase.md
+          - reference/csharp/PluginAttribute.md
+          - reference/csharp/Logger.md
+          - reference/csharp/Scheduler.md
+          - reference/csharp/ScheduledTask.md
+          - reference/csharp/Service.md
+          - reference/csharp/ServiceManager.md
+          - reference/csharp/CommandSender.md
+          - reference/csharp/CommandBuilder.md
+      - Entities:
+          - reference/csharp/Actor.md
+          - reference/csharp/Player.md
+          - reference/csharp/Mob.md
+          - reference/csharp/DamageSource.md
+          - reference/csharp/Enchantment.md
+          - reference/csharp/ItemEnchantment.md
+      - World:
+          - reference/csharp/Level.md
+          - reference/csharp/Dimension.md
+          - reference/csharp/Chunk.md
+          - reference/csharp/Block.md
+          - reference/csharp/BlockState.md
+          - reference/csharp/Location.md
+      - Items & Inventory:
+          - reference/csharp/ItemStack.md
+          - reference/csharp/Inventory.md
+          - reference/csharp/PlayerInventory.md
+      - UI:
+          - reference/csharp/FormBase.md
+          - reference/csharp/MessageForm.md
+          - reference/csharp/ActionForm.md
+          - reference/csharp/ModalForm.md
+          - reference/csharp/BossBar.md
+          - reference/csharp/MapView.md
+          - reference/csharp/MapCanvas.md
+          - reference/csharp/MapCursor.md
+          - reference/csharp/MapColor.md
+          - reference/csharp/MapRenderer.md
+      - reference/csharp/events.md
+      - reference/csharp/enums.md
+      - Native Interop:
+          - reference/csharp/Bootstrap.md

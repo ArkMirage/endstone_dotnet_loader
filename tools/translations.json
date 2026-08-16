@@ -1,0 +1,261 @@
+{
+  "types": {
+    "Endstone.Loader.Actor": {
+      "summary": "包装原生 endstone::Actor 的托管对象。实体是世界中可移动、可交互的对象(玩家、生物、掉落物等)。",
+      "members": {
+        "Type": "实体的类型标识(例如 \"minecraft:zombie\")。",
+        "RuntimeId": "实体的运行时 ID,每条运行时唯一。",
+        "Id": "实体的唯一 ID。",
+        "Name": "实体的名称。",
+        "Location": "实体当前的位置(坐标 + 视角)。",
+        "Velocity": "实体当前的速度向量。",
+        "Teleport(Location)": "将实体传送至同一维度内指定位置。",
+        "Teleport(Actor)": "将实体传送到另一实体的位置。",
+        "Remove": "将实体从世界中移除(玩家请使用 Player.Kick)。",
+        "SendMessage(string)": "向实体发送聊天消息。",
+        "AsMob": "将该实体向下转型为 Mob,非生物时返回 null。",
+        "SpawnActor(string, Location?)": "在实体所在维度生成指定类型的实体,失败返回 null。",
+        "SpawnMob(string, Location?)": "生成生物并返回,失败或非生物时返回 null。",
+        "GetBlock(int, int, int)": "获取实体所在维度的指定方块坐标处的方块。"
+      }
+    },
+    "Endstone.Loader.Block": {
+      "summary": "包装原生 endstone::Block 的托管对象,表示世界中的方块实例。",
+      "members": {
+        "Type": "方块的类型标识(例如 \"minecraft:stone\")。",
+        "SetType(string)": "设置方块的类型。",
+        "CaptureState": "捕获方块当前状态,修改后可通过 BlockState.Update 应用到世界。"
+      }
+    },
+    "Endstone.Loader.BlockState": {
+      "summary": "方块状态的快照,可独立修改再更新到世界中,用于实现原子化的方块改动。",
+      "members": {
+        "Update": "将捕获的状态应用到世界中。",
+        "Update(bool)": "带外力标志的状态更新。",
+        "Update(bool, bool)": "带外力与物理标志的状态更新。"
+      }
+    },
+    "Endstone.Loader.BossBar": {
+      "summary": "包装原生 endstone::BossBar 的托管对象。Boss 血条可以添加进度的文字说明与颜色/分段样式,并绑定到多个玩家。",
+      "members": {
+        "Title": "boss 血条的标题文字。",
+        "Color": "boss 血条的颜色。",
+        "Style": "boss 血条的分段样式。",
+        "Progress": "boss 血条的进度(0.0 - 1.0)。",
+        "IsVisible": "boss 血条是否可见。",
+        "AddPlayer(Player)": "将玩家加入可见列表。",
+        "RemovePlayer(Player)": "将玩家从可见列表移除。",
+        "AddFlag(BarFlag)": "添加一个标志(例如暗灭天空)。"
+      }
+    },
+    "Endstone.Loader.Bootstrap": {
+      "summary": "原生 C++ 加载器 (dotnet_loader) 调用的托管入口点。包含宿主初始化、插件装配、事件/表单/调度/地图渲染等回调转发逻辑。"
+    },
+    "Endstone.Loader.Chunk": {
+      "summary": "包装原生 endstone::Chunk 的托管对象,表示一个区块 (16 x 16 x 384)。"
+    },
+    "Endstone.Loader.CommandBuilder": {
+      "summary": "命令的流式构建器:配置描述、用法、别名、权限,并绑定命令处理函数。",
+      "members": {
+        "Description": "设置命令的描述文字。",
+        "Usage": "设置命令的用法示例(可多个)。",
+        "Alias": "添加命令别名。",
+        "Permission": "设置执行该命令所需权限节点。",
+        "Handler": "绑定命令处理器(接收 CommandSender 与参数列表)。"
+      }
+    },
+    "Endstone.Loader.CommandSender": {
+      "summary": "命令发送者的抽象,既可以是玩家也可以是控制台。通过 AsPlayer() 可判断并转型。",
+      "members": {
+        "Name": "发送者的名称。",
+        "SendMessage(string)": "向发送者发送消息。",
+        "HasPermission(string)": "检查发送者是否拥有指定权限。",
+        "AsPlayer": "将发送者转型为 Player,控制台时为 null。"
+      }
+    },
+    "Endstone.Loader.DamageSource": {
+      "summary": "伤害来源信息:伤害类型、直接/间接伤害者。"
+    },
+    "Endstone.Loader.Dimension": {
+      "summary": "包装原生 endstone::Dimension 的托管对象,表示一个维度(主世界、下界、末地等)。",
+      "members": {
+        "Name": "维度的名称。",
+        "GetLoadedChunks": "获取维度中已加载的区块。",
+        "SpawnActor(string, Location)": "在该维度指定位置生成实体。",
+        "GetBlockAt(int, int, int)": "获取维度内指定坐标处的方块。"
+      }
+    },
+    "Endstone.Loader.Enchantment": {
+      "summary": "包装原生 endstone::Enchantment 的托管对象。通过 Enchantment.Get(键) 或静态常量(如 Sharpness)获取,并提供常用附魔的静态属性。",
+      "members": {
+        "Get(string)": "按 ID(如 \"minecraft:sharpness\")获取附魔,未找到返回 null。"
+      }
+    },
+    "Endstone.Loader.Inventory": {
+      "summary": "包装原生 endstone::Inventory 的托管对象,提供物品的读取、添加、移除与容量查询。",
+      "members": {
+        "GetItem(int)": "获取指定栏位的物品。",
+        "SetItem(int, ItemStack?)": "设置指定栏位的物品。",
+        "AddItem(ItemStack)": "添加物品,不能完全装入时返回 false。",
+        "RemoveItem(ItemStack)": "移除指定物品。",
+        "Clear": "清空背包。"
+      }
+    },
+    "Endstone.Loader.ItemStack": {
+      "summary": "包装原生 endstone::ItemStack 的托管对象。使用 ItemStack.Create(\"minecraft:diamond\", 数量) 创建,可读写附魔、显示名与 lore。",
+      "members": {
+        "Create(string, int, int)": "按类型标识创建物品堆栈,可指定数量与数据值。",
+        "AddEnchant(string, int, bool)": "添加附魔;force 为 true 时忽略等级上限。",
+        "RemoveEnchant(string)": "移除指定附魔。",
+        "Enchantments": "物品上的全部附魔列表。",
+        "HasEnchant(string)": "是否拥有指定附魔。"
+      }
+    },
+    "Endstone.Loader.Level": {
+      "summary": "包装原生 endstone::Level 的托管对象,表示服务器世界。可读写时间、获取种子、查询维度与实体。",
+      "members": {
+        "Name": "世界的名称。",
+        "Time": "当前的世界时间(tick)。",
+        "GetDimensions": "世界内的全部维度。",
+        "GetActors": "世界内的全部实体。"
+      }
+    },
+    "Endstone.Loader.Logger": {
+      "summary": "插件日志记录器,输出到服务器的插件日志。Trace 级别默认被过滤,Info 及以上可见。",
+      "members": {
+        "Info": "记录一条 Info 级别日志。",
+        "Warning": "记录一条 Warning 级别日志。",
+        "Error": "记录一条 Error 级别日志。",
+        "Debug": "记录一条 Debug 级别日志。"
+      }
+    },
+    "Endstone.Loader.MapCanvas": {
+      "summary": "地图画布:通过 SetPixel/SetPixelColor 逐像素绘制地图渲染内容。"
+    },
+    "Endstone.Loader.MapCursor": {
+      "summary": "地图上的游标对象(坐标、方向、类型、可见性)。"
+    },
+    "Endstone.Loader.MapRenderer": {
+      "summary": "地图渲染器基类:重写 Render() 在 MapCanvas 上绘制,通过 MapView.AddRenderer 添加。",
+      "members": {
+        "Create(int, ulong)": "创建一个将回调转发到托管渲染器的原生渲染器持有者。"
+      }
+    },
+    "Endstone.Loader.MapView": {
+      "summary": "包装原生 endstone::MapView 的托管对象。服务器通过 CreateMap 创建地图视图,可调整缩放、中心与跟踪设置,并添加渲染器。"
+    },
+    "Endstone.Loader.Mob": {
+      "summary": "包装原生 endstone::Mob 的托管对象(继承 Actor),提供生命值等生物专属属性。"
+    },
+    "Endstone.Loader.Player": {
+      "summary": "包装原生 endstone::Player 的托管对象(继承 Actor),提供消息、操作、物品、模式、飞行、传送等玩家功能。",
+      "members": {
+        "IsOp": "玩家是否为服务器管理员 (OP)。",
+        "GameMode": "玩家的游戏模式。",
+        "SendTitle(string, string)": "向玩家发送 Title。",
+        "SendToast(string, string)": "向玩家发送系统提示 (toast)。",
+        "SendTip(string)": "向玩家发送 Tip 悬浮提示。",
+        "Inventory": "玩家主手背包。",
+        "EnderChest": "玩家末影箱。",
+        "Kick": "踢出玩家。",
+        "Transfer(string, int)": "将玩家转移到另一台服务器。",
+        "PlaySound(string, Location, float, float)": "向玩家播放音效。",
+        "ShowForm": "向玩家展示表单(MessageForm/ActionForm/ModalForm)。"
+      }
+    },
+    "Endstone.Loader.PlayerInventory": {
+      "summary": "玩家的背包(继承 Inventory),提供主手/副手与护甲槽的快速访问。"
+    },
+    "Endstone.Loader.PluginAttribute": {
+      "summary": "插件声明特性:标记插件主类,并提供名称、版本、描述与作者信息。",
+      "members": {
+        "Name": "插件名称(仅允许小写字母、数字、下划线)。",
+        "Version": "插件版本号。",
+        "Description": "插件描述。",
+        "Authors": "插件作者列表。"
+      }
+    },
+    "Endstone.Loader.PluginBase": {
+      "summary": "所有 .NET 插件的基类。继承并在主类上添加 [Plugin] 特性;重写 OnLoad/OnEnable/OnDisable 生命周期方法,通过 Command()/RegisterEvent()/Scheduler/ServiceManager 使用服务器功能。",
+      "members": {
+        "Logger": "插件的日志记录器。",
+        "Server": "服务器实例的访问器。",
+        "Command(string)": "注册命令并返回流式构建器。",
+        "RegisterEvent<T>(Action<T>, EventPriority)": "按事件类型注册处理器。",
+        "OnLoad": "插件加载时调用(世界可能尚未就绪)。",
+        "OnEnable": "插件启用时调用(世界已可用)。",
+        "OnDisable": "服务器关闭 / 插件卸载时调用。",
+        "Scheduler": "插件作用域的调度器。",
+        "ServiceManager": "插件作用域的服务管理器。"
+      }
+    },
+    "Endstone.Loader.ScheduledTask": {
+      "summary": "排队到原生 endstone 调度器的任务句柄。同步任务在服务器线程执行,异步任务在工作线程执行。",
+      "members": {
+        "Cancel": "取消该任务。",
+        "IsQueued": "任务是否仍在队列中。",
+        "IsRunning": "任务是否正在运行。",
+        "IsSync": "任务是否为同步任务。"
+      }
+    },
+    "Endstone.Loader.Scheduler": {
+      "summary": "插件作用域的调度器外壳,封装原生 endstone Scheduler。任务归属于插件,插件停用时自动全部取消。",
+      "members": {
+        "RunTask(Action)": "立即运行一次性同步任务。",
+        "RunTaskLater(Action, ulong)": "延迟指定 tick 后运行同步任务。",
+        "RunTaskTimer(Action, ulong, ulong)": "周期性同步任务(delay + period,单位 tick)。",
+        "RunTaskAsync(Action)": "立即运行一次性异步任务(禁止调用 BDS API)。",
+        "GetPendingTasks": "当前排队或运行中的全部任务。",
+        "CancelAll": "取消该插件拥有的全部任务。"
+      }
+    },
+    "Endstone.Loader.Server": {
+      "summary": "包装原生 endstone::Server 单例的托管对象,是访问服务器信息、广播、玩家、地图、boss 血条与世界的入口。",
+      "members": {
+        "Name": "服务器名称。",
+        "Version": "服务器版本。",
+        "MinecraftVersion": "Minecraft 版本(如 1.21.x)。",
+        "BroadcastMessage(string)": "向服务器广播一条消息。",
+        "GetOnlinePlayers": "获取全部在线玩家。",
+        "GetPlayer(string)": "按名称查找在线玩家,不存在返回 null。",
+        "DispatchCommand(string)": "以控制台身份执行一条命令。",
+        "Level": "服务器世界,未加载完成时为 null。",
+        "CreateBossBar": "创建 boss 血条。",
+        "CreateMap(Dimension)": "在指定维度创建地图视图。"
+      }
+    },
+    "Endstone.Loader.Service": {
+      "summary": "与服务器的服务管理器注册的服务的基类(对应 endstone::Service)。服务是标记式接口:提供者继承本类并实现自己的方法即可。"
+    },
+    "Endstone.Loader.ServiceManager": {
+      "summary": "插件作用域的服务管理器外壳(对应 endstone::ServiceManager)。注册的提供者关联到本插件,插件停用时自动注销。",
+      "members": {
+        "Register(string, Service, ServicePriority)": "为指定服务名注册提供者(在注销或插件停用前保持存活)。",
+        "Get(string)": "查询提供者,未注册时返回 null,多个提供者时返回优先级最高者。",
+        "UnregisterAll": "注销本插件注册的全部服务。",
+        "Unregister(Service)": "从所有服务中注销该提供者。"
+      }
+    },
+    "Endstone.Loader.FormBase": {
+      "summary": "三种表单(MessageForm/ActionForm/ModalForm)的流式基类。Send() 把所有权交给原生侧,提交/关闭时自动注销回调;发送后不可复用构建器。"
+    },
+    "Endstone.Loader.MessageForm": {
+      "summary": "带标题、内容与两个按钮的简单表单。"
+    },
+    "Endstone.Loader.ActionForm": {
+      "summary": "动作表单:标题 + 内容 + 任意数量的带图标按钮。"
+    },
+    "Endstone.Loader.ModalForm": {
+      "summary": "模态表单:标题 + 内容 + 多个控件(下拉、滑动条、文本输入、开关等),提交结果为 JSON 负载。"
+    },
+    "Endstone.Loader.Location": {
+      "summary": "三维坐标 + 视角(yaw/pitch)的值类型,用于表示实体/方块/生成位置。"
+    },
+    "Endstone.Loader.ItemEnchantment": {
+      "summary": "物品上的一条附魔记录(附魔 + 等级)。"
+    },
+    "Endstone.Loader.MapColor": {
+      "summary": "地图画布像素使用的 RGBA 颜色值类型。"
+    }
+  }
+}
