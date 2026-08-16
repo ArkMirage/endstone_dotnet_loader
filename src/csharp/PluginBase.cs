@@ -45,7 +45,12 @@ public sealed class PluginAttribute(string name, string version) : Attribute
     public string Version { get; } = version;
     public string Description { get; init; } = "";
     public string[] Authors { get; init; } = [];
-
+    public string[] Contributors { get; init; } = [];
+    public string Website { get; init; } = "";
+    public string Prefix { get; init; } = "";
+    public string[] Depend { get; init; } = [];
+    public string[] SoftDepend { get; init; } = [];
+    public string[] LoadBefore { get; init; } = [];
     /// <summary>Default value for permissions registered by this plugin (Endstone default: Operator).</summary>
     public PermissionDefault DefaultPermission { get; init; } = PermissionDefault.Operator;
 }

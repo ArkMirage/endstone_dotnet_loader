@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Endstone.Loader;
 
@@ -97,8 +98,8 @@ public static class Bootstrap
                 // default values (empty collections / empty strings) until real
                 // values are wired through PluginAttribute.
                 new PluginInfo(meta.Name, meta.Version, meta.Description, meta.Authors,
-                               /*contributors=*/[], /*website=*/"", /*prefix=*/"",
-                               /*depend=*/[], /*softDepend=*/[], /*loadBefore=*/[],
+                               meta.Contributors, meta.Website, meta.Prefix,
+                               meta.Depend, meta.SoftDepend, meta.LoadBefore,
                                meta.DefaultPermission,
                                instance.CommandDefinitions.ToArray()),
                 JsonOptions);
