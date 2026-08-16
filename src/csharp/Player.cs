@@ -10,14 +10,13 @@ public enum GameMode
     Spectator = 3,
 }
 
-/// <summary>Wrapper around a native endstone::Player (also an Actor).</summary>
-public sealed unsafe class Player : Actor
+/// <summary>Wrapper around a native endstone::Player.</summary>
+public sealed unsafe class Player : Mob
 {
     internal Player(IntPtr ptr) : base(ptr) { }
 
     private static Bridge.Table* T => Bridge.Raw;
 
-    public new string Name => Bridge.Str(T->PlayerGetName(_ptr));
     public string Xuid => Bridge.Str(T->PlayerGetXuid(_ptr));
     public string Address => Bridge.Str(T->PlayerGetAddress(_ptr));
     public string Locale => Bridge.Str(T->PlayerGetLocale(_ptr));
@@ -60,13 +59,7 @@ public sealed unsafe class Player : Actor
     public PlayerInventory Inventory => new((IntPtr)T->PlayerGetInventory(_ptr));
     /// <summary>The player's ender chest inventory.</summary>
     public Inventory EnderChest => new((IntPtr)T->PlayerGetEnderChest(_ptr));
-    public new void SendMessage(string message) => Bridge.Call1(T->PlayerSendMessage, _ptr, message);
 
-    public new void SendMessage(string format, params object?[] args) => SendMessage(string.Format(format, args));
-
-    public void SendErrorMessage(string message) => Bridge.Call1(T->PlayerSendErrorMessage, _ptr, message);
-
-    public void SendErrorMessage(string format, params object?[] args) => SendErrorMessage(string.Format(format, args));
     public void SendPopup(string message) => Bridge.Call1(T->PlayerSendPopup, _ptr, message);
     public void SendTip(string message) => Bridge.Call1(T->PlayerSendTip, _ptr, message);
     public void SendToast(string title, string content) => Bridge.Call2(T->PlayerSendToast, _ptr, title, content);

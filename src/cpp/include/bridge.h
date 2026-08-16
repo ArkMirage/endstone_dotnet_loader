@@ -78,9 +78,6 @@ enum class EventKind : int {
 
 struct BridgeTable {
     // ---- player ----
-    const char *(*player_get_name)(void *);
-    void (*player_send_message)(void *, const char *);
-    void (*player_send_error_message)(void *, const char *);
     void (*player_send_popup)(void *, const char *);
     void (*player_send_tip)(void *, const char *);
     void (*player_send_toast)(void *, const char *, const char *);
@@ -296,8 +293,6 @@ struct BridgeTable {
     bool (*actor_teleport_location)(void *, const float *);
     bool (*actor_teleport_actor)(void *, void *);
     void (*actor_remove)(void *);
-    void (*actor_send_message)(void *, const char *);
-    const char *(*actor_get_name)(void *);
     int (*actor_get_scoreboard_tag_count)(void *);
     const char *(*actor_get_scoreboard_tag)(void *, int);
     bool (*actor_add_scoreboard_tag)(void *, const char *);
@@ -385,9 +380,25 @@ struct BridgeTable {
     const char *(*sender_get_name)(void *);
     void (*sender_send_message)(void *, const char *);
     void (*sender_send_error_message)(void *, const char *);
+    // Permissible API (CommandSender derives from Permissible; the methods are
+    // virtual on the C++ side).
+    int (*sender_get_permission_level)(void *);
+    bool (*sender_is_permission_set)(void *, const char *);
+    bool (*sender_is_permission_set_perm)(void *, void *);
     bool (*sender_has_permission)(void *, const char *);
     bool (*sender_has_permission_perm)(void *, void *);
+    // Creates a PermissionAttachment owned by the permissible; the second
+    // argument is the native Plugin*; returns nullptr on failure.
+    void *(*sender_add_attachment)(void *, void *, const char *, bool);
+    void *(*sender_add_attachment_empty)(void *, void *);
+    bool (*sender_remove_attachment)(void *, void *);
+    void (*sender_recalculate_permissions)(void *);
+    // Copies up to capacity PermissionAttachmentInfo pointers into out;
+    // returns the number copied.
+    int (*sender_get_effective_permissions)(void *, void **, int);
     void *(*sender_as_player)(void *);
+    void *(*sender_as_actor)(void *);
+    void *(*sender_as_console)(void *);
 
     // ---- objects: form ----
     void *(*form_create)(int);
@@ -600,6 +611,25 @@ struct BridgeTable {
     void *(*permission_add_parent_name)(void *, const char *, bool);
     void (*permission_add_parent)(void *, void *, bool);
     void (*permission_recalculate)(void *);
+
+    // ---- objects: permission attachment ----
+    // Non-owning views of attachments owned by their permissible.
+    void *(*attachment_get_plugin)(void *);
+    void *(*attachment_get_permissible)(void *);
+    int (*attachment_get_permission_count)(void *);
+    const char *(*attachment_get_permission_name)(void *, int);
+    bool (*attachment_get_permission_value)(void *, int);
+    void (*attachment_set_permission)(void *, const char *, bool);
+    void (*attachment_set_permission_perm)(void *, void *, bool);
+    void (*attachment_unset_permission)(void *, const char *);
+    void (*attachment_unset_permission_perm)(void *, void *);
+    bool (*attachment_remove)(void *);
+
+    // ---- objects: permission attachment info ----
+    void *(*attachment_info_get_permissible)(void *);
+    const char *(*attachment_info_get_permission)(void *);
+    void *(*attachment_info_get_attachment)(void *);
+    bool (*attachment_info_get_value)(void *);
 };
 
 }  // namespace dotnet_loader

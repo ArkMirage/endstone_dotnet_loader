@@ -118,12 +118,32 @@ public static class Bootstrap
         string Website, string Prefix, string[] Depend, string[] SoftDepend, string[] LoadBefore,
         PermissionDefault DefaultPermission, CommandDefinition[] Commands);
 
+    private static readonly Dictionary<IntPtr, PluginBase> Plugins = new();
+
+    /// <summary>Maps a native Plugin* back to its managed PluginBase, or null
+    /// when the plugin is not (or no longer) loaded.</summary>
+    internal static PluginBase? FindPlugin(IntPtr nativePtr)
+    {
+        if (nativePtr == IntPtr.Zero)
+        {
+            return null;
+        }
+        lock (Plugins)
+        {
+            return Plugins.TryGetValue(nativePtr, out var plugin) ? plugin : null;
+        }
+    }
+
     [UnmanagedCallersOnly]
     public static void Attach(IntPtr gcHandle, IntPtr nativePlugin)
     {
         if (Resolve(gcHandle) is { } plugin)
         {
             plugin.SetPluginHandles(gcHandle, nativePlugin);
+            lock (Plugins)
+            {
+                Plugins[nativePlugin] = plugin;
+            }
         }
     }
 
@@ -150,6 +170,13 @@ public static class Bootstrap
     {
         if (gcHandle != IntPtr.Zero)
         {
+            if (Resolve(gcHandle) is { } plugin)
+            {
+                lock (Plugins)
+                {
+                    Plugins.Remove(plugin.NativeHandle);
+                }
+            }
             GCHandle.FromIntPtr(gcHandle).Free();
         }
     }

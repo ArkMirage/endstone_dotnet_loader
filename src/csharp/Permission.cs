@@ -16,6 +16,18 @@ public enum PermissionDefault
 }
 
 /// <summary>
+/// The permission level of a Permissible (wraps endstone::PermissionLevel).
+/// Numeric values MUST stay aligned with the C++ enum declaration order
+/// (Default=0, Operator=1, Console=2): the value is bridged as an integer.
+/// </summary>
+public enum PermissionLevel
+{
+    Default = 0,
+    Operator = 1,
+    Console = 2,
+}
+
+/// <summary>
 /// A permission that may be attached to a Permissible. Wraps a native
 /// endstone::Permission and is used by the whole permission system: create
 /// permissions with the plugin's <c>Permission(name)</c> factory (registered

@@ -15,9 +15,6 @@ internal static unsafe class Bridge
     internal struct Table
     {
         // ---- player ----
-        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetName;
-        public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerSendMessage;
-        public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerSendErrorMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerSendPopup;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerSendTip;
         public delegate* unmanaged[Cdecl]<void*, byte*, byte*, void> PlayerSendToast;
@@ -230,8 +227,6 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, float*, bool> ActorTeleportLocation;
         public delegate* unmanaged[Cdecl]<void*, void*, bool> ActorTeleportActor;
         public delegate* unmanaged[Cdecl]<void*, void> ActorRemove;
-        public delegate* unmanaged[Cdecl]<void*, byte*, void> ActorSendMessage;
-        public delegate* unmanaged[Cdecl]<void*, byte*> ActorGetName;
         public delegate* unmanaged[Cdecl]<void*, int> ActorGetScoreboardTagCount;
         public delegate* unmanaged[Cdecl]<void*, int, byte*> ActorGetScoreboardTag;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> ActorAddScoreboardTag;
@@ -318,9 +313,19 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> SenderGetName;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> SenderSendMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> SenderSendErrorMessage;
+        public delegate* unmanaged[Cdecl]<void*, int> SenderGetPermissionLevel;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> SenderIsPermissionSet;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool> SenderIsPermissionSetPerm;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> SenderHasPermission;
         public delegate* unmanaged[Cdecl]<void*, void*, bool> SenderHasPermissionPerm;
+        public delegate* unmanaged[Cdecl]<void*, void*, byte*, bool, void*> SenderAddAttachment;
+        public delegate* unmanaged[Cdecl]<void*, void*, void*> SenderAddAttachmentEmpty;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool> SenderRemoveAttachment;
+        public delegate* unmanaged[Cdecl]<void*, void> SenderRecalculatePermissions;
+        public delegate* unmanaged[Cdecl]<void*, void**, int, int> SenderGetEffectivePermissions;
         public delegate* unmanaged[Cdecl]<void*, void*> SenderAsPlayer;
+        public delegate* unmanaged[Cdecl]<void*, void*> SenderAsActor;
+        public delegate* unmanaged[Cdecl]<void*, void*> SenderAsConsole;
 
         // ---- objects: form ----
         public delegate* unmanaged[Cdecl]<int, void*> FormCreate;
@@ -504,6 +509,24 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, bool, void*> PermissionAddParentName;
         public delegate* unmanaged[Cdecl]<void*, void*, bool, void> PermissionAddParent;
         public delegate* unmanaged[Cdecl]<void*, void> PermissionRecalculate;
+
+        // ---- objects: permission attachment ----
+        public delegate* unmanaged[Cdecl]<void*, void*> AttachmentGetPlugin;
+        public delegate* unmanaged[Cdecl]<void*, void*> AttachmentGetPermissible;
+        public delegate* unmanaged[Cdecl]<void*, int> AttachmentGetPermissionCount;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*> AttachmentGetPermissionName;
+        public delegate* unmanaged[Cdecl]<void*, int, bool> AttachmentGetPermissionValue;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool, void> AttachmentSetPermission;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool, void> AttachmentSetPermissionPerm;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> AttachmentUnsetPermission;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> AttachmentUnsetPermissionPerm;
+        public delegate* unmanaged[Cdecl]<void*, bool> AttachmentRemove;
+
+        // ---- objects: permission attachment info ----
+        public delegate* unmanaged[Cdecl]<void*, void*> AttachmentInfoGetPermissible;
+        public delegate* unmanaged[Cdecl]<void*, byte*> AttachmentInfoGetPermission;
+        public delegate* unmanaged[Cdecl]<void*, void*> AttachmentInfoGetAttachment;
+        public delegate* unmanaged[Cdecl]<void*, bool> AttachmentInfoGetValue;
     }
 #pragma warning restore CS0649
 

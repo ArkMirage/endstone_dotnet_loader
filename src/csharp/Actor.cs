@@ -1,19 +1,15 @@
 namespace Endstone.Loader;
 
 /// <summary>Wraps a native endstone::Actor.</summary>
-public unsafe class Actor
+public unsafe class Actor : CommandSender
 {
-    protected readonly void* _ptr;
-
-    internal Actor(IntPtr ptr) => _ptr = (void*)ptr;
-    internal IntPtr NativePtr => (IntPtr)_ptr;
+    internal Actor(IntPtr ptr) : base(ptr) { }
 
     private static Bridge.Table* T => Bridge.Raw;
 
     public string Type => Bridge.Str(T->ActorGetType(_ptr));
     public ulong RuntimeId => T->ActorGetRuntimeId(_ptr);
     public long Id => T->ActorGetId(_ptr);
-    public string Name => Bridge.Str(T->ActorGetName(_ptr));
     public bool IsOnGround => T->ActorIsOnGround(_ptr);
     public bool IsInWater => T->ActorIsInWater(_ptr);
     public bool IsInLava => T->ActorIsInLava(_ptr);
@@ -60,10 +56,6 @@ public unsafe class Actor
 
     /// <summary>Removes this actor from the level (use Player.Kick for players).</summary>
     public void Remove() => T->ActorRemove(_ptr);
-
-    public void SendMessage(string message) => Bridge.Call1(T->ActorSendMessage, _ptr, message);
-
-    public void SendMessage(string format, params object?[] args) => SendMessage(string.Format(format, args));
 
     public string GetScoreboardTag(int index) => Bridge.Str(T->ActorGetScoreboardTag(_ptr, index));
 

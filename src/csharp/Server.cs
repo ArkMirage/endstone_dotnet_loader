@@ -40,6 +40,9 @@ public sealed unsafe class Server
         }
     }
 
+    /// <summary>Gets the console command sender.</summary>
+    public ConsoleCommandSender ConsoleSender => new((IntPtr)T->ServerGetConsoleSender(_ptr));
+
     public bool DispatchCommand(string commandLine)
     {
         var console = T->ServerGetConsoleSender(_ptr);

@@ -1,7 +1,7 @@
 namespace Endstone.Loader;
 
 /// <summary>Wraps a native endstone::Mob (an Actor with health).</summary>
-public sealed unsafe class Mob : Actor
+public unsafe class Mob : Actor
 {
     internal Mob(IntPtr ptr) : base(ptr) { }
 

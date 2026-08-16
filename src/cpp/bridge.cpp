@@ -12,6 +12,7 @@
 #include <variant>
 
 #include <endstone/endstone.hpp>
+#include <endstone/permissions/permission_attachment.h>
 
 namespace dotnet_loader {
 
@@ -47,6 +48,12 @@ endstone::Player *asPlayer(void *p) { return static_cast<endstone::Player *>(p);
 endstone::Server *asServer(void *p) { return static_cast<endstone::Server *>(p); }
 endstone::Event *asEvent(void *e) { return static_cast<endstone::Event *>(e); }
 endstone::Permission *asPermission(void *p) { return static_cast<endstone::Permission *>(p); }
+endstone::Plugin *asPlugin(void *p) { return static_cast<endstone::Plugin *>(p); }
+endstone::PermissionAttachment *asAttachment(void *a) { return static_cast<endstone::PermissionAttachment *>(a); }
+endstone::PermissionAttachmentInfo *asAttachmentInfo(void *i)
+{
+    return static_cast<endstone::PermissionAttachmentInfo *>(i);
+}
 endstone::ItemStack *asItem(void *i) { return static_cast<endstone::ItemStack *>(i); }
 std::unique_ptr<endstone::ItemMeta> itemMeta(void *i) { return asItem(i)->getItemMeta(); }
 endstone::Block *asBlock(void *b) { return static_cast<endstone::Block *>(b); }
@@ -72,9 +79,6 @@ endstone::Location locationFrom(const float *v, const endstone::Location &ref)
 
 // ---- player ----
 
-const char *playerGetName(void *p) { return strOut(asPlayer(p)->getName()); }
-void playerSendMessage(void *p, const char *msg) { asPlayer(p)->sendMessage(std::string(msg)); }
-void playerSendErrorMessage(void *p, const char *msg) { asPlayer(p)->sendErrorMessage(std::string(msg)); }
 void playerSendPopup(void *p, const char *msg) { asPlayer(p)->sendPopup(msg); }
 void playerSendTip(void *p, const char *msg) { asPlayer(p)->sendTip(msg); }
 void playerSendToast(void *p, const char *title, const char *content) { asPlayer(p)->sendToast(title, content); }
@@ -891,11 +895,6 @@ bool actorTeleportActor(void *a, void *target)
     return static_cast<endstone::Actor *>(a)->teleport(*static_cast<endstone::Actor *>(target));
 }
 void actorRemove(void *a) { static_cast<endstone::Actor *>(a)->remove(); }
-void actorSendMessage(void *a, const char *msg)
-{
-    static_cast<endstone::Actor *>(a)->sendMessage(std::string(msg ? msg : ""));
-}
-const char *actorGetName(void *a) { return strOut(static_cast<endstone::Actor *>(a)->getName()); }
 int actorGetScoreboardTagCount(void *a)
 {
     return static_cast<int>(static_cast<endstone::Actor *>(a)->getScoreboardTags().size());
@@ -1976,10 +1975,108 @@ bool senderHasPermissionPerm(void *s, void *perm)
 {
     return static_cast<endstone::CommandSender *>(s)->hasPermission(*asPermission(perm));
 }
+int senderGetPermissionLevel(void *s)
+{
+    return static_cast<int>(static_cast<endstone::CommandSender *>(s)->getPermissionLevel());
+}
+bool senderIsPermissionSet(void *s, const char *perm)
+{
+    return static_cast<endstone::CommandSender *>(s)->isPermissionSet(perm ? perm : "");
+}
+bool senderIsPermissionSetPerm(void *s, void *perm)
+{
+    return static_cast<endstone::CommandSender *>(s)->isPermissionSet(*asPermission(perm));
+}
+void *senderAddAttachment(void *s, void *plugin, const char *name, bool value)
+{
+    return static_cast<endstone::CommandSender *>(s)->addAttachment(*asPlugin(plugin), name ? name : "", value);
+}
+void *senderAddAttachmentEmpty(void *s, void *plugin)
+{
+    return static_cast<endstone::CommandSender *>(s)->addAttachment(*asPlugin(plugin));
+}
+bool senderRemoveAttachment(void *s, void *attachment)
+{
+    return static_cast<endstone::CommandSender *>(s)->removeAttachment(*asAttachment(attachment));
+}
+void senderRecalculatePermissions(void *s)
+{
+    static_cast<endstone::CommandSender *>(s)->recalculatePermissions();
+}
+int senderGetEffectivePermissions(void *s, void **out, int capacity)
+{
+    const auto &perms = static_cast<endstone::CommandSender *>(s)->getEffectivePermissions();
+    int count = 0;
+    for (auto *info : perms) {
+        if (count >= capacity) {
+            break;
+        }
+        out[count++] = info;
+    }
+    return count;
+}
 void *senderAsPlayer(void *s)
 {
     return static_cast<endstone::CommandSender *>(s)->asPlayer();
 }
+void *senderAsActor(void *s)
+{
+    return static_cast<endstone::CommandSender *>(s)->asActor();
+}
+void *senderAsConsole(void *s)
+{
+    return static_cast<endstone::CommandSender *>(s)->asConsole();
+}
+
+// ---- permission attachment ----
+
+void *attachmentGetPlugin(void *a) { return &asAttachment(a)->getPlugin(); }
+void *attachmentGetPermissible(void *a) { return &asAttachment(a)->getPermissible(); }
+int attachmentGetPermissionCount(void *a) { return static_cast<int>(asAttachment(a)->getPermissions().size()); }
+const char *attachmentGetPermissionName(void *a, int index)
+{
+    const auto perms = asAttachment(a)->getPermissions();
+    if (index < 0 || index >= static_cast<int>(perms.size())) {
+        return nullptr;
+    }
+    auto it = perms.begin();
+    std::advance(it, index);
+    return strOut(it->first);
+}
+bool attachmentGetPermissionValue(void *a, int index)
+{
+    const auto perms = asAttachment(a)->getPermissions();
+    if (index < 0 || index >= static_cast<int>(perms.size())) {
+        return false;
+    }
+    auto it = perms.begin();
+    std::advance(it, index);
+    return it->second;
+}
+void attachmentSetPermission(void *a, const char *name, bool value)
+{
+    asAttachment(a)->setPermission(name ? name : "", value);
+}
+void attachmentSetPermissionPerm(void *a, void *perm, bool value)
+{
+    asAttachment(a)->setPermission(*asPermission(perm), value);
+}
+void attachmentUnsetPermission(void *a, const char *name)
+{
+    asAttachment(a)->unsetPermission(name ? name : "");
+}
+void attachmentUnsetPermissionPerm(void *a, void *perm)
+{
+    asAttachment(a)->unsetPermission(*asPermission(perm));
+}
+bool attachmentRemove(void *a) { return asAttachment(a)->remove(); }
+
+// ---- permission attachment info ----
+
+void *attachmentInfoGetPermissible(void *i) { return &asAttachmentInfo(i)->getPermissible(); }
+const char *attachmentInfoGetPermission(void *i) { return strOut(asAttachmentInfo(i)->getPermission()); }
+void *attachmentInfoGetAttachment(void *i) { return asAttachmentInfo(i)->getAttachment(); }
+bool attachmentInfoGetValue(void *i) { return asAttachmentInfo(i)->getValue(); }
 
 // ---- permission ----
 
@@ -2072,9 +2169,6 @@ void permissionRecalculate(void *p) { asPermission(p)->recalculatePermissibles()
 const BridgeTable &getBridgeTable()
 {
     static BridgeTable table{
-        .player_get_name = &playerGetName,
-        .player_send_message = &playerSendMessage,
-        .player_send_error_message = &playerSendErrorMessage,
         .player_send_popup = &playerSendPopup,
         .player_send_tip = &playerSendTip,
         .player_send_toast = &playerSendToast,
@@ -2265,8 +2359,6 @@ const BridgeTable &getBridgeTable()
         .actor_teleport_location = &actorTeleportLocation,
         .actor_teleport_actor = &actorTeleportActor,
         .actor_remove = &actorRemove,
-        .actor_send_message = &actorSendMessage,
-        .actor_get_name = &actorGetName,
         .actor_get_scoreboard_tag_count = &actorGetScoreboardTagCount,
         .actor_get_scoreboard_tag = &actorGetScoreboardTag,
         .actor_add_scoreboard_tag = &actorAddScoreboardTag,
@@ -2347,9 +2439,19 @@ const BridgeTable &getBridgeTable()
         .sender_get_name = &senderGetName,
         .sender_send_message = &senderSendMessage,
         .sender_send_error_message = &senderSendErrorMessage,
+        .sender_get_permission_level = &senderGetPermissionLevel,
+        .sender_is_permission_set = &senderIsPermissionSet,
+        .sender_is_permission_set_perm = &senderIsPermissionSetPerm,
         .sender_has_permission = &senderHasPermission,
         .sender_has_permission_perm = &senderHasPermissionPerm,
+        .sender_add_attachment = &senderAddAttachment,
+        .sender_add_attachment_empty = &senderAddAttachmentEmpty,
+        .sender_remove_attachment = &senderRemoveAttachment,
+        .sender_recalculate_permissions = &senderRecalculatePermissions,
+        .sender_get_effective_permissions = &senderGetEffectivePermissions,
         .sender_as_player = &senderAsPlayer,
+        .sender_as_actor = &senderAsActor,
+        .sender_as_console = &senderAsConsole,
         .form_create = &formCreate,
         .form_set_title = &formSetTitle,
         .form_set_content = &formSetContent,
@@ -2508,6 +2610,20 @@ const BridgeTable &getBridgeTable()
         .permission_add_parent_name = &permissionAddParentName,
         .permission_add_parent = &permissionAddParent,
         .permission_recalculate = &permissionRecalculate,
+        .attachment_get_plugin = &attachmentGetPlugin,
+        .attachment_get_permissible = &attachmentGetPermissible,
+        .attachment_get_permission_count = &attachmentGetPermissionCount,
+        .attachment_get_permission_name = &attachmentGetPermissionName,
+        .attachment_get_permission_value = &attachmentGetPermissionValue,
+        .attachment_set_permission = &attachmentSetPermission,
+        .attachment_set_permission_perm = &attachmentSetPermissionPerm,
+        .attachment_unset_permission = &attachmentUnsetPermission,
+        .attachment_unset_permission_perm = &attachmentUnsetPermissionPerm,
+        .attachment_remove = &attachmentRemove,
+        .attachment_info_get_permissible = &attachmentInfoGetPermissible,
+        .attachment_info_get_permission = &attachmentInfoGetPermission,
+        .attachment_info_get_attachment = &attachmentInfoGetAttachment,
+        .attachment_info_get_value = &attachmentInfoGetValue,
     };
     return table;
 }
