@@ -2,9 +2,8 @@
 setlocal EnableExtensions
 rem ------------------------------------------------------------------
 rem Windows x64 build: native (C++) + managed (C#).
-rem Must be launched from a Developer PowerShell (VsDevCmd loaded):
-rem the MSVC/SDK/LLVM/Ninja/CMake environment is inherited, nothing is
-rem discovered or redefined here.
+rem To use the toolchain from Visual Studio, run this script from a Visual Studio Developer Shell
+rem If use the toolchain from a standalone installation of CMake, Ninja, and Clang, ensure that the following are on your PATH
 rem
 rem Output layout (mirrors %RELEASE_DIR%, zip archives ignored):
 rem   %CD%\artifacts\win-x64\plugins\endstone_dotnet_loader.dll
@@ -12,13 +11,14 @@ rem   %CD%\artifacts\win-x64\plugins\dotnet_loader\runtime\Endstone.Loader.*
 rem ------------------------------------------------------------------
 
 if not defined VCToolsInstallDir (
-    echo [error] MSVC environment not detected - launch from "Developer PowerShell"
-    echo         ^(which runs VsDevCmd automatically^) and try again.
-    exit /b 1
+    echo [info] You are not running this script from a Visual Studio Developer Shell. Using the toolchain from your PATH.
+) else (
+    echo [info] Using the toolchain from Visual Studio.
 )
-where clang-cl >nul 2>nul || (echo [error] clang-cl not on PATH; install "C++ Clang tools for Windows" & exit /b 1)
-where ninja >nul 2>nul || (echo [error] ninja not on PATH; install "CMake tools for Windows" & exit /b 1)
-where cmake >nul 2>nul || (echo [error] cmake not on PATH; install "CMake tools for Windows" & exit /b 1)
+
+where clang-cl >nul 2>nul || (echo [error] clang-cl not on PATH; install "C++ Clang tools for Windows" in VS or install LLVM & exit /b 1)
+where ninja >nul 2>nul || (echo [error] ninja not on PATH; install "CMake tools for Windows" in VS or install ninja to your path & exit /b 1)
+where cmake >nul 2>nul || (echo [error] cmake not on PATH; install "CMake tools for Windows" in VS or install cmake to your path & exit /b 1)
 where dotnet >nul 2>nul || (echo [error] dotnet SDK not found on PATH & exit /b 1)
 
 set "RID=win-x64"
