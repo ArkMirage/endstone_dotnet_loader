@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Endstone.DocGen")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4ccb578b686b454b56b3546cdb8d168c558c1c45")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+847e6f0785f81a3331c0f340845594f391221cbb")]
 [assembly: System.Reflection.AssemblyProductAttribute("Endstone.DocGen")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Endstone.DocGen")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

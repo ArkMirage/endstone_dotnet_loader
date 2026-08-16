@@ -157,5 +157,6 @@ nav:
           - reference/csharp/MapRenderer.md
       - reference/csharp/events.md
       - reference/csharp/enums.md
+      - reference/csharp/Event.md
       - Native Interop:
           - reference/csharp/Bootstrap.md

@@ -84,6 +84,10 @@ internal static class Program
         _translations = LoadJsonObject(_translationsPath);
 
         Directory.CreateDirectory(_outDir);
+        foreach (var stale in Directory.EnumerateFiles(_outDir, "*.md"))
+        {
+            File.Delete(stale);
+        }
         GenerateAll();
 
         Console.WriteLine($"[DocGen] Reference pages written to {_outDir}");
@@ -739,8 +743,6 @@ internal static class Program
         zh.AppendLine("所有事件类均派生自 `Event`,通过 `PluginBase.RegisterEvent<T>()` 注册。");
         zh.AppendLine("事件在服务器主线程上同步触发;多数事件暴露 `Player`,并可通过 `IsCancelled` 取消。");
         zh.AppendLine();
-        zh.AppendLine("在英文版中查看完整成员列表。");
-        zh.AppendLine();
         zh.AppendLine("| 事件 | 说明 |");
         zh.AppendLine("| --- | --- |");
         foreach (var t in eventTypes)
@@ -750,6 +752,26 @@ internal static class Program
             zh.AppendLine($"| `{t.Name}` | {translated} |");
         }
         zh.AppendLine();
+        foreach (var t in eventTypes)
+        {
+            var api = BuildType(t);
+            zh.AppendLine($"## `{t.Name}`");
+            zh.AppendLine();
+            if (!string.IsNullOrWhiteSpace(api.Summary))
+            {
+                zh.AppendLine(Translate("type", t.FullName ?? t.Name, api.Summary));
+                zh.AppendLine();
+            }
+            var body = new List<string>();
+            RenderSections(body, api, "zh");
+            if (body.Count > 0)
+            {
+                zh.Append(string.Join("\n", body));
+                zh.AppendLine();
+            }
+            zh.AppendLine("---");
+            zh.AppendLine();
+        }
         return (en.ToString(), zh.ToString());
     }
 
@@ -841,7 +863,7 @@ internal static class Program
         en.AppendLine("Every page below is **generated from source**: the code generator " +
                       "(`tools/DocGen`) reflects over `Endstone.Loader.dll`, merges the XML doc " +
                       "comments from `src/csharp`, and renders these Markdown pages. Never edit " +
-                      "them by hand - run the generator (see [Code generation](../../development/codegen.md)).");
+                      "them by hand - run the generator instead.");
         en.AppendLine();
 
         foreach (var cat in categories)
@@ -874,8 +896,7 @@ internal static class Program
         zh.AppendLine();
         zh.AppendLine("以下每个页面都是**从源码生成**的:代码生成器(`tools/DocGen`)对 " +
                       "`Endstone.Loader.dll` 做反射,合并 `src/csharp` 中的 XML 文档注释,然后渲染成 " +
-                      "这些 Markdown 页面。请勿手工编辑,运行生成器即可(见 " +
-                      "[代码生成](../../development/codegen.md))。");
+                      "这些 Markdown 页面。请勿手工编辑,运行生成器即可。");
         zh.AppendLine();
         foreach (var cat in categories)
         {
