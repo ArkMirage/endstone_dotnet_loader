@@ -13,6 +13,7 @@
 
 #include <endstone/endstone.hpp>
 #include <endstone/permissions/permission_attachment.h>
+#include <nlohmann/json.hpp>
 
 namespace dotnet_loader {
 
@@ -25,6 +26,10 @@ thread_local std::string g_payload_buffer;
 thread_local std::optional<endstone::ItemStack> g_item_slot;
 thread_local std::array<std::optional<endstone::ItemStack>, 64> g_item_slots;
 thread_local size_t g_item_slot_next = 0;
+// Snapshot of a plugin's declared permissions; PluginDescription::getPermissions()
+// returns a copy, so the vector is cached here to keep the returned pointers
+// valid until the next permission query on the same thread.
+thread_local std::vector<endstone::Permission> g_plugin_permissions;
 
 // Transient snapshot of an optional ItemStack; the managed side treats it as
 // read-only and must not outlive the next call on the same thread.
@@ -46,6 +51,7 @@ const char *strOut(std::string s)
 
 endstone::Player *asPlayer(void *p) { return static_cast<endstone::Player *>(p); }
 endstone::Server *asServer(void *p) { return static_cast<endstone::Server *>(p); }
+endstone::PluginManager *asPluginManager(void *p) { return static_cast<endstone::PluginManager *>(p); }
 endstone::Event *asEvent(void *e) { return static_cast<endstone::Event *>(e); }
 endstone::Permission *asPermission(void *p) { return static_cast<endstone::Permission *>(p); }
 endstone::Plugin *asPlugin(void *p) { return static_cast<endstone::Plugin *>(p); }
@@ -190,6 +196,68 @@ void *serverGetPlayer(void *p, const char *name)
 bool serverDispatchCommand(void *p, void *sender, const char *cmd)
 {
     return asServer(p)->dispatchCommand(*static_cast<endstone::CommandSender *>(sender), cmd);
+}
+
+// ---- plugin manager ----
+
+void *serverGetPluginManager(void *s) { return &asServer(s)->getPluginManager(); }
+void *pluginManagerGetPlugin(void *pm, const char *name)
+{
+    return asPluginManager(pm)->getPlugin(name ? name : "");
+}
+int pluginManagerGetPlugins(void *pm, void **out, int capacity)
+{
+    const auto plugins = asPluginManager(pm)->getPlugins();
+    const int n = std::min(capacity, static_cast<int>(plugins.size()));
+    for (int i = 0; i < n; ++i) {
+        out[i] = plugins[static_cast<size_t>(i)];
+    }
+    return static_cast<int>(plugins.size());
+}
+bool pluginManagerIsPluginEnabled(void *pm, const char *name)
+{
+    return asPluginManager(pm)->isPluginEnabled(name ? name : "");
+}
+
+// ---- plugin ----
+
+// Serializes the trivial fields of a PluginDescription as camelCase JSON,
+// mirroring the parseDescription() contract used for .NET plugin metadata.
+// Permissions are deliberately excluded: they are transferred as native
+// pointers via plugin_get_permission_count/plugin_get_permission so the
+// managed side can wrap them with the full Permission class.
+const char *pluginDescriptionToJson(void *plugin)
+{
+    const auto &d = asPlugin(plugin)->getDescription();
+    nlohmann::json j;
+    j["name"] = d.getName();
+    j["version"] = d.getVersion();
+    j["fullName"] = d.getFullName();
+    j["apiVersion"] = d.getAPIVersion();
+    j["description"] = d.getDescription();
+    j["load"] = static_cast<int>(d.getLoad());
+    j["authors"] = d.getAuthors();
+    j["contributors"] = d.getContributors();
+    j["website"] = d.getWebsite();
+    j["prefix"] = d.getPrefix();
+    j["provides"] = d.getProvides();
+    j["depend"] = d.getDepend();
+    j["softDepend"] = d.getSoftDepend();
+    j["loadBefore"] = d.getLoadBefore();
+    j["defaultPermission"] = static_cast<int>(d.getDefaultPermission());
+    return strOut(j.dump());
+}
+int pluginGetPermissionCount(void *p)
+{
+    g_plugin_permissions = asPlugin(p)->getDescription().getPermissions();
+    return static_cast<int>(g_plugin_permissions.size());
+}
+void *pluginGetPermission(void *p, int index)
+{
+    if (index < 0 || index >= static_cast<int>(g_plugin_permissions.size())) {
+        return nullptr;
+    }
+    return &g_plugin_permissions[static_cast<size_t>(index)];
 }
 
 // ---- events ----
@@ -786,13 +854,13 @@ int packetGetSubClientId(void *e, int kind)
         return 0;
     }
 }
-const char *pluginEventGetPluginName(void *e, int kind)
+void *pluginEventGetPlugin(void *e, int kind)
 {
     switch (static_cast<EventKind>(kind)) {
     case EventKind::PluginEnableEvent:
-        return strOut(static_cast<endstone::PluginEnableEvent *>(e)->getPlugin().getName());
+        return &static_cast<endstone::PluginEnableEvent *>(e)->getPlugin();
     case EventKind::PluginDisableEvent:
-        return strOut(static_cast<endstone::PluginDisableEvent *>(e)->getPlugin().getName());
+        return &static_cast<endstone::PluginDisableEvent *>(e)->getPlugin();
     default:
         return nullptr;
     }
@@ -2227,6 +2295,13 @@ const BridgeTable &getBridgeTable()
         .server_get_player = &serverGetPlayer,
         .server_get_console_sender = &serverGetConsoleSender,
         .server_dispatch_command = &serverDispatchCommand,
+        .server_get_plugin_manager = &serverGetPluginManager,
+        .plugin_manager_get_plugin = &pluginManagerGetPlugin,
+        .plugin_manager_get_plugins = &pluginManagerGetPlugins,
+        .plugin_manager_is_plugin_enabled = &pluginManagerIsPluginEnabled,
+        .plugin_get_description_json = &pluginDescriptionToJson,
+        .plugin_get_permission_count = &pluginGetPermissionCount,
+        .plugin_get_permission = &pluginGetPermission,
         .event_get_player = &eventGetPlayer,
         .event_get_actor = &eventGetActor,
         .event_is_cancelled = &eventIsCancelled,
@@ -2315,7 +2390,7 @@ const BridgeTable &getBridgeTable()
         .packet_get_player = &packetGetPlayer,
         .packet_get_address = &packetGetAddress,
         .packet_get_sub_client_id = &packetGetSubClientId,
-        .plugin_event_get_plugin_name = &pluginEventGetPluginName,
+        .plugin_event_get_plugin = &pluginEventGetPlugin,
         .script_get_message_id = &scriptGetMessageId,
         .script_get_message = &scriptGetMessage,
         .script_get_sender_name = &scriptGetSenderName,

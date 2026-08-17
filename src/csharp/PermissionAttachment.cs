@@ -19,7 +19,7 @@ public sealed unsafe class PermissionAttachment
 
     /// <summary>Gets the plugin responsible for this attachment, or null if
     /// the plugin is no longer loaded.</summary>
-    public PluginBase? Plugin => Bootstrap.FindPlugin((IntPtr)T->AttachmentGetPlugin(_ptr));
+    public Plugin? Plugin => Plugin.FromNative((IntPtr)T->AttachmentGetPlugin(_ptr));
 
     /// <summary>Gets the permissible this attachment is attached to.</summary>
     public CommandSender Permissible => new((IntPtr)T->AttachmentGetPermissible(_ptr));

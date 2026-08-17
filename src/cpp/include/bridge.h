@@ -139,6 +139,21 @@ struct BridgeTable {
     void *(*server_get_console_sender)(void *);
     bool (*server_dispatch_command)(void *, void *, const char *);
 
+    // ---- plugin manager ----
+    void *(*server_get_plugin_manager)(void *);
+    void *(*plugin_manager_get_plugin)(void *, const char *);
+    int (*plugin_manager_get_plugins)(void *, void **, int);
+    bool (*plugin_manager_is_plugin_enabled)(void *, const char *);
+
+    // ---- plugin ----
+    // Description is transferred as a JSON snapshot of the trivial fields
+    // (name/version/.../defaultPermission); permissions are transferred as
+    // native pointers (the plugin manager owns them) so the managed side can
+    // wrap them with the full Permission class.
+    const char *(*plugin_get_description_json)(void *);
+    int (*plugin_get_permission_count)(void *);
+    void *(*plugin_get_permission)(void *, int);
+
     // ---- events: common ----
     // event kind identifies the concrete event class (see EventKind above); it
     // is required because multi-type accessors must not rely on RTTI (typeinfo
@@ -247,7 +262,7 @@ struct BridgeTable {
     void *(*packet_get_player)(void *, int);
     const char *(*packet_get_address)(void *, int);
     int (*packet_get_sub_client_id)(void *, int);
-    const char *(*plugin_event_get_plugin_name)(void *, int);
+    void *(*plugin_event_get_plugin)(void *, int);
     const char *(*script_get_message_id)(void *);
     const char *(*script_get_message)(void *);
     const char *(*script_get_sender_name)(void *);

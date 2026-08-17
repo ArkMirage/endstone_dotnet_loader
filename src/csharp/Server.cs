@@ -43,6 +43,10 @@ public sealed unsafe class Server
     /// <summary>Gets the console command sender.</summary>
     public ConsoleCommandSender ConsoleSender => new((IntPtr)T->ServerGetConsoleSender(_ptr));
 
+    /// <summary>Gets the plugin manager, providing read-only access to all
+    /// loaded plugins (both .NET and native).</summary>
+    public PluginManager PluginManager => new((IntPtr)T->ServerGetPluginManager(_ptr));
+
     public bool DispatchCommand(string commandLine)
     {
         var console = T->ServerGetConsoleSender(_ptr);

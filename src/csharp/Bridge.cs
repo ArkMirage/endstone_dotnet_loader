@@ -76,6 +76,20 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*> ServerGetConsoleSender;
         public delegate* unmanaged[Cdecl]<void*, void*, byte*, bool> ServerDispatchCommand;
 
+        // ---- plugin manager ----
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerGetPluginManager;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> PluginManagerGetPlugin;
+        public delegate* unmanaged[Cdecl]<void*, void**, int, int> PluginManagerGetPlugins;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> PluginManagerIsPluginEnabled;
+
+        // ---- plugin ----
+        // Description is transferred as a JSON snapshot of the trivial fields;
+        // permissions are transferred as native pointers (owned by the plugin
+        // manager) and wrapped with the full Permission class.
+        public delegate* unmanaged[Cdecl]<void*, byte*> PluginGetDescriptionJson;
+        public delegate* unmanaged[Cdecl]<void*, int> PluginGetPermissionCount;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> PluginGetPermission;
+
         // ---- events: common ----
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetPlayer;
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetActor;
@@ -181,7 +195,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, void*> PacketGetPlayer;
         public delegate* unmanaged[Cdecl]<void*, int, byte*> PacketGetAddress;
         public delegate* unmanaged[Cdecl]<void*, int, int> PacketGetSubClientId;
-        public delegate* unmanaged[Cdecl]<void*, int, byte*> PluginEventGetPluginName;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> PluginEventGetPlugin;
         public delegate* unmanaged[Cdecl]<void*, byte*> ScriptGetMessageId;
         public delegate* unmanaged[Cdecl]<void*, byte*> ScriptGetMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*> ScriptGetSenderName;

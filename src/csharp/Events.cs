@@ -900,7 +900,10 @@ public sealed unsafe class PluginEnableEvent : Event
     private static Bridge.Table* T => Bridge.Raw;
     internal PluginEnableEvent(IntPtr ptr) : base(ptr) { }
 
-    public string PluginName => Bridge.Str(Bridge.CallKindStr(T->PluginEventGetPluginName, NativePtr, EventKind.PluginEnableEvent));
+    /// <summary>Gets the plugin involved in this event.</summary>
+    public Plugin Plugin => Plugin.FromNative((IntPtr)Bridge.CallKindPtr(T->PluginEventGetPlugin, NativePtr, EventKind.PluginEnableEvent));
+
+    public string PluginName => Plugin.Name;
 }
 
 public sealed unsafe class PluginDisableEvent : Event
@@ -908,7 +911,10 @@ public sealed unsafe class PluginDisableEvent : Event
     private static Bridge.Table* T => Bridge.Raw;
     internal PluginDisableEvent(IntPtr ptr) : base(ptr) { }
 
-    public string PluginName => Bridge.Str(Bridge.CallKindStr(T->PluginEventGetPluginName, NativePtr, EventKind.PluginDisableEvent));
+    /// <summary>Gets the plugin involved in this event.</summary>
+    public Plugin Plugin => Plugin.FromNative((IntPtr)Bridge.CallKindPtr(T->PluginEventGetPlugin, NativePtr, EventKind.PluginDisableEvent));
+
+    public string PluginName => Plugin.Name;
 }
 
 public sealed unsafe class ScriptMessageEvent : Event

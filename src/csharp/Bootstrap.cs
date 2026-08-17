@@ -92,6 +92,7 @@ public static class Bootstrap
             }
 
             var instance = (PluginBase)Activator.CreateInstance(pluginType)!;
+            instance.Description = PluginDescription.FromAttribute(meta);
 
             var info = JsonSerializer.Serialize(
                 // New metadata fields are temporarily filled with the C++ side's

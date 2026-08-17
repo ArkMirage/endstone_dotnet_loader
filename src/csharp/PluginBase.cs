@@ -56,9 +56,8 @@ public sealed class PluginAttribute(string name, string version) : Attribute
 }
 
 /// <summary>Base class for all .NET Endstone plugins.</summary>
-public abstract class PluginBase
+public abstract class PluginBase : Plugin
 {
-    internal IntPtr NativeHandle { get; set; }
     internal IntPtr GcHandle { get; set; }
 
     private readonly EventManager _events = new();
@@ -68,6 +67,8 @@ public abstract class PluginBase
     private Server? _server;
     private Scheduler? _scheduler;
     private ServiceManager? _serviceManager;
+
+    public PluginBase() : base(new PluginDescription()){}
 
     public Logger Logger => _logger ??= new Logger(this);
 
@@ -129,6 +130,10 @@ public abstract class PluginBase
         => _commands.Dispatch(name, sender, args);
 
     internal IEnumerable<CommandDefinition> CommandDefinitions => _commands.Definitions;
+
+    /// <summary>Permissions declared by this plugin (created through the
+    /// <c>Permission(name)</c> factory), reflecting the live list.</summary>
+    internal override Permission[] GetPermissions() => _permissions.ToArray();
 
     internal void SetPluginHandles(IntPtr gcHandle, IntPtr nativeHandle)
     {
