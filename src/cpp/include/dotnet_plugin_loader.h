@@ -79,4 +79,27 @@ private:
     std::vector<std::unique_ptr<DotNetPlugin>> plugins_;
 };
 
+/**
+ * PluginLoader backed by a managed Endstone.Loader.PluginLoader instance. Each
+ * matched file is handed to the managed loader, which returns a PluginBase; the
+ * resulting instance is wrapped in a DotNetPlugin exactly like assembly-loaded
+ * .NET plugins. Reuses the existing host channels, so no new plugin proxy is
+ * introduced between PluginBase and Plugin.
+ */
+class ManagedLoaderWrapper : public endstone::PluginLoader {
+public:
+    ManagedLoaderWrapper(endstone::Server &server, DotNetHost &host, endstone::Logger &logger,
+                         void *loader_gc, std::vector<std::string> filters);
+
+    [[nodiscard]] endstone::Plugin *loadPlugin(std::string file) override;
+    [[nodiscard]] std::vector<std::string> getPluginFileFilters() const override;
+
+private:
+    DotNetHost &host_;
+    endstone::Logger &logger_;
+    void *loader_gc_;
+    std::vector<std::string> filters_;
+    std::vector<std::unique_ptr<DotNetPlugin>> plugins_;
+};
+
 }  // namespace dotnet_loader

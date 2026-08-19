@@ -7,6 +7,7 @@
 #include <iterator>
 #include <memory>
 #include <optional>
+#include <regex>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -2234,6 +2235,23 @@ void permissionRecalculate(void *p) { asPermission(p)->recalculatePermissibles()
 
 }  // namespace
 
+// Validates a plugin-loader file filter with std::regex — the same engine
+// endstone's resolvePluginLoader uses — so the managed side can reject an
+// invalid pattern before it ever reaches endstone's loader scan.
+bool bridgeValidateRegex(const char *pattern)
+{
+    if (!pattern) {
+        return false;
+    }
+    try {
+        std::regex r(pattern);
+        return true;
+    }
+    catch (const std::regex_error &) {
+        return false;
+    }
+}
+
 const BridgeTable &getBridgeTable()
 {
     static BridgeTable table{
@@ -2647,6 +2665,7 @@ const BridgeTable &getBridgeTable()
         .inventory_set_held_item_slot = &inventorySetHeldItemSlot,
         .plugin_register_event = nullptr,  // filled by DotNetPluginLoader
         .map_render_callback = nullptr,  // filled by DotNetPluginLoader
+        .validate_regex = &bridgeValidateRegex,
         .server_get_scheduler = &serverGetScheduler,
         .scheduler_run_task = &schedulerRunTask,
         .scheduler_cancel_task = &schedulerCancelTask,
@@ -2699,6 +2718,7 @@ const BridgeTable &getBridgeTable()
         .attachment_info_get_permission = &attachmentInfoGetPermission,
         .attachment_info_get_attachment = &attachmentInfoGetAttachment,
         .attachment_info_get_value = &attachmentInfoGetValue,
+        .plugin_manager_register_loader = &pluginManagerRegisterLoader,
     };
     return table;
 }

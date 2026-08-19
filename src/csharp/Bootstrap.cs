@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace Endstone.Loader;
 
@@ -99,10 +98,10 @@ public static class Bootstrap
                 // default values (empty collections / empty strings) until real
                 // values are wired through PluginAttribute.
                 new PluginInfo(meta.Name, meta.Version, meta.Description, meta.Authors,
-                               meta.Contributors, meta.Website, meta.Prefix,
-                               meta.Depend, meta.SoftDepend, meta.LoadBefore,
-                               meta.DefaultPermission,
-                               instance.CommandDefinitions.ToArray()),
+                                meta.Contributors, meta.Website, meta.Prefix,
+                                meta.Depend, meta.SoftDepend, meta.LoadBefore,
+                                meta.DefaultPermission,
+                                instance.CommandDefinitions.ToArray()),
                 JsonOptions);
 
             WriteUtf8(infoBuffer, bufferSize, info);
@@ -114,6 +113,114 @@ public static class Bootstrap
             return IntPtr.Zero;
         }
     }
+
+    /// <summary>
+    /// Loads a plugin through a managed <see cref="PluginLoader"/> instance
+    /// (registered via PluginManager.RegisterLoader). Returns a GCHandle to the
+    /// PluginBase it produces, or 0 on failure / when the file is skipped.
+    /// </summary>
+    [UnmanagedCallersOnly]
+    public static IntPtr LoadPluginViaLoader(IntPtr loaderGcHandle, IntPtr fileUtf8, IntPtr infoBuffer, int bufferSize)
+    {
+        var path = Marshal.PtrToStringUTF8(fileUtf8) ?? "";
+        try
+        {
+            if (GCHandle.FromIntPtr(loaderGcHandle).Target is not PluginLoader loader)
+            {
+                WriteUtf8(infoBuffer, bufferSize, "invalid loader handle");
+                return IntPtr.Zero;
+            }
+
+            var instance = loader.LoadPlugin(path);
+            if (instance is null)
+            {
+                WriteUtf8(infoBuffer, bufferSize, "");  // empty info => skip silently
+                return IntPtr.Zero;
+            }
+
+            var d = instance.Description;
+            var info = JsonSerializer.Serialize(
+                new PluginInfo(d.Name, d.Version, d.Description, d.Authors, d.Contributors,
+                                d.Website, d.Prefix, d.Depend, d.SoftDepend, d.LoadBefore,
+                                d.DefaultPermission, instance.CommandDefinitions.ToArray()),
+                JsonOptions);
+            WriteUtf8(infoBuffer, bufferSize, info);
+            return GCHandle.ToIntPtr(GCHandle.Alloc(instance));
+        }
+        catch (Exception e)
+        {
+            WriteUtf8(infoBuffer, bufferSize, e.ToString());
+            return IntPtr.Zero;
+        }
+    }
+
+    /// <summary>
+    /// Serializes a loader's <see cref="PluginLoader.FileFilters"/> as a JSON
+    /// array of strings into the caller-provided buffer; returns 1 on success.
+    /// Only structural checks (non-empty list, non-empty strings) happen here;
+    /// regex syntax is validated natively with std::regex — the same engine
+    /// endstone uses — so no pattern is rejected or accepted by a mismatched
+    /// engine. Failures are logged with the loader's assembly/type so the log
+    /// identifies which plugin's loader implementation is broken.
+    /// </summary>
+    [UnmanagedCallersOnly]
+    public static unsafe int GetLoaderFilters(IntPtr loaderGcHandle, IntPtr buffer, int bufferSize)
+    {
+        PluginLoader? loader = null;
+        try
+        {
+            if (GCHandle.FromIntPtr(loaderGcHandle).Target is not PluginLoader l)
+            {
+                Log(IntPtr.Zero, LogLevel.Error, "Failed to query custom loader file filters: invalid loader handle.");
+                return 0;
+            }
+            loader = l;
+            var filters = loader.FileFilters ?? [];
+            if (filters.Count == 0)
+            {
+                Log(IntPtr.Zero, LogLevel.Error,
+                    $"Failed to query custom loader file filters from '{LoaderName(loader)}': no file filters declared.");
+                return 0;
+            }
+            foreach (var f in filters)
+            {
+                if (string.IsNullOrEmpty(f))
+                {
+                    Log(IntPtr.Zero, LogLevel.Error,
+                        $"Failed to query custom loader file filters from '{LoaderName(loader)}': empty filter string.");
+                    return 0;
+                }
+                // Regex syntax is validated natively with std::regex — the same
+                // engine endstone uses — so no pattern is rejected or accepted
+                // by a mismatched engine.
+                var buf = Bridge.ToUtf8(f);
+                fixed (byte* p = buf)
+                {
+                    if (!Bridge.Raw->ValidateRegex(p))
+                    {
+                        Log(IntPtr.Zero, LogLevel.Error,
+                            $"Failed to query custom loader file filters from '{LoaderName(loader)}': invalid filter '{f}'.");
+                        return 0;
+                    }
+                }
+            }
+            var json = JsonSerializer.Serialize(filters, JsonOptions);
+            WriteUtf8(buffer, bufferSize, json);
+            return 1;
+        }
+        catch (Exception e)
+        {
+            Log(IntPtr.Zero, LogLevel.Error,
+                $"Failed to query custom loader file filters from '{LoaderName(loader)}': {e}");
+            return 0;
+        }
+    }
+
+    // The assembly name (e.g. "MyPlugin" for MyPlugin.Plugin.dll) is the
+    // closest zero-cost proxy for the plugin name; the loader type alone
+    // cannot identify the owning plugin.
+    private static string LoaderName(PluginLoader? loader) =>
+        loader is null ? "unknown loader" : $"{loader.GetType().Assembly.GetName().Name} ({loader.GetType().FullName})";
 
     record class PluginInfo(string Name, string Version, string Description, string[] Authors, string[] Contributors,
         string Website, string Prefix, string[] Depend, string[] SoftDepend, string[] LoadBefore,

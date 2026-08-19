@@ -477,6 +477,7 @@ internal static unsafe class Bridge
         // ---- plugin registration ----
         public delegate* unmanaged[Cdecl]<void*, byte*, int, bool, void*, void> PluginRegisterEvent;
         public delegate* unmanaged[Cdecl]<void*, void*, void*, ulong, void> MapRenderCallback;
+        public delegate* unmanaged[Cdecl]<byte*, bool> ValidateRegex;
 
         // ---- scheduler ----
         public delegate* unmanaged[Cdecl]<void*, void*> ServerGetScheduler;
@@ -541,6 +542,10 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> AttachmentInfoGetPermission;
         public delegate* unmanaged[Cdecl]<void*, void*> AttachmentInfoGetAttachment;
         public delegate* unmanaged[Cdecl]<void*, bool> AttachmentInfoGetValue;
+
+        // ---- plugin registration ----
+        // Registers a managed PluginLoader (gc handle) and scans `directory`.
+        public delegate* unmanaged[Cdecl]<void*, void*, void*, void> PluginManagerRegisterLoader;
     }
 #pragma warning restore CS0649
 
@@ -714,13 +719,18 @@ internal static unsafe class Bridge
     }
 
     internal static void CallRegisterEvent(void* gcHandle, string eventName, int priority, bool ignoreCancelled,
-                                           void* cbHandle)
+                                            void* cbHandle)
     {
         var buf = ToUtf8(eventName);
         fixed (byte* p = buf)
         {
             T->PluginRegisterEvent(gcHandle, p, priority, ignoreCancelled, cbHandle);
         }
+    }
+
+    internal static void CallRegisterLoader(void* pm, void* loaderGc, void* dirUtf8)
+    {
+        T->PluginManagerRegisterLoader(pm, loaderGc, dirUtf8);
     }
 
     internal static Table* Raw => T;

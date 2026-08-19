@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Endstone.Loader;
 
 public enum LogLevel
@@ -68,7 +70,13 @@ public abstract class PluginBase : Plugin
     private Scheduler? _scheduler;
     private ServiceManager? _serviceManager;
 
-    public PluginBase() : base(new PluginDescription()){}
+    public PluginBase() : base(new PluginDescription())
+    {
+        if (GetType().GetCustomAttribute<PluginAttribute>() is { } meta)
+        {
+            Description = PluginDescription.FromAttribute(meta);
+        }
+    }
 
     public Logger Logger => _logger ??= new Logger(this);
 

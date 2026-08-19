@@ -274,6 +274,8 @@ void DotNetHost::start(LogFn log_fn, const void *bridge_table)
     InitFn init_fn = nullptr;
     bind(toNativeStr("Init").c_str(), reinterpret_cast<void **>(&init_fn));
     bind(toNativeStr("LoadPlugin").c_str(), reinterpret_cast<void **>(&load_plugin));
+    bind(toNativeStr("LoadPluginViaLoader").c_str(), reinterpret_cast<void **>(&load_plugin_via_loader));
+    bind(toNativeStr("GetLoaderFilters").c_str(), reinterpret_cast<void **>(&get_loader_filters));
     bind(toNativeStr("Attach").c_str(), reinterpret_cast<void **>(&attach));
     bind(toNativeStr("OnLoad").c_str(), reinterpret_cast<void **>(&on_load));
     bind(toNativeStr("OnEnable").c_str(), reinterpret_cast<void **>(&on_enable));

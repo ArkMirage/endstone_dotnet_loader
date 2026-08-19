@@ -559,6 +559,10 @@ struct BridgeTable {
     // Filled by installEventBridge: render(map-view) callback into managed code.
     // (canvas, map, player, renderer_id).
     void (*map_render_callback)(void *, void *, void *, uint64_t);
+    // Validates a plugin-loader file filter with std::regex — the same engine
+    // endstone's resolvePluginLoader uses. Returns true when the pattern
+    // compiles; the managed side calls this before registering a loader.
+    bool (*validate_regex)(const char *);
 
     // ---- scheduler ----
     void *(*server_get_scheduler)(void *);
@@ -645,6 +649,11 @@ struct BridgeTable {
     const char *(*attachment_info_get_permission)(void *);
     void *(*attachment_info_get_attachment)(void *);
     bool (*attachment_info_get_value)(void *);
+
+    // ---- plugin registration ----
+    // Registers a managed PluginLoader; scans `directory` afterwards. loader_gc
+    // is a GCHandle to the Endstone.Loader.PluginLoader instance.
+    void (*plugin_manager_register_loader)(void *pm, void *loader_gc, const char *directory);
 };
 
 }  // namespace dotnet_loader
@@ -653,5 +662,8 @@ namespace dotnet_loader {
 
 const BridgeTable &getBridgeTable();
 BridgeTable &mutableBridgeTable();
+
+// Implemented in dotnet_plugin_loader.cpp; registers a managed PluginLoader.
+void pluginManagerRegisterLoader(void *pm, void *loader_gc, const char *directory);
 
 }  // namespace dotnet_loader

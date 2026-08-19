@@ -1,17 +1,44 @@
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+
 namespace Endstone.Loader;
 
 /// <summary>
 /// Wraps the native endstone::PluginManager. Provides read-only access to the
 /// plugin ecosystem: look up plugins by name, enumerate all loaded plugins and
-/// query their enabled state.
+/// query their enabled state. Also lets a plugin register a custom
+/// <see cref="PluginLoader"/>.
 /// </summary>
 public sealed unsafe class PluginManager
 {
     private static Bridge.Table* T => Bridge.Raw;
 
+    // Kept alive for the server lifetime: a registered loader cannot be
+    // unregistered, so its managed handle must survive until shutdown.
+    private static readonly List<GCHandle> RegisteredLoaders = [];
+
     private readonly void* _ptr;
 
     internal PluginManager(IntPtr ptr) => _ptr = (void*)ptr;
+
+    /// <summary>
+    /// Registers a custom <see cref="PluginLoader"/>. After registration the
+    /// given <paramref name="directory"/> is scanned and every file matching the
+    /// loader's <see cref="PluginLoader.FileFilters"/> is loaded as a plugin.
+    /// The loader stays registered for the server lifetime (there is no
+    /// unregister); point <paramref name="directory"/> at a folder dedicated to
+    /// the loader's files to avoid clashing with other loaders.
+    /// </summary>
+    public void RegisterLoader(PluginLoader loader, string directory)
+    {
+        var gc = GCHandle.Alloc(loader);
+        RegisteredLoaders.Add(gc);
+        var dirBuf = Bridge.ToUtf8(directory);
+        fixed (byte* p = dirBuf)
+        {
+            Bridge.CallRegisterLoader(_ptr, (void*)GCHandle.ToIntPtr(gc), p);
+        }
+    }
 
     /// <summary>Gets the plugin with the given name (case-sensitive), or null
     /// if it is not loaded. .NET plugins resolve to their live PluginBase;

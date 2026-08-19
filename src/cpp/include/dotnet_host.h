@@ -15,6 +15,14 @@ using InitFn = int (*)(LogFn log_fn, const void *bridge_table);
 // plugin info object {"name","version","description","authors","commands"}
 // into buffer (utf8); on failure writes a plain-text error message.
 using LoadPluginFn = void *(*)(const char *assembly_path_utf8, char *info_buffer, int32_t buffer_size);
+// Loads a plugin through a managed PluginLoader instance (GCHandle), returning
+// a GCHandle (0 on failure / skip) and writing a JSON plugin info object (or a
+// plain-text error message / empty string on skip) into buffer.
+using LoadPluginViaLoaderFn = void *(*)(void *loader_gc, const char *file_utf8, char *info_buffer,
+                                        int32_t buffer_size);
+// Serializes a managed PluginLoader's FileFilters as a JSON array of strings
+// into buffer; returns 1 on success, 0 on failure.
+using GetLoaderFiltersFn = int (*)(void *loader_gc, char *buffer, int32_t buffer_size);
 // Associates the managed plugin instance with its native proxy pointer (for logging).
 using AttachFn = void (*)(void *gc_handle, void *native_plugin);
 using LifecycleFn = void (*)(void *gc_handle);
@@ -59,6 +67,8 @@ public:
     [[nodiscard]] bool isStarted() const { return started_; }
 
     LoadPluginFn load_plugin = nullptr;
+    LoadPluginViaLoaderFn load_plugin_via_loader = nullptr;
+    GetLoaderFiltersFn get_loader_filters = nullptr;
     AttachFn attach = nullptr;
     LifecycleFn on_load = nullptr;
     LifecycleFn on_enable = nullptr;

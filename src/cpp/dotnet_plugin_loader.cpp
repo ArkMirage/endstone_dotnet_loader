@@ -2,12 +2,15 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <filesystem>
 #include <optional>
 #include <unordered_map>
 
 #include <nlohmann/json.hpp>
 
 #include "bridge.h"
+
+namespace fs = std::filesystem;
 
 namespace dotnet_loader {
 
@@ -23,6 +26,7 @@ std::unordered_map<void *, DotNetPlugin *> &pluginLookup()
 
 endstone::Logger *s_event_logger = nullptr;
 DotNetHost *s_host = nullptr;
+endstone::Server *s_server = nullptr;
 
 }  // namespace
 
@@ -31,6 +35,7 @@ DotNetPluginLoader::DotNetPluginLoader(endstone::Server &server, DotNetHost &hos
 {
     s_event_logger = &logger;
     s_host = &host;
+    s_server = &server;
 }
 
 // Converts a JSON command object into an endstone::Command.
@@ -250,6 +255,90 @@ endstone::Plugin *DotNetPluginLoader::loadPlugin(std::string file)
     pluginLookup()[gc_handle] = plugin.get();
     auto *ptr = plugin.get();
     plugins_.push_back(std::move(plugin));  // loader keeps ownership, same as the Python loader
+    return ptr;
+}
+
+void pluginManagerRegisterLoader(void *pm_ptr, void *loader_gc, const char *dir)
+{
+    if (!pm_ptr || !loader_gc || !s_server || !s_host || !s_event_logger) {
+        return;
+    }
+    auto &pm = *static_cast<endstone::PluginManager *>(pm_ptr);
+
+    char buf[4096] = {};
+    if (!s_host->get_loader_filters || s_host->get_loader_filters(loader_gc, buf, sizeof(buf)) == 0) {
+        s_event_logger->error("[DotNetLoader] Failed to query custom loader file filters; ignoring registration.");
+        return;
+    }
+    const auto filters = nlohmann::json::parse(buf, nullptr, false);
+    std::vector<std::string> filter_list;
+    if (filters.is_array()) {
+        for (const auto &f : filters) {
+            if (f.is_string()) {
+                filter_list.push_back(f.get<std::string>());
+            }
+        }
+    }
+    if (filter_list.empty()) {
+        s_event_logger->error("[DotNetLoader] Custom loader registered with no file filters; ignoring registration.");
+        return;
+    }
+
+
+    auto loader =
+        std::make_unique<ManagedLoaderWrapper>(*s_server, *s_host, *s_event_logger, loader_gc, std::move(filter_list));
+    pm.registerLoader(std::move(loader));
+
+    // Loaders registered after the initial scan are excluded from that snapshot,
+    // so trigger a fresh pass on the loader's directory (non-recursive).
+    if (dir && *dir) {
+        std::error_code ec;
+        fs::create_directories(dir, ec);
+        pm.loadPlugins(dir);
+    }
+}
+
+ManagedLoaderWrapper::ManagedLoaderWrapper(endstone::Server &server, DotNetHost &host, endstone::Logger &logger,
+                                           void *loader_gc, std::vector<std::string> filters)
+    : PluginLoader(server), host_(host), logger_(logger), loader_gc_(loader_gc), filters_(std::move(filters))
+{
+}
+
+std::vector<std::string> ManagedLoaderWrapper::getPluginFileFilters() const
+{
+    return filters_;
+}
+
+endstone::Plugin *ManagedLoaderWrapper::loadPlugin(std::string file)
+{
+    if (!host_.isStarted()) {
+        logger_.error(".NET runtime is not running; cannot load '{}'", file);
+        return nullptr;
+    }
+
+    char info[4096] = {};
+    void *gc_handle = host_.load_plugin_via_loader(loader_gc_, file.c_str(), info, sizeof(info));
+    if (!gc_handle) {
+        // An empty info buffer means the managed loader skipped the file
+        // (normal); a non-empty buffer carries the failure reason.
+        if (info[0]) {
+            logger_.error("Failed to load plugin via managed loader from '{}': {}", file, info);
+        }
+        return nullptr;
+    }
+
+    auto description = parseDescription(info);
+    if (!description) {
+        host_.release(gc_handle);
+        return nullptr;
+    }
+
+    auto plugin = std::make_unique<DotNetPlugin>(host_, gc_handle, std::move(*description));
+    host_.attach(gc_handle, plugin.get());
+    host_.set_server(&getServer());
+    pluginLookup()[gc_handle] = plugin.get();
+    auto *ptr = plugin.get();
+    plugins_.push_back(std::move(plugin));
     return ptr;
 }
 
