@@ -75,3 +75,6 @@ site/
 # .NET build output
 bin/
 obj/
+
+# Develop Tool
+.vscode/
