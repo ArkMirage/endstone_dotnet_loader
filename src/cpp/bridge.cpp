@@ -242,9 +242,6 @@ const char *pluginDescriptionToJson(void *plugin)
     j["website"] = d.getWebsite();
     j["prefix"] = d.getPrefix();
     j["provides"] = d.getProvides();
-    j["depend"] = d.getDepend();
-    j["softDepend"] = d.getSoftDepend();
-    j["loadBefore"] = d.getLoadBefore();
     j["defaultPermission"] = static_cast<int>(d.getDefaultPermission());
     return strOut(j.dump());
 }

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <filesystem>
+#include <iostream>
 #include <optional>
 #include <unordered_map>
 
@@ -72,7 +73,7 @@ endstone::PermissionDefault parsePermissionDefault(const nlohmann::json &doc)
 // Parses the JSON plugin info object into an endstone::PluginDescription.
 // The managed side serializes plugin info with camelCase keys (JsonNamingPolicy.CamelCase),
 // e.g. {"name","version","description","authors","contributors","website","prefix",
-// "depend","softDepend","loadBefore","defaultPermission","commands"}.
+// "defaultPermission","commands"}.
 // Returns nullopt on malformed input.
 std::optional<endstone::PluginDescription> parseDescription(const char *info)
 {
@@ -87,9 +88,7 @@ std::optional<endstone::PluginDescription> parseDescription(const char *info)
         /*authors=*/doc.value("authors", std::vector<std::string>{}),
         /*contributors=*/doc.value("contributors", std::vector<std::string>{}),
         /*website=*/doc.value("website", std::string{}), /*prefix=*/doc.value("prefix", std::string{}),
-        /*provides=*/{}, /*depend=*/doc.value("depend", std::vector<std::string>{}),
-        /*soft_depend=*/doc.value("softDepend", std::vector<std::string>{}),
-        /*load_before=*/doc.value("loadBefore", std::vector<std::string>{}),
+        /*provides=*/{}, /*depend=*/{}, /*soft_depend=*/{}, /*load_before=*/{},
         /*default_permission=*/parsePermissionDefault(doc),
         /*commands=*/parseCommands(doc.value("commands", nlohmann::json::array())));
 }
@@ -139,8 +138,9 @@ void DotNetPlugin::refreshCommands()
     description_ = endstone::PluginDescription(
         description_.getName(), description_.getVersion(), description_.getDescription(), description_.getLoad(),
         description_.getAuthors(), description_.getContributors(), description_.getWebsite(),
-        description_.getPrefix(), description_.getProvides(), description_.getDepend(),
-        description_.getSoftDepend(), description_.getLoadBefore(), description_.getDefaultPermission(), commands,
+        description_.getPrefix(), description_.getProvides(),
+        /*depend=*/{}, /*soft_depend=*/{}, /*load_before=*/{},
+        description_.getDefaultPermission(), commands,
         description_.getPermissions());
 }
 
@@ -222,8 +222,12 @@ void installEventBridge()
 
 std::vector<std::string> DotNetPluginLoader::getPluginFileFilters() const
 {
-    // Only match *.Plugin.dll to avoid clashing with the C++ loader's "\.dll$"
-    return {"\\.Plugin\\.dll$"};
+    // Match "*.Plugin.dll" in any letter case. Case tolerance is required on
+    // Windows: PluginManager routes a listed file to the first loader whose
+    // filter regex matches, and the built-in C++ loader's "\.dll$" pattern
+    // (registered before us) would otherwise claim these assemblies, so
+    // findNetPlugins() reports them with an upper-cased extension.
+    return { "\\.Plugin\\.dll$" };
 }
 
 endstone::Plugin *DotNetPluginLoader::loadPlugin(std::string file)

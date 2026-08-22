@@ -27,9 +27,6 @@ public sealed class PluginDescription
     public string Website { get; init; } = "";
     public string Prefix { get; init; } = "";
     public string[] Provides { get; init; } = [];
-    public string[] Depend { get; init; } = [];
-    public string[] SoftDepend { get; init; } = [];
-    public string[] LoadBefore { get; init; } = [];
     public PermissionDefault DefaultPermission { get; init; }
 
     /// <summary>Builds the description from a [Plugin] attribute. Called by
@@ -45,9 +42,6 @@ public sealed class PluginDescription
         Contributors = meta.Contributors,
         Website = meta.Website,
         Prefix = meta.Prefix,
-        Depend = meta.Depend,
-        SoftDepend = meta.SoftDepend,
-        LoadBefore = meta.LoadBefore,
         DefaultPermission = meta.DefaultPermission,
     };
 }
@@ -97,9 +91,6 @@ public unsafe class Plugin
     public string Website => Description.Website;
     public string Prefix => Description.Prefix;
     public string[] Provides => Description.Provides;
-    public string[] Depend => Description.Depend;
-    public string[] SoftDepend => Description.SoftDepend;
-    public string[] LoadBefore => Description.LoadBefore;
     public PermissionDefault DefaultPermission => Description.DefaultPermission;
 
     /// <summary>Gets the permissions declared by this plugin. Native plugins

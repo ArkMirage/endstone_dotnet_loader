@@ -99,7 +99,6 @@ public static class Bootstrap
                 // values are wired through PluginAttribute.
                 new PluginInfo(meta.Name, meta.Version, meta.Description, meta.Authors,
                                 meta.Contributors, meta.Website, meta.Prefix,
-                                meta.Depend, meta.SoftDepend, meta.LoadBefore,
                                 meta.DefaultPermission,
                                 instance.CommandDefinitions.ToArray()),
                 JsonOptions);
@@ -141,7 +140,7 @@ public static class Bootstrap
             var d = instance.Description;
             var info = JsonSerializer.Serialize(
                 new PluginInfo(d.Name, d.Version, d.Description, d.Authors, d.Contributors,
-                                d.Website, d.Prefix, d.Depend, d.SoftDepend, d.LoadBefore,
+                                d.Website, d.Prefix,
                                 d.DefaultPermission, instance.CommandDefinitions.ToArray()),
                 JsonOptions);
             WriteUtf8(infoBuffer, bufferSize, info);
@@ -223,7 +222,7 @@ public static class Bootstrap
         loader is null ? "unknown loader" : $"{loader.GetType().Assembly.GetName().Name} ({loader.GetType().FullName})";
 
     record class PluginInfo(string Name, string Version, string Description, string[] Authors, string[] Contributors,
-        string Website, string Prefix, string[] Depend, string[] SoftDepend, string[] LoadBefore,
+        string Website, string Prefix,
         PermissionDefault DefaultPermission, CommandDefinition[] Commands);
 
     private static readonly Dictionary<IntPtr, PluginBase> Plugins = new();
