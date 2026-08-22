@@ -78,6 +78,20 @@ public abstract unsafe class Service
         }
     }
 
+    /// <summary>The native holder (a heap <c>shared_ptr&lt;endstone::Service&gt;</c>) owning
+    /// this provider's proxy. Passed to ServiceManagerRegister so the native side can copy
+    /// the shared_ptr and keep the proxy alive. This is NOT the same as <see cref="ProviderPointer"/>,
+    /// which is the raw <c>endstone::Service*</c> obtained from the holder -- registering with the
+    /// raw pointer instead of the holder is a type-confusion bug that makes lookups fail.</summary>
+    internal IntPtr HolderPointer
+    {
+        get
+        {
+            _ = ProviderPointer; // ensure the holder/proxy exist
+            return _holder;
+        }
+    }
+
     internal static Service? Find(IntPtr provider)
     {
         lock (RegistryLock)
@@ -145,12 +159,33 @@ public sealed unsafe class ServiceManager
         var buf = Bridge.ToUtf8(name);
         fixed (byte* p = buf)
         {
-            T->ServiceManagerRegister(_manager, p, (void*)provider.ProviderPointer, _plugin, (int)priority);
+            T->ServiceManagerRegister(_manager, p, (void*)provider.HolderPointer, _plugin, (int)priority);
         }
         lock (_lock)
         {
             _providers[provider.ProviderPointer] = provider;
         }
+    }
+
+    public void Register<TInterface, TProvider>( ServicePriority priority = ServicePriority.Normal)
+        where TInterface : class
+        where TProvider : Service, TInterface, new()
+    {
+        Register(typeof(TInterface).FullName!, new TProvider(), priority);
+    }
+
+    public void Register<TInterface, TProvider>(TProvider provider, ServicePriority priority = ServicePriority.Normal)
+        where TInterface : class
+        where TProvider : Service, TInterface
+    {
+        Register(typeof(TInterface).FullName!, provider, priority);
+    }
+
+    public TInterface? Get<TInterface>() where TInterface : class
+    {
+        var name = typeof(TInterface).FullName!;
+        var provider = Get(name);
+        return provider as TInterface;
     }
 
     /// <summary>Unregisters all services registered by this plugin.</summary>
