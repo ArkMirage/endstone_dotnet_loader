@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -45,9 +47,81 @@ public static class Bootstrap
     {
         _logFn = (delegate* unmanaged[Cdecl]<void*, int, byte*, void>)logFn;
         Bridge.Initialize(bridgeTable);
+        LoadSharedAssemblies();
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             Log(IntPtr.Zero, LogLevel.Critical, $"Unhandled exception in .NET plugin: {e.ExceptionObject}");
         return 0;
+    }
+
+    /// <summary>
+    /// Loads cross-plugin contract assemblies into the shared, non-collectible
+    /// ALC so their Type identity is server-wide. Two sources are scanned:
+    ///   1) every DLL under &lt;plugin.net&gt;/shared/
+    ///   2) every top-level *.API.dll directly under &lt;plugin.net&gt;
+    /// &lt;plugin.net&gt; is the dotnet plugin loading directory, i.e. the server
+    /// root joined with "plugins.net" (mirrors the C++ side's
+    /// fs::current_path() / "plugins.net"). It can be overridden with the
+    /// ENDSTONE_DOTNET_SHARED_DIR environment variable.
+    /// </summary>
+    private static void LoadSharedAssemblies()
+    {
+        var overrideDir = Environment.GetEnvironmentVariable("ENDSTONE_DOTNET_SHARED_DIR");
+        var baseDir = string.IsNullOrEmpty(overrideDir)
+            ? Path.Combine(Environment.CurrentDirectory, "plugins.net")
+            : overrideDir;
+
+        var shared = SharedLoadContext.Instance;
+        var sharedDir = Path.Combine(baseDir, "shared");
+        // Only the dedicated shared/ folder is a dependency-resolution search
+        // path. The whole plugins.net (which holds every plugin assembly) must
+        // NOT be scanned, otherwise a plugin DLL could be pulled into the
+        // shared ALC when resolving a shared assembly's dependency.
+        shared.AddSearchDirectory(sharedDir);
+
+        var loaded = 0;
+
+        // 1) every DLL under plugin.net/shared/
+        if (Directory.Exists(sharedDir))
+        {
+            foreach (var dll in Directory.EnumerateFiles(sharedDir, "*.dll", SearchOption.TopDirectoryOnly))
+            {
+                if (TryLoadShared(dll))
+                {
+                    loaded++;
+                }
+            }
+        }
+
+        // 2) top-level *.API.dll directly under plugin.net/
+        if (Directory.Exists(baseDir))
+        {
+            foreach (var dll in Directory.EnumerateFiles(baseDir, "*.API.dll", SearchOption.TopDirectoryOnly))
+            {
+                if (TryLoadShared(dll))
+                {
+                    loaded++;
+                }
+            }
+        }
+
+        if (loaded > 0)
+        {
+            Log(IntPtr.Zero, LogLevel.Info, $"Loaded {loaded} shared contract assembly(ies) from '{baseDir}'.");
+        }
+    }
+
+    private static bool TryLoadShared(string dll)
+    {
+        try
+        {
+            SharedLoadContext.Instance.LoadShared(dll);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Log(IntPtr.Zero, LogLevel.Warning, $"Skipping shared assembly '{dll}': {e.Message}");
+            return false;
+        }
     }
 
     [UnmanagedCallersOnly]

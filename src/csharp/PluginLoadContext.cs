@@ -21,6 +21,13 @@ internal sealed class PluginLoadContext(string pluginPath) : AssemblyLoadContext
             return typeof(Bootstrap).Assembly;
         }
 
+        // Shared contract assemblies resolve to the single shared ALC instance
+        // so their Type identity is server-wide and cross-ALC casts succeed.
+        if (SharedLoadContext.TryGetShared(assemblyName, out var shared))
+        {
+            return shared;
+        }
+
         var path = _resolver.ResolveAssemblyToPath(assemblyName);
         return path != null ? LoadFromAssemblyPath(path) : null;
     }
