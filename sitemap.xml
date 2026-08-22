@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/getting-started/installation/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/getting-started/installation/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/installation/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/getting-started/toolchain/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/getting-started/toolchain/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/toolchain/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/getting-started/your-first-plugin/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/getting-started/your-first-plugin/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/your-first-plugin/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ActionForm/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ActionForm/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ActionForm/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Actor/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Actor/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Actor/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Block/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Block/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Block/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/BlockState/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/BlockState/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/BlockState/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Bootstrap/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Bootstrap/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Bootstrap/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/BossBar/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/BossBar/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/BossBar/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Chunk/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Chunk/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Chunk/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/CommandBuilder/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/CommandBuilder/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/CommandBuilder/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/CommandSender/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/CommandSender/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/CommandSender/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ConsoleCommandSender/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ConsoleCommandSender/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ConsoleCommandSender/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/DamageSource/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/DamageSource/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/DamageSource/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Dimension/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Dimension/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Dimension/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Enchantment/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Enchantment/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Enchantment/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Event/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Event/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Event/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/FormBase/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/FormBase/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/FormBase/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Inventory/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Inventory/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Inventory/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ItemEnchantment/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ItemEnchantment/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ItemEnchantment/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ItemStack/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ItemStack/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ItemStack/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Level/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Level/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Level/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Location/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Location/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Location/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Logger/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Logger/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Logger/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapCanvas/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapCanvas/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapCanvas/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapColor/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapColor/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapColor/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapCursor/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapCursor/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapCursor/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapRenderer/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapRenderer/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapRenderer/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapView/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapView/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapView/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MessageForm/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MessageForm/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MessageForm/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Mob/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Mob/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Mob/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ModalForm/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ModalForm/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ModalForm/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Permission/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Permission/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Permission/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PermissionAttachment/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PermissionAttachment/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PermissionAttachment/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PermissionAttachmentInfo/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PermissionAttachmentInfo/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PermissionAttachmentInfo/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Player/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Player/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Player/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PlayerInventory/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PlayerInventory/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PlayerInventory/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Plugin/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Plugin/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Plugin/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginAttribute/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginAttribute/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginAttribute/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginBase/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginBase/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginBase/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginDescription/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginDescription/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginDescription/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginLoader/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginLoader/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginLoader/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginManager/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginManager/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginManager/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ScheduledTask/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ScheduledTask/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ScheduledTask/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Scheduler/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Scheduler/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Scheduler/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Server/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Server/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Server/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Service/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Service/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Service/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ServiceManager/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ServiceManager/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ServiceManager/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/enums/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/enums/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/enums/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/events/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/events/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/events/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/installation/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/installation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/getting-started/installation/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/toolchain/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/toolchain/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/getting-started/toolchain/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/your-first-plugin/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/getting-started/your-first-plugin/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/getting-started/your-first-plugin/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ActionForm/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ActionForm/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ActionForm/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Actor/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Actor/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Actor/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Block/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Block/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Block/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/BlockState/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/BlockState/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/BlockState/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Bootstrap/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Bootstrap/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Bootstrap/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/BossBar/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/BossBar/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/BossBar/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Chunk/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Chunk/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Chunk/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/CommandBuilder/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/CommandBuilder/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/CommandBuilder/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/CommandSender/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/CommandSender/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/CommandSender/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ConsoleCommandSender/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ConsoleCommandSender/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ConsoleCommandSender/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/DamageSource/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/DamageSource/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/DamageSource/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Dimension/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Dimension/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Dimension/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Enchantment/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Enchantment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Enchantment/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Event/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Event/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Event/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/FormBase/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/FormBase/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/FormBase/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Inventory/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Inventory/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Inventory/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ItemEnchantment/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ItemEnchantment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ItemEnchantment/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ItemStack/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ItemStack/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ItemStack/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Level/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Level/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Level/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Location/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Location/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Location/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Logger/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Logger/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Logger/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapCanvas/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapCanvas/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapCanvas/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapColor/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapColor/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapColor/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapCursor/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapCursor/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapCursor/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapRenderer/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapRenderer/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapRenderer/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapView/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MapView/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MapView/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MessageForm/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/MessageForm/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/MessageForm/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Mob/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Mob/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Mob/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ModalForm/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ModalForm/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ModalForm/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Permission/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Permission/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Permission/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PermissionAttachment/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PermissionAttachment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PermissionAttachment/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PermissionAttachmentInfo/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PermissionAttachmentInfo/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PermissionAttachmentInfo/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Player/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Player/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Player/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PlayerInventory/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PlayerInventory/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PlayerInventory/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Plugin/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Plugin/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Plugin/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginAttribute/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginAttribute/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginAttribute/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginBase/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginBase/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginBase/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginDescription/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginDescription/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginDescription/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginLoader/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginLoader/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginLoader/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginManager/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/PluginManager/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/PluginManager/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ScheduledTask/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ScheduledTask/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ScheduledTask/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Scheduler/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Scheduler/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Scheduler/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Server/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Server/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Server/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Service/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/Service/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/Service/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ServiceManager/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/ServiceManager/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/ServiceManager/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/enums/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/enums/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/enums/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/events/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/events/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/events/"/>
+    </url>
+    <url>
+        <loc>https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/</loc>
+        <lastmod>2026-08-22</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://arkmirage.github.io/endstone_dotnet_loader/reference/csharp/"/>
+    </url>
+</urlset>

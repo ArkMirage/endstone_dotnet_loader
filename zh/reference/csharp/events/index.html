@@ -1,0 +1,8475 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Ark Mirage">
+      
+      
+        <link rel="canonical" href="https://arkmirage.github.io/endstone_dotnet_loader/zh/reference/csharp/events/">
+      
+      
+        <link rel="prev" href="../MapRenderer/">
+      
+      
+        <link rel="next" href="../enums/">
+      
+      
+        
+          <link rel="alternate" href="../../../../reference/csharp/events/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>事件 - Endstone DotNet Loader</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../../" title="Endstone DotNet Loader" class="md-header__button md-logo" aria-label="Endstone DotNet Loader" data-md-component="logo">
+      
+  <img src="../../../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Endstone DotNet Loader
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              事件
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../../reference/csharp/events/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ArkMirage/endstone_dotnet_loader" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ArkMirage/endstone_dotnet_loader
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="标签" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../" title="Endstone DotNet Loader" class="md-nav__button md-logo" aria-label="Endstone DotNet Loader" data-md-component="logo">
+      
+  <img src="../../../../assets/logo.png" alt="logo">
+
+    </a>
+    Endstone DotNet Loader
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ArkMirage/endstone_dotnet_loader" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ArkMirage/endstone_dotnet_loader
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../getting-started/your-first-plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your First Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../getting-started/toolchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using EndstoneDotnet.Toolchain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PluginBase/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PluginBase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PluginAttribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PluginAttribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Logger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ScheduledTask/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ScheduledTask
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Service/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ServiceManager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ServiceManager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CommandSender/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CommandSender
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CommandBuilder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CommandBuilder
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Entities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Actor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Player/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Mob/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mob
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DamageSource/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DamageSource
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Enchantment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enchantment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ItemEnchantment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ItemEnchantment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    World
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    World
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Level/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Level
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Dimension/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dimension
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Chunk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chunk
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Block/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Block
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BlockState/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BlockState
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Location/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Location
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Items & Inventory
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Items & Inventory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ItemStack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ItemStack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Inventory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inventory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../PlayerInventory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PlayerInventory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    UI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FormBase/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FormBase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MessageForm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MessageForm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ActionForm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ActionForm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ModalForm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ModalForm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../BossBar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BossBar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapView/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapView
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapCanvas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapCanvas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapCursor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapCursor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapColor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapColor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MapRenderer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapRenderer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    事件
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    事件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#actordamageevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorDamageEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#damage-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Damage : float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#damagesource-damagesource" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DamageSource : DamageSource
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actordeathevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorDeathEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#damagesource-damagesource_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DamageSource : DamageSource
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorexplodeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorExplodeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blockcount-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#location-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Location : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block-getblockint-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block GetBlock(int index)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorknockbackevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorKnockbackEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#knockback-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Knockback : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-actor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source : Actor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorremoveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorRemoveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorspawnevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorSpawnEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorteleportevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorTeleportEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockbreakevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockBreakEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockcookevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockCookEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#result-itemstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-itemstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockexplodeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockExplodeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blockcount-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block-getblockint-index_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block GetBlock(int index)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockformevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockFormEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newstate-blockstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewState : BlockState
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockfromtoevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockFromToEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toblock-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToBlock : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockgrowevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockGrowEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newstate-blockstate_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewState : BlockState
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockpistonextendevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockPistonExtendEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direction-blockface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direction : BlockFace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockpistonretractevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockPistonRetractEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direction-blockface_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direction : BlockFace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockplaceevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockPlaceEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blockagainst-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockAgainst : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#placedstate-blockstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlacedState : BlockState
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#broadcastmessageevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BroadcastMessageEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#message-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipientcount-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RecipientCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunkloadevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChunkLoadEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dimensionname-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DimensionName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#x-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        X : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#z-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunkunloadevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChunkUnloadEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dimensionname-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DimensionName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#x-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        X : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#z-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leavesdecayevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LeavesDecayEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapinitializeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MapInitializeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packetreceiveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketReceiveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packetid-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload-byte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Payload : byte[]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#player-player" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player : Player
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subclientid-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SubClientId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packetsendevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketSendEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packetid-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload-byte_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Payload : byte[]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#player-player_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player : Player
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subclientid-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SubClientId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerbedenterevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerBedEnterEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bed-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bed : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerbedleaveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerBedLeaveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bed-block_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bed : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerchatevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerChatEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#format-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#message-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipientcount-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RecipientCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playercommandevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerCommandEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerdeathevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerDeathEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deathmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeathMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerdimensionchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerDimensionChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerdropitemevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerDropItemEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playeremoteevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerEmoteEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emoteid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EmoteId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ismuted-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IsMuted : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#void-setmutedbool-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMuted(bool value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playergamemodechangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerGameModeChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newgamemode-gamemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewGameMode : GameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerinteractactorevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerInteractActorEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actor-actor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actor : Actor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerinteractevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerInteractEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_33" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-interactaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action : InteractAction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#block-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blockface-blockface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockFace : BlockFace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clickedposition-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClickedPosition : Location?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasblock-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HasBlock : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasitem-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HasItem : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playeritemconsumeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerItemConsumeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_34" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hand-equipmentslot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hand : EquipmentSlot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playeritemheldevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerItemHeldEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_35" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newslot-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewSlot : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#previousslot-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PreviousSlot : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerjoinevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerJoinEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_36" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#joinmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JoinMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerjumpevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerJumpEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerkickevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerKickEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_37" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reason-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reason : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerloginevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerLoginEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_38" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kickmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KickMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playermoveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerMoveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_39" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerpickupitemevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerPickupItemEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerportalevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerPortalEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerquitevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerQuitEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_42" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quitmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuitMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerrespawnevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerRespawnEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerskinchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerSkinChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_43" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newskincapeid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewSkinCapeId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#newskinid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewSkinId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skinchangemessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SkinChangeMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerteleportevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerTeleportEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_44" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugindisableevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginDisableEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_45" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin : Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginname-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pluginenableevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginEnableEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-plugin_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin : Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginname-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scriptmessageevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScriptMessageEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_47" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#message-string_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messageid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MessageId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendername-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SenderName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#servercommandevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerCommandEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_48" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sender-commandsender" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sender : CommandSender
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendername-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SenderName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serverlistpingevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerListPingEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_49" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-string_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gamemode-gamemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GameMode : GameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#levelname-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LevelName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localport-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LocalPort : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localportv6-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LocalPortV6 : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maxplayers-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MaxPlayers : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minecraftversionnetwork-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MinecraftVersionNetwork : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#motd-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motd : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#networkprotocolversion-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NetworkProtocolVersion : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#numplayers-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NumPlayers : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serverguid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerGuid : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_50" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#void-setgamemodegamemode-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetGameMode(GameMode value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setlevelnamestring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetLevelName(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setlocalportint-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetLocalPort(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setlocalportv6int-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetLocalPortV6(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setmaxplayersint-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMaxPlayers(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setminecraftversionnetworkstring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMinecraftVersionNetwork(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setmotdstring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMotd(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setnumplayersint-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetNumPlayers(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setserverguidstring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetServerGuid(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serverloadevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerLoadEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_51" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-loadtype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type : LoadType
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#thunderchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ThunderChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_52" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tothunderstate-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToThunderState : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weatherchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WeatherChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_53" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toweatherstate-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToWeatherState : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    枚举
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Event/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Native Interop
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Native Interop
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bootstrap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#actordamageevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorDamageEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#damage-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Damage : float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#damagesource-damagesource" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DamageSource : DamageSource
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actordeathevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorDeathEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#damagesource-damagesource_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DamageSource : DamageSource
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorexplodeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorExplodeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blockcount-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#location-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Location : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block-getblockint-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block GetBlock(int index)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorknockbackevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorKnockbackEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#knockback-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Knockback : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-actor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source : Actor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorremoveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorRemoveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorspawnevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorSpawnEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#actorteleportevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ActorTeleportEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockbreakevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockBreakEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockcookevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockCookEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#result-itemstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-itemstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockexplodeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockExplodeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blockcount-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block-getblockint-index_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block GetBlock(int index)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockformevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockFormEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newstate-blockstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewState : BlockState
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockfromtoevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockFromToEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toblock-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToBlock : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockgrowevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockGrowEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newstate-blockstate_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewState : BlockState
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockpistonextendevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockPistonExtendEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direction-blockface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direction : BlockFace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockpistonretractevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockPistonRetractEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#direction-blockface_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Direction : BlockFace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blockplaceevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockPlaceEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#blockagainst-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockAgainst : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#placedstate-blockstate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlacedState : BlockState
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#broadcastmessageevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BroadcastMessageEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#message-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipientcount-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RecipientCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunkloadevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChunkLoadEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dimensionname-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DimensionName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#x-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        X : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#z-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chunkunloadevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ChunkUnloadEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dimensionname-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DimensionName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#x-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        X : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#z-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leavesdecayevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LeavesDecayEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapinitializeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MapInitializeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packetreceiveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketReceiveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packetid-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload-byte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Payload : byte[]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#player-player" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player : Player
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subclientid-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SubClientId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packetsendevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketSendEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packetid-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PacketId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#payload-byte_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Payload : byte[]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#player-player_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player : Player
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subclientid-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SubClientId : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerbedenterevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerBedEnterEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bed-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bed : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerbedleaveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerBedLeaveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bed-block_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bed : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerchatevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerChatEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#format-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#message-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipientcount-int_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RecipientCount : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playercommandevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerCommandEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerdeathevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerDeathEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deathmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeathMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerdimensionchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerDimensionChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerdropitemevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerDropItemEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playeremoteevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerEmoteEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#emoteid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EmoteId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ismuted-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IsMuted : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_30" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#void-setmutedbool-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMuted(bool value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playergamemodechangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerGameModeChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_31" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newgamemode-gamemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewGameMode : GameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerinteractactorevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerInteractActorEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#actor-actor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Actor : Actor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerinteractevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerInteractEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_33" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#action-interactaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Action : InteractAction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#block-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Block : Block
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blockface-blockface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BlockFace : BlockFace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clickedposition-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClickedPosition : Location?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasblock-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HasBlock : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hasitem-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HasItem : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playeritemconsumeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerItemConsumeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_34" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hand-equipmentslot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hand : EquipmentSlot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playeritemheldevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerItemHeldEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_35" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newslot-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewSlot : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#previousslot-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PreviousSlot : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerjoinevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerJoinEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_36" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#joinmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JoinMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerjumpevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerJumpEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerkickevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerKickEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_37" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reason-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reason : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerloginevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerLoginEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_38" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kickmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KickMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playermoveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerMoveEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_39" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerpickupitemevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerPickupItemEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#item-itemstack_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Item : ItemStack
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerportalevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerPortalEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerquitevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerQuitEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_42" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quitmessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QuitMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerrespawnevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerRespawnEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerskinchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerSkinChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_43" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#newskincapeid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewSkinCapeId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#newskinid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NewSkinId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#skinchangemessage-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SkinChangeMessage : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playerteleportevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PlayerTeleportEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_44" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-location_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to-location_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        To : Location
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugindisableevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginDisableEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_45" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin : Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginname-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pluginenableevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginEnableEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-plugin_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin : Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluginname-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PluginName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scriptmessageevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScriptMessageEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_47" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#message-string_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Message : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messageid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MessageId : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendername-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SenderName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#servercommandevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerCommandEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_48" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sender-commandsender" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sender : CommandSender
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sendername-string_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SenderName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serverlistpingevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerListPingEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_49" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#address-string_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gamemode-gamemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GameMode : GameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#levelname-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LevelName : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localport-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LocalPort : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localportv6-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LocalPortV6 : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maxplayers-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MaxPlayers : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minecraftversionnetwork-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MinecraftVersionNetwork : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#motd-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motd : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#networkprotocolversion-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NetworkProtocolVersion : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#numplayers-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NumPlayers : int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serverguid-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerGuid : string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_50" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        方法
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="方法">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#void-setgamemodegamemode-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetGameMode(GameMode value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setlevelnamestring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetLevelName(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setlocalportint-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetLocalPort(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setlocalportv6int-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetLocalPortV6(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setmaxplayersint-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMaxPlayers(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setminecraftversionnetworkstring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMinecraftVersionNetwork(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setmotdstring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetMotd(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setnumplayersint-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetNumPlayers(int value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#void-setserverguidstring-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        void SetServerGuid(string value)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serverloadevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ServerLoadEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_51" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-loadtype" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type : LoadType
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#thunderchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ThunderChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_52" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tothunderstate-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToThunderState : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#weatherchangeevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WeatherChangeEvent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_53" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="属性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toweatherstate-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToWeatherState : bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/ArkMirage/endstone_dotnet_loader/edit/main/docs/reference/csharp/events.zh.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/ArkMirage/endstone_dotnet_loader/raw/main/docs/reference/csharp/events.zh.md" title="查看本页的源代码" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="_1">事件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>所有事件类均派生自 <code>Event</code>,通过 <code>PluginBase.RegisterEvent&lt;T&gt;()</code> 注册。
+事件在服务器主线程上同步触发;多数事件暴露 <code>Player</code>,并可通过 <code>IsCancelled</code> 取消。</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ActorDamageEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ActorDeathEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ActorExplodeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ActorKnockbackEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ActorRemoveEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ActorSpawnEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ActorTeleportEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockBreakEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockCookEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockExplodeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockFormEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockFromToEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockGrowEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockPistonExtendEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockPistonRetractEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BlockPlaceEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>BroadcastMessageEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ChunkLoadEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ChunkUnloadEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>LeavesDecayEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>MapInitializeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PacketReceiveEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PacketSendEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerBedEnterEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerBedLeaveEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerChatEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerCommandEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerDeathEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerDimensionChangeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerDropItemEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerEmoteEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerGameModeChangeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerInteractActorEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerInteractEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerItemConsumeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerItemHeldEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerJoinEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerJumpEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerKickEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerLoginEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerMoveEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerPickupItemEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerPortalEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerQuitEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerRespawnEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerSkinChangeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PlayerTeleportEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PluginDisableEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>PluginEnableEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ScriptMessageEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ServerCommandEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ServerListPingEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ServerLoadEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>ThunderChangeEvent</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>WeatherChangeEvent</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="actordamageevent"><code>ActorDamageEvent</code><a class="headerlink" href="#actordamageevent" title="Permanent link">&para;</a></h2>
+<h2 id="_2">属性<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="damage-float"><code>Damage</code> : <code>float</code><a class="headerlink" href="#damage-float" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="damagesource-damagesource"><code>DamageSource</code> : <code>DamageSource</code><a class="headerlink" href="#damagesource-damagesource" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="actordeathevent"><code>ActorDeathEvent</code><a class="headerlink" href="#actordeathevent" title="Permanent link">&para;</a></h2>
+<h2 id="_3">属性<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="damagesource-damagesource_1"><code>DamageSource</code> : <code>DamageSource</code><a class="headerlink" href="#damagesource-damagesource_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="actorexplodeevent"><code>ActorExplodeEvent</code><a class="headerlink" href="#actorexplodeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_4">属性<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="blockcount-int"><code>BlockCount</code> : <code>int</code><a class="headerlink" href="#blockcount-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="location-location"><code>Location</code> : <code>Location</code><a class="headerlink" href="#location-location" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h2 id="_5">方法<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="block-getblockint-index"><code>Block GetBlock(int index)</code><a class="headerlink" href="#block-getblockint-index" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="actorknockbackevent"><code>ActorKnockbackEvent</code><a class="headerlink" href="#actorknockbackevent" title="Permanent link">&para;</a></h2>
+<h2 id="_6">属性<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h3 id="knockback-location"><code>Knockback</code> : <code>Location</code><a class="headerlink" href="#knockback-location" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="source-actor"><code>Source</code> : <code>Actor</code><a class="headerlink" href="#source-actor" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="actorremoveevent"><code>ActorRemoveEvent</code><a class="headerlink" href="#actorremoveevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="actorspawnevent"><code>ActorSpawnEvent</code><a class="headerlink" href="#actorspawnevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="actorteleportevent"><code>ActorTeleportEvent</code><a class="headerlink" href="#actorteleportevent" title="Permanent link">&para;</a></h2>
+<h2 id="_7">属性<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h3 id="from-location"><code>From</code> : <code>Location</code><a class="headerlink" href="#from-location" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="to-location"><code>To</code> : <code>Location</code><a class="headerlink" href="#to-location" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="blockbreakevent"><code>BlockBreakEvent</code><a class="headerlink" href="#blockbreakevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="blockcookevent"><code>BlockCookEvent</code><a class="headerlink" href="#blockcookevent" title="Permanent link">&para;</a></h2>
+<h2 id="_8">属性<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h3 id="result-itemstack"><code>Result</code> : <code>ItemStack</code><a class="headerlink" href="#result-itemstack" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="source-itemstack"><code>Source</code> : <code>ItemStack</code><a class="headerlink" href="#source-itemstack" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="blockexplodeevent"><code>BlockExplodeEvent</code><a class="headerlink" href="#blockexplodeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_9">属性<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<h3 id="blockcount-int_1"><code>BlockCount</code> : <code>int</code><a class="headerlink" href="#blockcount-int_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h2 id="_10">方法<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h3 id="block-getblockint-index_1"><code>Block GetBlock(int index)</code><a class="headerlink" href="#block-getblockint-index_1" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="blockformevent"><code>BlockFormEvent</code><a class="headerlink" href="#blockformevent" title="Permanent link">&para;</a></h2>
+<h2 id="_11">属性<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<h3 id="newstate-blockstate"><code>NewState</code> : <code>BlockState</code><a class="headerlink" href="#newstate-blockstate" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="blockfromtoevent"><code>BlockFromToEvent</code><a class="headerlink" href="#blockfromtoevent" title="Permanent link">&para;</a></h2>
+<h2 id="_12">属性<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<h3 id="toblock-block"><code>ToBlock</code> : <code>Block</code><a class="headerlink" href="#toblock-block" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="blockgrowevent"><code>BlockGrowEvent</code><a class="headerlink" href="#blockgrowevent" title="Permanent link">&para;</a></h2>
+<h2 id="_13">属性<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<h3 id="newstate-blockstate_1"><code>NewState</code> : <code>BlockState</code><a class="headerlink" href="#newstate-blockstate_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="blockpistonextendevent"><code>BlockPistonExtendEvent</code><a class="headerlink" href="#blockpistonextendevent" title="Permanent link">&para;</a></h2>
+<h2 id="_14">属性<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h2>
+<h3 id="direction-blockface"><code>Direction</code> : <code>BlockFace</code><a class="headerlink" href="#direction-blockface" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="blockpistonretractevent"><code>BlockPistonRetractEvent</code><a class="headerlink" href="#blockpistonretractevent" title="Permanent link">&para;</a></h2>
+<h2 id="_15">属性<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h2>
+<h3 id="direction-blockface_1"><code>Direction</code> : <code>BlockFace</code><a class="headerlink" href="#direction-blockface_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="blockplaceevent"><code>BlockPlaceEvent</code><a class="headerlink" href="#blockplaceevent" title="Permanent link">&para;</a></h2>
+<h2 id="_16">属性<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h2>
+<h3 id="blockagainst-block"><code>BlockAgainst</code> : <code>Block</code><a class="headerlink" href="#blockagainst-block" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="placedstate-blockstate"><code>PlacedState</code> : <code>BlockState</code><a class="headerlink" href="#placedstate-blockstate" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="broadcastmessageevent"><code>BroadcastMessageEvent</code><a class="headerlink" href="#broadcastmessageevent" title="Permanent link">&para;</a></h2>
+<h2 id="_17">属性<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h2>
+<h3 id="message-string"><code>Message</code> : <code>string</code><a class="headerlink" href="#message-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="recipientcount-int"><code>RecipientCount</code> : <code>int</code><a class="headerlink" href="#recipientcount-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="chunkloadevent"><code>ChunkLoadEvent</code><a class="headerlink" href="#chunkloadevent" title="Permanent link">&para;</a></h2>
+<h2 id="_18">属性<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h2>
+<h3 id="dimensionname-string"><code>DimensionName</code> : <code>string</code><a class="headerlink" href="#dimensionname-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="x-int"><code>X</code> : <code>int</code><a class="headerlink" href="#x-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="z-int"><code>Z</code> : <code>int</code><a class="headerlink" href="#z-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="chunkunloadevent"><code>ChunkUnloadEvent</code><a class="headerlink" href="#chunkunloadevent" title="Permanent link">&para;</a></h2>
+<h2 id="_19">属性<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h2>
+<h3 id="dimensionname-string_1"><code>DimensionName</code> : <code>string</code><a class="headerlink" href="#dimensionname-string_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="x-int_1"><code>X</code> : <code>int</code><a class="headerlink" href="#x-int_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="z-int_1"><code>Z</code> : <code>int</code><a class="headerlink" href="#z-int_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="leavesdecayevent"><code>LeavesDecayEvent</code><a class="headerlink" href="#leavesdecayevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="mapinitializeevent"><code>MapInitializeEvent</code><a class="headerlink" href="#mapinitializeevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="packetreceiveevent"><code>PacketReceiveEvent</code><a class="headerlink" href="#packetreceiveevent" title="Permanent link">&para;</a></h2>
+<h2 id="_20">属性<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h2>
+<h3 id="address-string"><code>Address</code> : <code>string</code><a class="headerlink" href="#address-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="packetid-int"><code>PacketId</code> : <code>int</code><a class="headerlink" href="#packetid-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="payload-byte"><code>Payload</code> : <code>byte[]</code><a class="headerlink" href="#payload-byte" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="player-player"><code>Player</code> : <code>Player</code><a class="headerlink" href="#player-player" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="subclientid-int"><code>SubClientId</code> : <code>int</code><a class="headerlink" href="#subclientid-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="packetsendevent"><code>PacketSendEvent</code><a class="headerlink" href="#packetsendevent" title="Permanent link">&para;</a></h2>
+<h2 id="_21">属性<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h2>
+<h3 id="address-string_1"><code>Address</code> : <code>string</code><a class="headerlink" href="#address-string_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="packetid-int_1"><code>PacketId</code> : <code>int</code><a class="headerlink" href="#packetid-int_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="payload-byte_1"><code>Payload</code> : <code>byte[]</code><a class="headerlink" href="#payload-byte_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="player-player_1"><code>Player</code> : <code>Player</code><a class="headerlink" href="#player-player_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="subclientid-int_1"><code>SubClientId</code> : <code>int</code><a class="headerlink" href="#subclientid-int_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerbedenterevent"><code>PlayerBedEnterEvent</code><a class="headerlink" href="#playerbedenterevent" title="Permanent link">&para;</a></h2>
+<h2 id="_22">属性<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h2>
+<h3 id="bed-block"><code>Bed</code> : <code>Block</code><a class="headerlink" href="#bed-block" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerbedleaveevent"><code>PlayerBedLeaveEvent</code><a class="headerlink" href="#playerbedleaveevent" title="Permanent link">&para;</a></h2>
+<h2 id="_23">属性<a class="headerlink" href="#_23" title="Permanent link">&para;</a></h2>
+<h3 id="bed-block_1"><code>Bed</code> : <code>Block</code><a class="headerlink" href="#bed-block_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerchatevent"><code>PlayerChatEvent</code><a class="headerlink" href="#playerchatevent" title="Permanent link">&para;</a></h2>
+<h2 id="_24">属性<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h2>
+<h3 id="format-string"><code>Format</code> : <code>string</code><a class="headerlink" href="#format-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="message-string_1"><code>Message</code> : <code>string</code><a class="headerlink" href="#message-string_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="recipientcount-int_1"><code>RecipientCount</code> : <code>int</code><a class="headerlink" href="#recipientcount-int_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playercommandevent"><code>PlayerCommandEvent</code><a class="headerlink" href="#playercommandevent" title="Permanent link">&para;</a></h2>
+<h2 id="_25">属性<a class="headerlink" href="#_25" title="Permanent link">&para;</a></h2>
+<h3 id="command-string"><code>Command</code> : <code>string</code><a class="headerlink" href="#command-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerdeathevent"><code>PlayerDeathEvent</code><a class="headerlink" href="#playerdeathevent" title="Permanent link">&para;</a></h2>
+<h2 id="_26">属性<a class="headerlink" href="#_26" title="Permanent link">&para;</a></h2>
+<h3 id="deathmessage-string"><code>DeathMessage</code> : <code>string</code><a class="headerlink" href="#deathmessage-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerdimensionchangeevent"><code>PlayerDimensionChangeEvent</code><a class="headerlink" href="#playerdimensionchangeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_27">属性<a class="headerlink" href="#_27" title="Permanent link">&para;</a></h2>
+<h3 id="from-string"><code>From</code> : <code>string</code><a class="headerlink" href="#from-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="to-string"><code>To</code> : <code>string</code><a class="headerlink" href="#to-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerdropitemevent"><code>PlayerDropItemEvent</code><a class="headerlink" href="#playerdropitemevent" title="Permanent link">&para;</a></h2>
+<h2 id="_28">属性<a class="headerlink" href="#_28" title="Permanent link">&para;</a></h2>
+<h3 id="item-itemstack"><code>Item</code> : <code>ItemStack</code><a class="headerlink" href="#item-itemstack" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playeremoteevent"><code>PlayerEmoteEvent</code><a class="headerlink" href="#playeremoteevent" title="Permanent link">&para;</a></h2>
+<h2 id="_29">属性<a class="headerlink" href="#_29" title="Permanent link">&para;</a></h2>
+<h3 id="emoteid-string"><code>EmoteId</code> : <code>string</code><a class="headerlink" href="#emoteid-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="ismuted-bool"><code>IsMuted</code> : <code>bool</code><a class="headerlink" href="#ismuted-bool" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h2 id="_30">方法<a class="headerlink" href="#_30" title="Permanent link">&para;</a></h2>
+<h3 id="void-setmutedbool-value"><code>void SetMuted(bool value)</code><a class="headerlink" href="#void-setmutedbool-value" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="playergamemodechangeevent"><code>PlayerGameModeChangeEvent</code><a class="headerlink" href="#playergamemodechangeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_31">属性<a class="headerlink" href="#_31" title="Permanent link">&para;</a></h2>
+<h3 id="newgamemode-gamemode"><code>NewGameMode</code> : <code>GameMode</code><a class="headerlink" href="#newgamemode-gamemode" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerinteractactorevent"><code>PlayerInteractActorEvent</code><a class="headerlink" href="#playerinteractactorevent" title="Permanent link">&para;</a></h2>
+<h2 id="_32">属性<a class="headerlink" href="#_32" title="Permanent link">&para;</a></h2>
+<h3 id="actor-actor"><code>Actor</code> : <code>Actor</code><a class="headerlink" href="#actor-actor" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerinteractevent"><code>PlayerInteractEvent</code><a class="headerlink" href="#playerinteractevent" title="Permanent link">&para;</a></h2>
+<h2 id="_33">属性<a class="headerlink" href="#_33" title="Permanent link">&para;</a></h2>
+<h3 id="action-interactaction"><code>Action</code> : <code>InteractAction</code><a class="headerlink" href="#action-interactaction" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="block-block"><code>Block</code> : <code>Block</code><a class="headerlink" href="#block-block" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="blockface-blockface"><code>BlockFace</code> : <code>BlockFace</code><a class="headerlink" href="#blockface-blockface" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="clickedposition-location"><code>ClickedPosition</code> : <code>Location?</code><a class="headerlink" href="#clickedposition-location" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="hasblock-bool"><code>HasBlock</code> : <code>bool</code><a class="headerlink" href="#hasblock-bool" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="hasitem-bool"><code>HasItem</code> : <code>bool</code><a class="headerlink" href="#hasitem-bool" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="item-itemstack_1"><code>Item</code> : <code>ItemStack</code><a class="headerlink" href="#item-itemstack_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playeritemconsumeevent"><code>PlayerItemConsumeEvent</code><a class="headerlink" href="#playeritemconsumeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_34">属性<a class="headerlink" href="#_34" title="Permanent link">&para;</a></h2>
+<h3 id="hand-equipmentslot"><code>Hand</code> : <code>EquipmentSlot</code><a class="headerlink" href="#hand-equipmentslot" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="item-itemstack_2"><code>Item</code> : <code>ItemStack</code><a class="headerlink" href="#item-itemstack_2" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playeritemheldevent"><code>PlayerItemHeldEvent</code><a class="headerlink" href="#playeritemheldevent" title="Permanent link">&para;</a></h2>
+<h2 id="_35">属性<a class="headerlink" href="#_35" title="Permanent link">&para;</a></h2>
+<h3 id="newslot-int"><code>NewSlot</code> : <code>int</code><a class="headerlink" href="#newslot-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="previousslot-int"><code>PreviousSlot</code> : <code>int</code><a class="headerlink" href="#previousslot-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerjoinevent"><code>PlayerJoinEvent</code><a class="headerlink" href="#playerjoinevent" title="Permanent link">&para;</a></h2>
+<h2 id="_36">属性<a class="headerlink" href="#_36" title="Permanent link">&para;</a></h2>
+<h3 id="joinmessage-string"><code>JoinMessage</code> : <code>string</code><a class="headerlink" href="#joinmessage-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerjumpevent"><code>PlayerJumpEvent</code><a class="headerlink" href="#playerjumpevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="playerkickevent"><code>PlayerKickEvent</code><a class="headerlink" href="#playerkickevent" title="Permanent link">&para;</a></h2>
+<h2 id="_37">属性<a class="headerlink" href="#_37" title="Permanent link">&para;</a></h2>
+<h3 id="reason-string"><code>Reason</code> : <code>string</code><a class="headerlink" href="#reason-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerloginevent"><code>PlayerLoginEvent</code><a class="headerlink" href="#playerloginevent" title="Permanent link">&para;</a></h2>
+<h2 id="_38">属性<a class="headerlink" href="#_38" title="Permanent link">&para;</a></h2>
+<h3 id="kickmessage-string"><code>KickMessage</code> : <code>string</code><a class="headerlink" href="#kickmessage-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playermoveevent"><code>PlayerMoveEvent</code><a class="headerlink" href="#playermoveevent" title="Permanent link">&para;</a></h2>
+<h2 id="_39">属性<a class="headerlink" href="#_39" title="Permanent link">&para;</a></h2>
+<h3 id="from-location_1"><code>From</code> : <code>Location</code><a class="headerlink" href="#from-location_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="to-location_1"><code>To</code> : <code>Location</code><a class="headerlink" href="#to-location_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerpickupitemevent"><code>PlayerPickupItemEvent</code><a class="headerlink" href="#playerpickupitemevent" title="Permanent link">&para;</a></h2>
+<h2 id="_40">属性<a class="headerlink" href="#_40" title="Permanent link">&para;</a></h2>
+<h3 id="item-itemstack_3"><code>Item</code> : <code>ItemStack</code><a class="headerlink" href="#item-itemstack_3" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="playerportalevent"><code>PlayerPortalEvent</code><a class="headerlink" href="#playerportalevent" title="Permanent link">&para;</a></h2>
+<h2 id="_41">属性<a class="headerlink" href="#_41" title="Permanent link">&para;</a></h2>
+<h3 id="from-location_2"><code>From</code> : <code>Location</code><a class="headerlink" href="#from-location_2" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="to-location_2"><code>To</code> : <code>Location</code><a class="headerlink" href="#to-location_2" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerquitevent"><code>PlayerQuitEvent</code><a class="headerlink" href="#playerquitevent" title="Permanent link">&para;</a></h2>
+<h2 id="_42">属性<a class="headerlink" href="#_42" title="Permanent link">&para;</a></h2>
+<h3 id="quitmessage-string"><code>QuitMessage</code> : <code>string</code><a class="headerlink" href="#quitmessage-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerrespawnevent"><code>PlayerRespawnEvent</code><a class="headerlink" href="#playerrespawnevent" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="playerskinchangeevent"><code>PlayerSkinChangeEvent</code><a class="headerlink" href="#playerskinchangeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_43">属性<a class="headerlink" href="#_43" title="Permanent link">&para;</a></h2>
+<h3 id="newskincapeid-string"><code>NewSkinCapeId</code> : <code>string</code><a class="headerlink" href="#newskincapeid-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="newskinid-string"><code>NewSkinId</code> : <code>string</code><a class="headerlink" href="#newskinid-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="skinchangemessage-string"><code>SkinChangeMessage</code> : <code>string</code><a class="headerlink" href="#skinchangemessage-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="playerteleportevent"><code>PlayerTeleportEvent</code><a class="headerlink" href="#playerteleportevent" title="Permanent link">&para;</a></h2>
+<h2 id="_44">属性<a class="headerlink" href="#_44" title="Permanent link">&para;</a></h2>
+<h3 id="from-location_3"><code>From</code> : <code>Location</code><a class="headerlink" href="#from-location_3" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="to-location_3"><code>To</code> : <code>Location</code><a class="headerlink" href="#to-location_3" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<hr />
+<h2 id="plugindisableevent"><code>PluginDisableEvent</code><a class="headerlink" href="#plugindisableevent" title="Permanent link">&para;</a></h2>
+<h2 id="_45">属性<a class="headerlink" href="#_45" title="Permanent link">&para;</a></h2>
+<h3 id="plugin-plugin"><code>Plugin</code> : <code>Plugin</code><a class="headerlink" href="#plugin-plugin" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="pluginname-string"><code>PluginName</code> : <code>string</code><a class="headerlink" href="#pluginname-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="pluginenableevent"><code>PluginEnableEvent</code><a class="headerlink" href="#pluginenableevent" title="Permanent link">&para;</a></h2>
+<h2 id="_46">属性<a class="headerlink" href="#_46" title="Permanent link">&para;</a></h2>
+<h3 id="plugin-plugin_1"><code>Plugin</code> : <code>Plugin</code><a class="headerlink" href="#plugin-plugin_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="pluginname-string_1"><code>PluginName</code> : <code>string</code><a class="headerlink" href="#pluginname-string_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="scriptmessageevent"><code>ScriptMessageEvent</code><a class="headerlink" href="#scriptmessageevent" title="Permanent link">&para;</a></h2>
+<h2 id="_47">属性<a class="headerlink" href="#_47" title="Permanent link">&para;</a></h2>
+<h3 id="message-string_2"><code>Message</code> : <code>string</code><a class="headerlink" href="#message-string_2" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="messageid-string"><code>MessageId</code> : <code>string</code><a class="headerlink" href="#messageid-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="sendername-string"><code>SenderName</code> : <code>string</code><a class="headerlink" href="#sendername-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="servercommandevent"><code>ServerCommandEvent</code><a class="headerlink" href="#servercommandevent" title="Permanent link">&para;</a></h2>
+<h2 id="_48">属性<a class="headerlink" href="#_48" title="Permanent link">&para;</a></h2>
+<h3 id="command-string_1"><code>Command</code> : <code>string</code><a class="headerlink" href="#command-string_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get;set; }</code></p>
+<h3 id="sender-commandsender"><code>Sender</code> : <code>CommandSender</code><a class="headerlink" href="#sender-commandsender" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="sendername-string_1"><code>SenderName</code> : <code>string</code><a class="headerlink" href="#sendername-string_1" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="serverlistpingevent"><code>ServerListPingEvent</code><a class="headerlink" href="#serverlistpingevent" title="Permanent link">&para;</a></h2>
+<h2 id="_49">属性<a class="headerlink" href="#_49" title="Permanent link">&para;</a></h2>
+<h3 id="address-string_2"><code>Address</code> : <code>string</code><a class="headerlink" href="#address-string_2" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="gamemode-gamemode"><code>GameMode</code> : <code>GameMode</code><a class="headerlink" href="#gamemode-gamemode" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="levelname-string"><code>LevelName</code> : <code>string</code><a class="headerlink" href="#levelname-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="localport-int"><code>LocalPort</code> : <code>int</code><a class="headerlink" href="#localport-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="localportv6-int"><code>LocalPortV6</code> : <code>int</code><a class="headerlink" href="#localportv6-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="maxplayers-int"><code>MaxPlayers</code> : <code>int</code><a class="headerlink" href="#maxplayers-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="minecraftversionnetwork-string"><code>MinecraftVersionNetwork</code> : <code>string</code><a class="headerlink" href="#minecraftversionnetwork-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="motd-string"><code>Motd</code> : <code>string</code><a class="headerlink" href="#motd-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="networkprotocolversion-int"><code>NetworkProtocolVersion</code> : <code>int</code><a class="headerlink" href="#networkprotocolversion-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="numplayers-int"><code>NumPlayers</code> : <code>int</code><a class="headerlink" href="#numplayers-int" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h3 id="serverguid-string"><code>ServerGuid</code> : <code>string</code><a class="headerlink" href="#serverguid-string" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<h2 id="_50">方法<a class="headerlink" href="#_50" title="Permanent link">&para;</a></h2>
+<h3 id="void-setgamemodegamemode-value"><code>void SetGameMode(GameMode value)</code><a class="headerlink" href="#void-setgamemodegamemode-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setlevelnamestring-value"><code>void SetLevelName(string value)</code><a class="headerlink" href="#void-setlevelnamestring-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setlocalportint-value"><code>void SetLocalPort(int value)</code><a class="headerlink" href="#void-setlocalportint-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setlocalportv6int-value"><code>void SetLocalPortV6(int value)</code><a class="headerlink" href="#void-setlocalportv6int-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setmaxplayersint-value"><code>void SetMaxPlayers(int value)</code><a class="headerlink" href="#void-setmaxplayersint-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setminecraftversionnetworkstring-value"><code>void SetMinecraftVersionNetwork(string value)</code><a class="headerlink" href="#void-setminecraftversionnetworkstring-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setmotdstring-value"><code>void SetMotd(string value)</code><a class="headerlink" href="#void-setmotdstring-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setnumplayersint-value"><code>void SetNumPlayers(int value)</code><a class="headerlink" href="#void-setnumplayersint-value" title="Permanent link">&para;</a></h3>
+<h3 id="void-setserverguidstring-value"><code>void SetServerGuid(string value)</code><a class="headerlink" href="#void-setserverguidstring-value" title="Permanent link">&para;</a></h3>
+<hr />
+<h2 id="serverloadevent"><code>ServerLoadEvent</code><a class="headerlink" href="#serverloadevent" title="Permanent link">&para;</a></h2>
+<h2 id="_51">属性<a class="headerlink" href="#_51" title="Permanent link">&para;</a></h2>
+<h3 id="type-loadtype"><code>Type</code> : <code>LoadType</code><a class="headerlink" href="#type-loadtype" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="thunderchangeevent"><code>ThunderChangeEvent</code><a class="headerlink" href="#thunderchangeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_52">属性<a class="headerlink" href="#_52" title="Permanent link">&para;</a></h2>
+<h3 id="tothunderstate-bool"><code>ToThunderState</code> : <code>bool</code><a class="headerlink" href="#tothunderstate-bool" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+<h2 id="weatherchangeevent"><code>WeatherChangeEvent</code><a class="headerlink" href="#weatherchangeevent" title="Permanent link">&para;</a></h2>
+<h2 id="_53">属性<a class="headerlink" href="#_53" title="Permanent link">&para;</a></h2>
+<h3 id="toweatherstate-bool"><code>ToWeatherState</code> : <code>bool</code><a class="headerlink" href="#toweatherstate-bool" title="Permanent link">&para;</a></h3>
+<p><code>{ get; }</code></p>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="页脚" >
+        
+          
+          <a href="../MapRenderer/" class="md-footer__link md-footer__link--prev" aria-label="上一页: MapRenderer">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              <div class="md-ellipsis">
+                MapRenderer
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../enums/" class="md-footer__link md-footer__link--next" aria-label="下一页: 枚举">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              <div class="md-ellipsis">
+                枚举
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Ark Mirage
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/ArkMirage" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
