@@ -2230,6 +2230,233 @@ void permissionAddParent(void *p, void *parent, bool value)
 }
 void permissionRecalculate(void *p) { asPermission(p)->recalculatePermissibles(); }
 
+// ---- scoreboard ----
+
+endstone::Scoreboard *asScoreboard(void *s) { return static_cast<endstone::Scoreboard *>(s); }
+endstone::Objective *asObjective(void *o) { return static_cast<endstone::Objective *>(o); }
+endstone::Score *asScore(void *s) { return static_cast<endstone::Score *>(s); }
+
+// Holder for scoreboards created by plugins: heap std::shared_ptr the managed
+// side owns and releases with scoreboard_release. Views of server/player
+// scoreboards are passed as raw pointers instead (the server owns those).
+using ScoreboardHolder = std::shared_ptr<endstone::Scoreboard>;
+
+// Cached getEntries() result; entry strings live inside the variant copies.
+thread_local std::vector<endstone::ScoreEntry> g_score_entries;
+
+endstone::ScoreEntry scoreEntryFrom(int kind, void *actor, const char *name)
+{
+    switch (kind) {
+    case 0:
+        return static_cast<endstone::Player *>(actor);
+    case 1:
+        return static_cast<endstone::Actor *>(actor);
+    default:
+        return std::string(name ? name : "");
+    }
+}
+
+void *serverGetScoreboard(void *s) { return asServer(s)->getScoreboard(); }
+
+void *serverCreateScoreboard(void *s)
+{
+    auto board = asServer(s)->createScoreboard();
+    return board ? new ScoreboardHolder(std::move(board)) : nullptr;
+}
+
+// Called from OwnedScoreboard.Dispose() only (an explicit display-control
+// operation, like BossBar.Dispose): dropping the last shared_ptr reference
+// runs the Bedrock scoreboard destructor, which must happen on the server
+// thread -- so no finalizer queues this, plugins dispose deliberately.
+void scoreboardRelease(void *h) { delete static_cast<ScoreboardHolder *>(h); }
+
+void *scoreboardHolderGet(void *h)
+{
+    auto *holder = static_cast<ScoreboardHolder *>(h);
+    return holder && *holder ? holder->get() : nullptr;
+}
+
+void *playerGetScoreboard(void *p) { return &asPlayer(p)->getScoreboard(); }
+
+void playerSetScoreboard(void *p, void *sb)
+{
+    if (sb) {
+        asPlayer(p)->setScoreboard(*asScoreboard(sb));
+    }
+}
+
+void *scoreboardAddObjective(void *sb, const char *name, int criteria_type, const char *display_name, int render_type)
+{
+    if (!name) {
+        return nullptr;
+    }
+    auto objective = display_name && *display_name
+                         ? asScoreboard(sb)->addObjective(std::string(name),
+                                                          static_cast<endstone::Criteria::Type>(criteria_type),
+                                                          std::string(display_name),
+                                                          static_cast<endstone::RenderType>(render_type))
+                         : asScoreboard(sb)->addObjective(std::string(name),
+                                                          static_cast<endstone::Criteria::Type>(criteria_type));
+    return objective ? objective.release() : nullptr;
+}
+
+void *scoreboardGetObjective(void *sb, const char *name)
+{
+    auto objective = asScoreboard(sb)->getObjective(name ? name : "");
+    return objective ? objective.release() : nullptr;
+}
+
+void *scoreboardGetObjectiveInSlot(void *sb, int slot)
+{
+    auto objective = asScoreboard(sb)->getObjective(static_cast<endstone::DisplaySlot>(slot));
+    return objective ? objective.release() : nullptr;
+}
+
+int scoreboardGetObjectives(void *sb, void **out, int capacity)
+{
+    auto objectives = asScoreboard(sb)->getObjectives();
+    const int n = std::min(capacity, static_cast<int>(objectives.size()));
+    for (int i = 0; i < n; ++i) {
+        out[i] = objectives[static_cast<size_t>(i)].release();
+    }
+    return static_cast<int>(objectives.size());
+}
+
+int scoreboardGetObjectivesByCriteria(void *sb, int criteria_type, void **out, int capacity)
+{
+    auto objectives =
+        asScoreboard(sb)->getObjectivesByCriteria(static_cast<endstone::Criteria::Type>(criteria_type));
+    const int n = std::min(capacity, static_cast<int>(objectives.size()));
+    for (int i = 0; i < n; ++i) {
+        out[i] = objectives[static_cast<size_t>(i)].release();
+    }
+    return static_cast<int>(objectives.size());
+}
+
+int scoreboardGetScores(void *sb, int entry_kind, void *entry_actor, const char *entry_name, void **out, int capacity)
+{
+    auto scores = asScoreboard(sb)->getScores(scoreEntryFrom(entry_kind, entry_actor, entry_name));
+    const int n = std::min(capacity, static_cast<int>(scores.size()));
+    for (int i = 0; i < n; ++i) {
+        out[i] = scores[static_cast<size_t>(i)].release();
+    }
+    return static_cast<int>(scores.size());
+}
+
+void scoreboardResetScores(void *sb, int entry_kind, void *entry_actor, const char *entry_name)
+{
+    asScoreboard(sb)->resetScores(scoreEntryFrom(entry_kind, entry_actor, entry_name));
+}
+
+int scoreboardGetEntryCount(void *sb)
+{
+    g_score_entries = asScoreboard(sb)->getEntries();
+    return static_cast<int>(g_score_entries.size());
+}
+
+int scoreboardGetEntry(void *sb, int index, void **out_actor, const char **out_name)
+{
+    if (index < 0 || index >= static_cast<int>(g_score_entries.size())) {
+        return -1;
+    }
+    auto &entry = g_score_entries[static_cast<size_t>(index)];
+    if (auto *player = std::get_if<endstone::Player *>(&entry)) {
+        if (out_actor) *out_actor = *player;
+        return 0;
+    }
+    if (auto *actor = std::get_if<endstone::Actor *>(&entry)) {
+        if (out_actor) *out_actor = *actor;
+        return 1;
+    }
+    if (auto *name = std::get_if<std::string>(&entry)) {
+        if (out_name) *out_name = strOut(*name);
+        return 2;
+    }
+    return -1;
+}
+
+void scoreboardClearSlot(void *sb, int slot)
+{
+    asScoreboard(sb)->clearSlot(static_cast<endstone::DisplaySlot>(slot));
+}
+
+const char *objectiveGetName(void *o) { return strOut(asObjective(o)->getName()); }
+const char *objectiveGetDisplayName(void *o) { return strOut(asObjective(o)->getDisplayName()); }
+void objectiveSetDisplayName(void *o, const char *v) { asObjective(o)->setDisplayName(v ? v : ""); }
+const char *objectiveGetCriteriaName(void *o) { return strOut(asObjective(o)->getCriteria().getName()); }
+bool objectiveIsCriteriaReadOnly(void *o) { return asObjective(o)->getCriteria().isReadOnly(); }
+int objectiveGetCriteriaRenderType(void *o)
+{
+    return static_cast<int>(asObjective(o)->getCriteria().getDefaultRenderType());
+}
+bool objectiveIsModifiable(void *o) { return asObjective(o)->isModifiable(); }
+void *objectiveGetScoreboard(void *o) { return &asObjective(o)->getScoreboard(); }
+void objectiveUnregister(void *o) { asObjective(o)->unregister(); }
+bool objectiveIsDisplayed(void *o) { return asObjective(o)->isDisplayed(); }
+
+int objectiveGetDisplaySlot(void *o)
+{
+    const auto slot = asObjective(o)->getDisplaySlot();
+    return slot.has_value() ? static_cast<int>(slot.value()) : -1;
+}
+int objectiveGetSortOrder(void *o)
+{
+    const auto order = asObjective(o)->getSortOrder();
+    return order.has_value() ? static_cast<int>(order.value()) : -1;
+}
+void objectiveSetDisplaySlot(void *o, int slot)
+{
+    asObjective(o)->setDisplaySlot(slot >= 0 ? std::optional<endstone::DisplaySlot>(
+                                                  static_cast<endstone::DisplaySlot>(slot))
+                                             : std::nullopt);
+}
+void objectiveSetSortOrder(void *o, int order)
+{
+    asObjective(o)->setSortOrder(static_cast<endstone::ObjectiveSortOrder>(order));
+}
+void objectiveSetDisplay(void *o, int slot, int order)
+{
+    asObjective(o)->setDisplay(slot >= 0 ? std::optional<endstone::DisplaySlot>(
+                                               static_cast<endstone::DisplaySlot>(slot))
+                                         : std::nullopt,
+                               static_cast<endstone::ObjectiveSortOrder>(order));
+}
+int objectiveGetRenderType(void *o) { return static_cast<int>(asObjective(o)->getRenderType()); }
+
+void *objectiveGetScore(void *o, int entry_kind, void *entry_actor, const char *entry_name)
+{
+    auto score = asObjective(o)->getScore(scoreEntryFrom(entry_kind, entry_actor, entry_name));
+    return score ? score.release() : nullptr;
+}
+
+bool objectiveEquals(void *a, void *b) { return b && *asObjective(a) == *asObjective(b); }
+void objectiveDelete(void *o) { delete asObjective(o); }
+
+int scoreGetEntry(void *s, void **out_actor, const char **out_name)
+{
+    const auto entry = asScore(s)->getEntry();
+    if (auto *player = std::get_if<endstone::Player *>(&entry)) {
+        if (out_actor) *out_actor = *player;
+        return 0;
+    }
+    if (auto *actor = std::get_if<endstone::Actor *>(&entry)) {
+        if (out_actor) *out_actor = *actor;
+        return 1;
+    }
+    if (auto *name = std::get_if<std::string>(&entry)) {
+        if (out_name) *out_name = strOut(*name);
+        return 2;
+    }
+    return -1;
+}
+
+int scoreGetValue(void *s) { return asScore(s)->getValue(); }
+void scoreSetValue(void *s, int v) { asScore(s)->setValue(v); }
+bool scoreIsScoreSet(void *s) { return asScore(s)->isScoreSet(); }
+void *scoreGetObjective(void *s) { return &asScore(s)->getObjective(); }
+void *scoreGetScoreboard(void *s) { return &asScore(s)->getScoreboard(); }
+void scoreDelete(void *s) { delete asScore(s); }
+
 }  // namespace
 
 // Validates a plugin-loader file filter with std::regex — the same engine
@@ -2716,6 +2943,48 @@ const BridgeTable &getBridgeTable()
         .attachment_info_get_attachment = &attachmentInfoGetAttachment,
         .attachment_info_get_value = &attachmentInfoGetValue,
         .plugin_manager_register_loader = &pluginManagerRegisterLoader,
+        .server_get_scoreboard = &serverGetScoreboard,
+        .server_create_scoreboard = &serverCreateScoreboard,
+        .scoreboard_holder_get = &scoreboardHolderGet,
+        .scoreboard_release = &scoreboardRelease,
+        .player_get_scoreboard = &playerGetScoreboard,
+        .player_set_scoreboard = &playerSetScoreboard,
+        .scoreboard_add_objective = &scoreboardAddObjective,
+        .scoreboard_get_objective = &scoreboardGetObjective,
+        .scoreboard_get_objective_in_slot = &scoreboardGetObjectiveInSlot,
+        .scoreboard_get_objectives = &scoreboardGetObjectives,
+        .scoreboard_get_objectives_by_criteria = &scoreboardGetObjectivesByCriteria,
+        .scoreboard_get_scores = &scoreboardGetScores,
+        .scoreboard_reset_scores = &scoreboardResetScores,
+        .scoreboard_get_entry_count = &scoreboardGetEntryCount,
+        .scoreboard_get_entry = &scoreboardGetEntry,
+        .scoreboard_clear_slot = &scoreboardClearSlot,
+        .objective_get_name = &objectiveGetName,
+        .objective_get_display_name = &objectiveGetDisplayName,
+        .objective_set_display_name = &objectiveSetDisplayName,
+        .objective_get_criteria_name = &objectiveGetCriteriaName,
+        .objective_is_criteria_read_only = &objectiveIsCriteriaReadOnly,
+        .objective_get_criteria_render_type = &objectiveGetCriteriaRenderType,
+        .objective_is_modifiable = &objectiveIsModifiable,
+        .objective_get_scoreboard = &objectiveGetScoreboard,
+        .objective_unregister = &objectiveUnregister,
+        .objective_is_displayed = &objectiveIsDisplayed,
+        .objective_get_display_slot = &objectiveGetDisplaySlot,
+        .objective_get_sort_order = &objectiveGetSortOrder,
+        .objective_set_display_slot = &objectiveSetDisplaySlot,
+        .objective_set_sort_order = &objectiveSetSortOrder,
+        .objective_set_display = &objectiveSetDisplay,
+        .objective_get_render_type = &objectiveGetRenderType,
+        .objective_get_score = &objectiveGetScore,
+        .objective_equals = &objectiveEquals,
+        .objective_delete = &objectiveDelete,
+        .score_get_entry = &scoreGetEntry,
+        .score_get_value = &scoreGetValue,
+        .score_set_value = &scoreSetValue,
+        .score_is_score_set = &scoreIsScoreSet,
+        .score_get_objective = &scoreGetObjective,
+        .score_get_scoreboard = &scoreGetScoreboard,
+        .score_delete = &scoreDelete,
     };
     return table;
 }

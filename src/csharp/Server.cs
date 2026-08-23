@@ -91,4 +91,32 @@ public sealed unsafe class Server
             return bar == null ? null : new BossBar(bar);
         }
     }
+
+    /// <summary>Gets the primary scoreboard controlled by the server (saved by
+    /// the server and affected by the /scoreboard command), or null before the
+    /// level has loaded. The returned wrapper is a non-owning view.</summary>
+    public Scoreboard? GetScoreboard()
+    {
+        var board = T->ServerGetScoreboard(_ptr);
+        return board == null ? null : new Scoreboard(board);
+    }
+
+    /// <summary>Creates a new scoreboard tracked by the server. It is not
+    /// saved by the server and not affected by the /scoreboard command. The
+    /// returned <see cref="OwnedScoreboard"/> owns the plugin's reference:
+    /// Dispose it once the board is no longer assigned to any player
+    /// (assign players back with Player.SetScoreboard(Server.GetScoreboard())
+    /// or let them quit first).</summary>
+    public OwnedScoreboard? CreateScoreboard()
+    {
+        var holder = T->ServerCreateScoreboard(_ptr);
+        if (holder == null)
+        {
+            return null;
+        }
+        // The holder wraps a shared_ptr<Scoreboard>; read the raw pointer for
+        // bridge calls and keep the holder for lifetime management.
+        var board = T->ScoreboardHolderGet(holder);
+        return board == null ? null : new OwnedScoreboard(board, holder);
+    }
 }

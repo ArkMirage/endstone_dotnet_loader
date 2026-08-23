@@ -546,6 +546,61 @@ internal static unsafe class Bridge
         // ---- plugin registration ----
         // Registers a managed PluginLoader (gc handle) and scans `directory`.
         public delegate* unmanaged[Cdecl]<void*, void*, void*, void> PluginManagerRegisterLoader;
+
+        // ---- objects: scoreboard ----
+        // Scoreboard views (server/player) are non-owning raw pointers;
+        // CreateScoreboard returns a shared_ptr holder released via
+        // ScoreboardRelease. Objectives/Scores are unique_ptr transfers owned
+        // by the managed wrapper (ObjectiveDelete/ScoreDelete). Score entries
+        // cross as kind 0=player, 1=actor, 2=fake player name.
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerGetScoreboard;
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerCreateScoreboard;
+        public delegate* unmanaged[Cdecl]<void*, void*> ScoreboardHolderGet;
+        // Queues the holder for destruction on the server thread (safe from
+        // any thread, including the GC finalizer thread); the first enqueue
+        // schedules a one-shot drain task natively.
+        public delegate* unmanaged[Cdecl]<void*, void> ScoreboardRelease;
+        public delegate* unmanaged[Cdecl]<void*, void*> PlayerGetScoreboard;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> PlayerSetScoreboard;
+
+        public delegate* unmanaged[Cdecl]<void*, byte*, int, byte*, int, void*> ScoreboardAddObjective;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> ScoreboardGetObjective;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> ScoreboardGetObjectiveInSlot;
+        public delegate* unmanaged[Cdecl]<void*, void**, int, int> ScoreboardGetObjectives;
+        public delegate* unmanaged[Cdecl]<void*, int, void**, int, int> ScoreboardGetObjectivesByCriteria;
+        public delegate* unmanaged[Cdecl]<void*, int, void*, byte*, void**, int, int> ScoreboardGetScores;
+        public delegate* unmanaged[Cdecl]<void*, int, void*, byte*, void> ScoreboardResetScores;
+        public delegate* unmanaged[Cdecl]<void*, int> ScoreboardGetEntryCount;
+        public delegate* unmanaged[Cdecl]<void*, int, void**, byte**, int> ScoreboardGetEntry;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ScoreboardClearSlot;
+
+        public delegate* unmanaged[Cdecl]<void*, byte*> ObjectiveGetName;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ObjectiveGetDisplayName;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> ObjectiveSetDisplayName;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ObjectiveGetCriteriaName;
+        public delegate* unmanaged[Cdecl]<void*, bool> ObjectiveIsCriteriaReadOnly;
+        public delegate* unmanaged[Cdecl]<void*, int> ObjectiveGetCriteriaRenderType;
+        public delegate* unmanaged[Cdecl]<void*, bool> ObjectiveIsModifiable;
+        public delegate* unmanaged[Cdecl]<void*, void*> ObjectiveGetScoreboard;
+        public delegate* unmanaged[Cdecl]<void*, void> ObjectiveUnregister;
+        public delegate* unmanaged[Cdecl]<void*, bool> ObjectiveIsDisplayed;
+        public delegate* unmanaged[Cdecl]<void*, int> ObjectiveGetDisplaySlot;
+        public delegate* unmanaged[Cdecl]<void*, int> ObjectiveGetSortOrder;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ObjectiveSetDisplaySlot;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ObjectiveSetSortOrder;
+        public delegate* unmanaged[Cdecl]<void*, int, int, void> ObjectiveSetDisplay;
+        public delegate* unmanaged[Cdecl]<void*, int> ObjectiveGetRenderType;
+        public delegate* unmanaged[Cdecl]<void*, int, void*, byte*, void*> ObjectiveGetScore;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool> ObjectiveEquals;
+        public delegate* unmanaged[Cdecl]<void*, void> ObjectiveDelete;
+
+        public delegate* unmanaged[Cdecl]<void*, void**, byte**, int> ScoreGetEntry;
+        public delegate* unmanaged[Cdecl]<void*, int> ScoreGetValue;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ScoreSetValue;
+        public delegate* unmanaged[Cdecl]<void*, bool> ScoreIsScoreSet;
+        public delegate* unmanaged[Cdecl]<void*, void*> ScoreGetObjective;
+        public delegate* unmanaged[Cdecl]<void*, void*> ScoreGetScoreboard;
+        public delegate* unmanaged[Cdecl]<void*, void> ScoreDelete;
     }
 #pragma warning restore CS0649
 
@@ -731,6 +786,132 @@ internal static unsafe class Bridge
     internal static void CallRegisterLoader(void* pm, void* loaderGc, void* dirUtf8)
     {
         T->PluginManagerRegisterLoader(pm, loaderGc, dirUtf8);
+    }
+
+    // ---- score entry marshalling ----
+    // Score entries are the C++ variant<Player*, Actor*, std::string>; the
+    // managed side passes (kind, actor pointer, fake player name) triples.
+
+    internal static void* CallScoreEntry(delegate* unmanaged[Cdecl]<void*, int, void*, byte*, void*> fn,
+                                         void* obj, ScoreEntry entry)
+    {
+        var kind = entry.Kind;
+        void* actor = null;
+        byte* name = null;
+        if (kind == 2)
+        {
+            var buf = ToUtf8(entry.Name ?? string.Empty);
+            fixed (byte* p = buf)
+            {
+                return fn(obj, (int)kind, actor, p);
+            }
+        }
+        if (kind == 0)
+        {
+            actor = (void*)entry.Player!.NativePtr;
+        }
+        else if (kind == 1)
+        {
+            actor = (void*)entry.Actor!.NativePtr;
+        }
+        return fn(obj, (int)kind, actor, name);
+    }
+
+    internal static void CallScoreEntryVoid(delegate* unmanaged[Cdecl]<void*, int, void*, byte*, void> fn,
+                                            void* obj, ScoreEntry entry)
+    {
+        var kind = entry.Kind;
+        void* actor = null;
+        byte* name = null;
+        if (kind == 2)
+        {
+            var buf = ToUtf8(entry.Name ?? string.Empty);
+            fixed (byte* p = buf)
+            {
+                fn(obj, (int)kind, actor, p);
+                return;
+            }
+        }
+        if (kind == 0)
+        {
+            actor = (void*)entry.Player!.NativePtr;
+        }
+        else if (kind == 1)
+        {
+            actor = (void*)entry.Actor!.NativePtr;
+        }
+        fn(obj, (int)kind, actor, name);
+    }
+
+    /// <summary>Calls a score-entry accessor that fills an out array of
+    /// native Score pointers; returns the total number of scores available.</summary>
+    internal static int CallScoreEntryScores(delegate* unmanaged[Cdecl]<void*, int, void*, byte*, void**, int, int> fn,
+                                             void* obj, ScoreEntry entry, void** outScores, int capacity)
+    {
+        var kind = entry.Kind;
+        void* actor = null;
+        byte* name = null;
+        if (kind == 2)
+        {
+            var buf = ToUtf8(entry.Name ?? string.Empty);
+            fixed (byte* p = buf)
+            {
+                return fn(obj, (int)kind, actor, p, outScores, capacity);
+            }
+        }
+        if (kind == 0)
+        {
+            actor = (void*)entry.Player!.NativePtr;
+        }
+        else if (kind == 1)
+        {
+            actor = (void*)entry.Actor!.NativePtr;
+        }
+        return fn(obj, (int)kind, actor, name, outScores, capacity);
+    }
+
+    /// <summary>Reads entry `index` from the native getEntries() cache; the
+    /// returned name is copied immediately (thread-local buffer).</summary>
+    internal static ScoreEntry ReadScoreEntryIndexed(delegate* unmanaged[Cdecl]<void*, int, void**, byte**, int> fn,
+                                                     void* obj, int index)
+    {
+        void* actor = null;
+        byte* name = null;
+        var kind = fn(obj, index, &actor, &name);
+        switch (kind)
+        {
+            case 0:
+                return ScoreEntry.ForPlayer(new Player((IntPtr)actor));
+            case 1:
+                return ScoreEntry.ForActor(new Actor((IntPtr)actor));
+            case 2:
+                return ScoreEntry.ForName(Str(name));
+            default:
+                throw new InvalidOperationException("Invalid score entry returned by the native bridge.");
+        }
+    }
+
+    /// <summary>Reads a native variant&lt;Player*, Actor*, string&gt; entry
+    /// written by the given accessor; the returned name is copied immediately
+    /// (native side uses its thread-local buffer).</summary>
+    internal static ScoreEntry ReadScoreEntry(delegate* unmanaged[Cdecl]<void*, void**, byte**, int> fn, void* obj)
+    {
+        void* actor;
+        byte* name;
+        int kind;
+        // Pointers are only valid while no other native call runs in between.
+        kind = fn(obj, &actor, &name);
+        switch (kind)
+        {
+            case 0:
+                return ScoreEntry.ForPlayer(new Player((IntPtr)actor));
+            case 1:
+                return ScoreEntry.ForActor(new Actor((IntPtr)actor));
+            case 2:
+                return ScoreEntry.ForName(Str(name));
+            default:
+                throw new InvalidOperationException("Invalid score entry returned by the native bridge.");
+        }
     }
 
     internal static Table* Raw => T;

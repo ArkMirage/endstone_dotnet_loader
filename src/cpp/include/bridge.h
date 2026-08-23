@@ -654,6 +654,71 @@ struct BridgeTable {
     // Registers a managed PluginLoader; scans `directory` afterwards. loader_gc
     // is a GCHandle to the Endstone.Loader.PluginLoader instance.
     void (*plugin_manager_register_loader)(void *pm, void *loader_gc, const char *directory);
+
+    // ---- objects: scoreboard ----
+    // Scoreboard lifetime: Server.getScoreboard()/Player.getScoreboard() return
+    // non-owning views (the server keeps the shared_ptr); createScoreboard()
+    // returns a heap std::shared_ptr<Scoreboard> holder that the managed side
+    // must release with scoreboard_release. Objectives and Scores come back as
+    // unique_ptr transfers: the managed wrapper owns them and frees them with
+    // objective_delete / score_delete.
+    // Score entries are the C++ variant<Player*, Actor*, std::string>; they
+    // cross the bridge as kind 0=player, 1=actor, 2=fake player name.
+    void *(*server_get_scoreboard)(void *);
+    void *(*server_create_scoreboard)(void *);
+    // Reads the raw Scoreboard* out of a holder created by server_create_scoreboard.
+    void *(*scoreboard_holder_get)(void *);
+    // Queues a scoreboard holder for destruction on the server thread (safe
+    // from any thread, including the GC finalizer thread). The first enqueue
+    // schedules a one-shot drain task; no polling in the steady state.
+    void (*scoreboard_release)(void *);
+    void *(*player_get_scoreboard)(void *);
+    void (*player_set_scoreboard)(void *, void *);
+
+    void *(*scoreboard_add_objective)(void *, const char *, int criteria_type, const char *display_name, int render_type);
+    void *(*scoreboard_get_objective)(void *, const char *);
+    void *(*scoreboard_get_objective_in_slot)(void *, int slot);
+    int (*scoreboard_get_objectives)(void *, void **, int);
+    int (*scoreboard_get_objectives_by_criteria)(void *, int criteria_type, void **, int);
+    int (*scoreboard_get_scores)(void *, int entry_kind, void *entry_actor, const char *entry_name, void **, int);
+    void (*scoreboard_reset_scores)(void *, int entry_kind, void *entry_actor, const char *entry_name);
+    int (*scoreboard_get_entry_count)(void *);
+    // Reads entry `index` from the cached getEntries() vector; returns the
+    // entry kind and writes the actor pointer (kinds 0/1) and/or the fake
+    // player name (kind 2, thread-local buffer).
+    int (*scoreboard_get_entry)(void *, int index, void **out_actor, const char **out_name);
+    void (*scoreboard_clear_slot)(void *, int slot);
+
+    const char *(*objective_get_name)(void *);
+    const char *(*objective_get_display_name)(void *);
+    void (*objective_set_display_name)(void *, const char *);
+    const char *(*objective_get_criteria_name)(void *);
+    bool (*objective_is_criteria_read_only)(void *);
+    int (*objective_get_criteria_render_type)(void *);
+    bool (*objective_is_modifiable)(void *);
+    void *(*objective_get_scoreboard)(void *);
+    void (*objective_unregister)(void *);
+    bool (*objective_is_displayed)(void *);
+    // Display slot / sort order getters return -1 when not displayed.
+    int (*objective_get_display_slot)(void *);
+    int (*objective_get_sort_order)(void *);
+    void (*objective_set_display_slot)(void *, int slot);  // -1 clears the slot
+    void (*objective_set_sort_order)(void *, int order);
+    void (*objective_set_display)(void *, int slot, int order);
+    int (*objective_get_render_type)(void *);
+    void *(*objective_get_score)(void *, int entry_kind, void *entry_actor, const char *entry_name);
+    bool (*objective_equals)(void *, void *);
+    void (*objective_delete)(void *);
+
+    // Writes the tracked entry: returns the kind and fills out_actor (kinds
+    // 0/1) and/or out_name (kind 2, thread-local buffer).
+    int (*score_get_entry)(void *, void **out_actor, const char **out_name);
+    int (*score_get_value)(void *);
+    void (*score_set_value)(void *, int);
+    bool (*score_is_score_set)(void *);
+    void *(*score_get_objective)(void *);
+    void *(*score_get_scoreboard)(void *);
+    void (*score_delete)(void *);
 };
 
 }  // namespace dotnet_loader

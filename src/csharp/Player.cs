@@ -60,6 +60,10 @@ public sealed unsafe class Player : Mob
     /// <summary>The player's ender chest inventory.</summary>
     public Inventory EnderChest => new((IntPtr)T->PlayerGetEnderChest(_ptr));
 
+    /// <summary>The scoreboard currently visible to this player (falls back
+    /// to the main server scoreboard). Non-owning view.</summary>
+    public Scoreboard Scoreboard => new((IntPtr)T->PlayerGetScoreboard(_ptr));
+
     public void SendPopup(string message) => Bridge.Call1(T->PlayerSendPopup, _ptr, message);
     public void SendTip(string message) => Bridge.Call1(T->PlayerSendTip, _ptr, message);
     public void SendToast(string title, string content) => Bridge.Call2(T->PlayerSendToast, _ptr, title, content);
@@ -107,4 +111,10 @@ public sealed unsafe class Player : Mob
     /// <summary>Sends the full map rendering (pixels + cursors) to this player.
     /// Blocks the server thread while the renderers draw.</summary>
     public void SendMap(MapView map) => T->PlayerSendMap(_ptr, (void*)map.NativePtr);
+
+    /// <summary>Sets the scoreboard visible to this player. Accepts the main
+    /// scoreboard (Server.GetScoreboard()) or a plugin-created
+    /// OwnedScoreboard, which must be kept alive while assigned.</summary>
+    public void SetScoreboard(Scoreboard scoreboard)
+        => T->PlayerSetScoreboard(_ptr, (void*)scoreboard.NativePtr);
 }
