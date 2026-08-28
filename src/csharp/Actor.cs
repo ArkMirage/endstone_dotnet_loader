@@ -15,7 +15,15 @@ public unsafe class Actor : CommandSender
     public bool IsInLava => T->ActorIsInLava(_ptr);
     public bool IsDead => T->ActorIsDead(_ptr);
     public bool IsValid => T->ActorIsValid(_ptr);
-    public string DimensionName => Bridge.Str(T->ActorGetDimensionName(_ptr));
+    public Dimension Dimension
+    {
+        get
+        {
+            var d = T->ActorGetDimension(_ptr);
+            return d == null ? throw new InvalidOperationException("Actor has no dimension") : new Dimension((IntPtr)d);
+        }
+    }
+
     public string NameTag => Bridge.Str(T->ActorGetNameTag(_ptr));
     public string ScoreTag => Bridge.Str(T->ActorGetScoreTag(_ptr));
     public bool IsNameTagVisible => T->ActorIsNameTagVisible(_ptr);
