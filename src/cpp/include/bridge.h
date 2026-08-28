@@ -729,7 +729,44 @@ struct BridgeTable {
     void *(*score_get_objective)(void *);
     void *(*score_get_scoreboard)(void *);
     void (*score_delete)(void *);
-};
+    // ---- objects: ban list ----
+    // BanList pointers are non-owning views of server-owned singletons.
+    // BanEntry pointers are non-owning views of entries owned by their list.
+    void *(*server_get_ban_list)(void *);
+    void *(*server_get_ip_ban_list)(void *);
+
+    // PlayerBanList operations
+    void *(*player_ban_list_get_ban_entry)(void *, const char *);
+    void *(*player_ban_list_add_ban)(void *, const char *, const char *, int64_t, const char *);
+    int (*player_ban_list_get_entries)(void *, void **, int);
+    bool (*player_ban_list_is_banned)(void *, const char *);
+    void (*player_ban_list_remove_ban)(void *, const char *);
+
+    // IpBanList operations
+    void *(*ip_ban_list_get_ban_entry)(void *, const char *);
+    void *(*ip_ban_list_add_ban)(void *, const char *, const char *, int64_t, const char *);
+    int (*ip_ban_list_get_entries)(void *, void **, int);
+    bool (*ip_ban_list_is_banned)(void *, const char *);
+    void (*ip_ban_list_remove_ban)(void *, const char *);
+
+    // PlayerBanEntry accessors
+    const char *(*player_ban_entry_get_name)(void *);
+    const char *(*player_ban_entry_get_uuid)(void *);
+    const char *(*player_ban_entry_get_xuid)(void *);
+
+    // IpBanEntry accessor
+    const char *(*ip_ban_entry_get_address)(void *);
+
+    // BanEntry common (base class methods — work on any BanEntry*)
+    // Created/Expiration are epoch seconds; -1 for expiration = no expiry.
+    int64_t (*ban_entry_get_created)(void *);
+    void (*ban_entry_set_created)(void *, int64_t);
+    const char *(*ban_entry_get_source)(void *);
+    void (*ban_entry_set_source)(void *, const char *);
+    int64_t (*ban_entry_get_expiration)(void *);
+    void (*ban_entry_set_expiration)(void *, int64_t);
+    const char *(*ban_entry_get_reason)(void *);
+    void (*ban_entry_set_reason)(void *, const char *);};
 
 }  // namespace dotnet_loader
 

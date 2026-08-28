@@ -2489,6 +2489,184 @@ void *scoreGetObjective(void *s) { return &asScore(s)->getObjective(); }
 void *scoreGetScoreboard(void *s) { return &asScore(s)->getScoreboard(); }
 void scoreDelete(void *s) { delete asScore(s); }
 
+// ---- ban list ----
+
+endstone::PlayerBanList *asPlayerBanList(void *p)
+{
+    return static_cast<endstone::PlayerBanList *>(p);
+}
+
+endstone::IpBanList *asIpBanList(void *p)
+{
+    return static_cast<endstone::IpBanList *>(p);
+}
+
+void *serverGetBanList(void *s)
+{
+    return &asServer(s)->getBanList();
+}
+
+void *serverGetIpBanList(void *s)
+{
+    return &asServer(s)->getIpBanList();
+}
+
+void *playerBanListGetBanEntry(void *l, const char *name)
+{
+    auto entry = asPlayerBanList(l)->getBanEntry(name ? name : "");
+    return entry ? entry.get().get() : nullptr;
+}
+
+// Converts epoch seconds to BanEntry::Date; -1 means no expiration.
+using BanDate = endstone::BanEntry::Date;
+
+std::optional<BanDate> epochToOptional(int64_t epoch)
+{
+    if (epoch < 0) {
+        return std::nullopt;
+    }
+    return BanDate(std::chrono::seconds(epoch));
+}
+
+void *playerBanListAddBan(void *l, const char *name, const char *reason, int64_t expires, const char *source)
+{
+    auto entry = asPlayerBanList(l)->addBan(
+        name ? name : "",
+        reason ? std::optional<std::string>(reason) : std::nullopt,
+        epochToOptional(expires),
+        source ? std::optional<std::string>(source) : std::nullopt);
+    return entry.get().get();
+}
+
+int playerBanListGetEntries(void *l, void **out, int capacity)
+{
+    auto entries = asPlayerBanList(l)->getEntries();
+    int count = static_cast<int>(std::min(entries.size(), static_cast<size_t>(capacity)));
+    for (int i = 0; i < count; i++) {
+        out[i] = entries[i].get().get();
+    }
+    return static_cast<int>(entries.size());
+}
+
+bool playerBanListIsBanned(void *l, const char *name)
+{
+    return asPlayerBanList(l)->isBanned(name ? name : "");
+}
+
+void playerBanListRemoveBan(void *l, const char *name)
+{
+    asPlayerBanList(l)->removeBan(name ? name : "");
+}
+
+void *ipBanListGetBanEntry(void *l, const char *address)
+{
+    auto entry = asIpBanList(l)->getBanEntry(address ? address : "");
+    return entry ? entry.get().get() : nullptr;
+}
+
+void *ipBanListAddBan(void *l, const char *address, const char *reason, int64_t expires, const char *source)
+{
+    auto entry = asIpBanList(l)->addBan(
+        address ? address : "",
+        reason ? std::optional<std::string>(reason) : std::nullopt,
+        epochToOptional(expires),
+        source ? std::optional<std::string>(source) : std::nullopt);
+    return entry.get().get();
+}
+
+int ipBanListGetEntries(void *l, void **out, int capacity)
+{
+    auto entries = asIpBanList(l)->getEntries();
+    int count = static_cast<int>(std::min(entries.size(), static_cast<size_t>(capacity)));
+    for (int i = 0; i < count; i++) {
+        out[i] = entries[i].get().get();
+    }
+    return static_cast<int>(entries.size());
+}
+
+bool ipBanListIsBanned(void *l, const char *address)
+{
+    return asIpBanList(l)->isBanned(address ? address : "");
+}
+
+void ipBanListRemoveBan(void *l, const char *address)
+{
+    asIpBanList(l)->removeBan(address ? address : "");
+}
+
+// PlayerBanEntry accessors
+
+const char *playerBanEntryGetName(void *e)
+{
+    return strOut(static_cast<endstone::PlayerBanEntry *>(e)->getName());
+}
+
+const char *playerBanEntryGetUuid(void *e)
+{
+    auto uuid = static_cast<endstone::PlayerBanEntry *>(e)->getUniqueId();
+    return uuid ? strOut(uuid->str()) : nullptr;
+}
+
+const char *playerBanEntryGetXuid(void *e)
+{
+    auto xuid = static_cast<endstone::PlayerBanEntry *>(e)->getXuid();
+    return xuid ? strOut(*xuid) : nullptr;
+}
+
+// IpBanEntry accessor
+
+const char *ipBanEntryGetAddress(void *e)
+{
+    return strOut(static_cast<endstone::IpBanEntry *>(e)->getAddress());
+}
+
+// BanEntry common (base class)
+
+int64_t banEntryGetCreated(void *e)
+{
+    auto tp = static_cast<endstone::BanEntry *>(e)->getCreated();
+    return std::chrono::duration_cast<std::chrono::seconds>(tp.time_since_epoch()).count();
+}
+
+void banEntrySetCreated(void *e, int64_t epoch)
+{
+    static_cast<endstone::BanEntry *>(e)->setCreated(BanDate(std::chrono::seconds(epoch)));
+}
+
+const char *banEntryGetSource(void *e)
+{
+    return strOut(static_cast<endstone::BanEntry *>(e)->getSource());
+}
+
+void banEntrySetSource(void *e, const char *source)
+{
+    static_cast<endstone::BanEntry *>(e)->setSource(source ? source : "");
+}
+
+int64_t banEntryGetExpiration(void *e)
+{
+    auto exp = static_cast<endstone::BanEntry *>(e)->getExpiration();
+    if (!exp) {
+        return -1;
+    }
+    return std::chrono::duration_cast<std::chrono::seconds>(exp->time_since_epoch()).count();
+}
+
+void banEntrySetExpiration(void *e, int64_t epoch)
+{
+    static_cast<endstone::BanEntry *>(e)->setExpiration(epochToOptional(epoch));
+}
+
+const char *banEntryGetReason(void *e)
+{
+    return strOut(static_cast<endstone::BanEntry *>(e)->getReason());
+}
+
+void banEntrySetReason(void *e, const char *reason)
+{
+    static_cast<endstone::BanEntry *>(e)->setReason(reason ? reason : "");
+}
+
 }  // namespace
 
 // Validates a plugin-loader file filter with std::regex — the same engine
@@ -3020,6 +3198,30 @@ const BridgeTable &getBridgeTable()
         .score_get_objective = &scoreGetObjective,
         .score_get_scoreboard = &scoreGetScoreboard,
         .score_delete = &scoreDelete,
+        .server_get_ban_list = &serverGetBanList,
+        .server_get_ip_ban_list = &serverGetIpBanList,
+        .player_ban_list_get_ban_entry = &playerBanListGetBanEntry,
+        .player_ban_list_add_ban = &playerBanListAddBan,
+        .player_ban_list_get_entries = &playerBanListGetEntries,
+        .player_ban_list_is_banned = &playerBanListIsBanned,
+        .player_ban_list_remove_ban = &playerBanListRemoveBan,
+        .ip_ban_list_get_ban_entry = &ipBanListGetBanEntry,
+        .ip_ban_list_add_ban = &ipBanListAddBan,
+        .ip_ban_list_get_entries = &ipBanListGetEntries,
+        .ip_ban_list_is_banned = &ipBanListIsBanned,
+        .ip_ban_list_remove_ban = &ipBanListRemoveBan,
+        .player_ban_entry_get_name = &playerBanEntryGetName,
+        .player_ban_entry_get_uuid = &playerBanEntryGetUuid,
+        .player_ban_entry_get_xuid = &playerBanEntryGetXuid,
+        .ip_ban_entry_get_address = &ipBanEntryGetAddress,
+        .ban_entry_get_created = &banEntryGetCreated,
+        .ban_entry_set_created = &banEntrySetCreated,
+        .ban_entry_get_source = &banEntryGetSource,
+        .ban_entry_set_source = &banEntrySetSource,
+        .ban_entry_get_expiration = &banEntryGetExpiration,
+        .ban_entry_set_expiration = &banEntrySetExpiration,
+        .ban_entry_get_reason = &banEntryGetReason,
+        .ban_entry_set_reason = &banEntrySetReason,
     };
     return table;
 }

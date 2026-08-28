@@ -605,6 +605,45 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*> ScoreGetObjective;
         public delegate* unmanaged[Cdecl]<void*, void*> ScoreGetScoreboard;
         public delegate* unmanaged[Cdecl]<void*, void> ScoreDelete;
+
+        // ---- objects: ban list ----
+        // BanList pointers are non-owning views of server-owned singletons.
+        // BanEntry pointers are non-owning views of entries owned by their list.
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerGetBanList;
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerGetIpBanList;
+
+        // PlayerBanList operations
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> PlayerBanListGetBanEntry;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, long, byte*, void*> PlayerBanListAddBan;
+        public delegate* unmanaged[Cdecl]<void*, void**, int, int> PlayerBanListGetEntries;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> PlayerBanListIsBanned;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerBanListRemoveBan;
+
+        // IpBanList operations
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> IpBanListGetBanEntry;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, long, byte*, void*> IpBanListAddBan;
+        public delegate* unmanaged[Cdecl]<void*, void**, int, int> IpBanListGetEntries;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> IpBanListIsBanned;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> IpBanListRemoveBan;
+
+        // PlayerBanEntry accessors
+        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerBanEntryGetName;
+        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerBanEntryGetUuid;
+        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerBanEntryGetXuid;
+
+        // IpBanEntry accessor
+        public delegate* unmanaged[Cdecl]<void*, byte*> IpBanEntryGetAddress;
+
+        // BanEntry common (base class — works on any BanEntry*)
+        // Created/Expiration are epoch seconds; -1 for expiration = no expiry.
+        public delegate* unmanaged[Cdecl]<void*, long> BanEntryGetCreated;
+        public delegate* unmanaged[Cdecl]<void*, long, void> BanEntrySetCreated;
+        public delegate* unmanaged[Cdecl]<void*, byte*> BanEntryGetSource;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> BanEntrySetSource;
+        public delegate* unmanaged[Cdecl]<void*, long> BanEntryGetExpiration;
+        public delegate* unmanaged[Cdecl]<void*, long, void> BanEntrySetExpiration;
+        public delegate* unmanaged[Cdecl]<void*, byte*> BanEntryGetReason;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> BanEntrySetReason;
     }
 #pragma warning restore CS0649
 

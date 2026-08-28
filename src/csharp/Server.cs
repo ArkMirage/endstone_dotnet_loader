@@ -119,4 +119,10 @@ public sealed unsafe class Server
         var board = T->ScoreboardHolderGet(holder);
         return board == null ? null : new OwnedScoreboard(board, holder);
     }
+
+    /// <summary>Gets the player ban list (non-owning view; the server owns it).</summary>
+    public PlayerBanList GetBanList() => new(T->ServerGetBanList(_ptr));
+
+    /// <summary>Gets the IP ban list (non-owning view; the server owns it).</summary>
+    public IpBanList GetIpBanList() => new(T->ServerGetIpBanList(_ptr));
 }
