@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <cstdint>
+#include <type_traits>
+#include <vector>
 #include <format>
 #include <iterator>
 #include <memory>
@@ -15,6 +18,8 @@
 #include <endstone/endstone.hpp>
 #include <endstone/permissions/permission_attachment.h>
 #include <nlohmann/json.hpp>
+
+#include "nbt.h"
 
 namespace dotnet_loader {
 
@@ -813,6 +818,33 @@ void packetSetPayload(void *e, int kind, const void *data, int len)
         break;
     default:
         break;
+    }
+}
+
+// ---- item NBT ----
+// The managed side receives/sends already-serialized CBOR (see nbt.cpp); raw
+// Endstone NBT pointers are never exposed across the bridge.
+const char *itemGetNbt(void *i, int *len)
+{
+    const auto *item = asItem(i);
+    endstone::CompoundTag nbt;
+    if (item) {
+        nbt = item->getNbt();
+    }
+    // Item NBT is always a Compound; wrap it as a generic Tag for serialization.
+    endstone::nbt::Tag root = std::move(nbt);
+    return nbtSerialize(root, len);
+}
+
+void itemSetNbt(void *i, const void *data, int len)
+{
+    auto *item = asItem(i);
+    if (!item || !data || len <= 0) {
+        return;
+    }
+    auto tag = nbtDeserialize(data, len);
+    if (tag && tag->type() == endstone::nbt::Type::Compound) {
+        item->setNbt(tag->get<endstone::CompoundTag>());
     }
 }
 void *packetGetPlayer(void *e, int kind)
@@ -2704,6 +2736,9 @@ const BridgeTable &getBridgeTable()
         .item_actor_get_type = &itemActorGetType,
         .item_actor_get_amount = &itemActorGetAmount,
         .item_actor_get_translation_key = &itemActorGetTranslationKey,
+        .item_get_nbt = &itemGetNbt,
+        .item_set_nbt = &itemSetNbt,
+        .nbt_free_buffer = &nbtFreeBuffer,
         .item_has_display_name = &itemHasDisplayName,
         .item_get_display_name = &itemGetDisplayName,
         .item_has_lore = &itemHasLore,

@@ -192,6 +192,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, int> PacketGetId;
         public delegate* unmanaged[Cdecl]<void*, int, int*, byte*> PacketGetPayload;
         public delegate* unmanaged[Cdecl]<void*, int, void*, int, void> PacketSetPayload;
+
         public delegate* unmanaged[Cdecl]<void*, int, void*> PacketGetPlayer;
         public delegate* unmanaged[Cdecl]<void*, int, byte*> PacketGetAddress;
         public delegate* unmanaged[Cdecl]<void*, int, int> PacketGetSubClientId;
@@ -271,6 +272,9 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> ItemActorGetType;
         public delegate* unmanaged[Cdecl]<void*, int> ItemActorGetAmount;
         public delegate* unmanaged[Cdecl]<void*, byte*> ItemActorGetTranslationKey;
+        public delegate* unmanaged[Cdecl]<void*, int*, byte*> ItemGetNbt;
+        public delegate* unmanaged[Cdecl]<void*, byte*, int, void> ItemSetNbt;
+        public delegate* unmanaged[Cdecl]<void*, void> NbtFreeBuffer;
         public delegate* unmanaged[Cdecl]<void*, bool> ItemHasDisplayName;
         public delegate* unmanaged[Cdecl]<void*, byte*> ItemGetDisplayName;
         public delegate* unmanaged[Cdecl]<void*, bool> ItemHasLore;

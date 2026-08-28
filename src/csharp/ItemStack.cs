@@ -1,3 +1,7 @@
+using System.Runtime.InteropServices;
+
+using Endstone.Loader.Nbt;
+
 namespace Endstone.Loader;
 
 /// <summary>Wraps a native endstone::ItemStack read-only view. When created via
@@ -134,4 +138,39 @@ public sealed unsafe class ItemStack : IDisposable
 
     /// <summary>Binds this map item to the given map view (only works on map item stacks).</summary>
     public bool SetMapView(MapView map) => !_isItemActor && T->ItemSetMapView(_ptr, (void*)map.NativePtr);
+
+    /// <summary>Gets the item's NBT compound tag, or null when the item has no NBT
+    /// (not available on item actors). The native side hands back already-serialized
+    /// CBOR; we decode it into the managed NbtTag placeholder.</summary>
+    public NbtTag? GetNbt()
+    {
+        if (_isItemActor)
+        {
+            return null;
+        }
+        int len = 0;
+        var data = T->ItemGetNbt(_ptr, &len);
+        if (len <= 0 || data == null)
+        {
+            return null;
+        }
+        var bytes = new byte[len];
+        Marshal.Copy((IntPtr)data, bytes, 0, len);
+        T->NbtFreeBuffer(data);
+        return NbtCbor.Read(bytes);
+    }
+
+    /// <summary>Sets the item's NBT compound tag (not available on item actors).</summary>
+    public void SetNbt(NbtTag root)
+    {
+        if (_isItemActor)
+        {
+            return;
+        }
+        var bytes = NbtCbor.Write(root);
+        fixed (byte* p = bytes)
+        {
+            T->ItemSetNbt(_ptr, p, bytes.Length);
+        }
+    }
 }

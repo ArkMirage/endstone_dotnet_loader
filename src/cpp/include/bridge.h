@@ -338,6 +338,16 @@ struct BridgeTable {
     const char *(*item_actor_get_type)(void *);
     int (*item_actor_get_amount)(void *);
     const char *(*item_actor_get_translation_key)(void *);
+    // Item NBT is transferred as already-serialized CBOR (see nbt.cpp); raw
+    // Endstone NBT pointers are never exposed across the bridge.
+    // item_get_nbt heap-allocates the CBOR bytes; the managed side copies them
+    // and frees the buffer with nbt_free_buffer. *len receives the byte count.
+    const char *(*item_get_nbt)(void *, int *);
+    // item_set_nbt consumes CBOR bytes produced by the managed side.
+    void (*item_set_nbt)(void *, const void *, int);
+    // Frees the buffer returned by item_get_nbt (the managed side is the caller,
+    // so it owns and releases the allocation).
+    void (*nbt_free_buffer)(void *);
     bool (*item_has_display_name)(void *);
     const char *(*item_get_display_name)(void *);
     bool (*item_has_lore)(void *);

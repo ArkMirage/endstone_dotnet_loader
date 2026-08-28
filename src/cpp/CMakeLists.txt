@@ -84,6 +84,7 @@ endstone_add_plugin(${PROJECT_NAME}
         dotnet_host.cpp
         dotnet_plugin_loader.cpp
         bridge.cpp
+        nbt.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
