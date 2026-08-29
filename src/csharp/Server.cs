@@ -40,6 +40,15 @@ public sealed unsafe class Server
         }
     }
 
+    /// <summary>Gets the player with the given UUID, or null if not online.</summary>
+    public Player? GetPlayer(Guid uuid)
+    {
+        byte* buf = stackalloc byte[16];
+        UuidMarshal.Write(uuid, new Span<byte>(buf, 16));
+        var player = T->ServerGetPlayerByUuid(_ptr, buf);
+        return player == null ? null : new Player((IntPtr)player);
+    }
+
     /// <summary>Gets the console command sender.</summary>
     public ConsoleCommandSender ConsoleSender => new((IntPtr)T->ServerGetConsoleSender(_ptr));
 

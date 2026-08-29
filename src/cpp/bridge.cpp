@@ -55,6 +55,12 @@ const char *strOut(std::string s)
     return g_str_buffer.c_str();
 }
 
+// UUIDs cross the boundary as 16 raw bytes in canonical (network) byte order,
+// matching endstone::UUID::data and Python's uuid.UUID.bytes. The managed side
+// converts to/from System.Guid via Uuid.ToBytes/FromBytes.
+void uuidToBytes(const endstone::UUID &u, uint8_t *out);
+endstone::UUID uuidFromBytes(const uint8_t *in);
+
 endstone::Player *asPlayer(void *p) { return static_cast<endstone::Player *>(p); }
 endstone::Server *asServer(void *p) { return static_cast<endstone::Server *>(p); }
 endstone::PluginManager *asPluginManager(void *p) { return static_cast<endstone::PluginManager *>(p); }
@@ -198,6 +204,11 @@ void *serverGetConsoleSender(void *p) { return &asServer(p)->getCommandSender();
 void *serverGetPlayer(void *p, const char *name)
 {
     return asServer(p)->getPlayer(name ? name : "");
+}
+
+void *serverGetPlayerByUuid(void *p, const uint8_t *uuid16)
+{
+    return asServer(p)->getPlayer(uuidFromBytes(uuid16));
 }
 bool serverDispatchCommand(void *p, void *sender, const char *cmd)
 {
@@ -2601,10 +2612,29 @@ const char *playerBanEntryGetName(void *e)
     return strOut(static_cast<endstone::PlayerBanEntry *>(e)->getName());
 }
 
-const char *playerBanEntryGetUuid(void *e)
+// UUIDs cross the boundary as 16 raw bytes in canonical (network) byte order,
+// matching endstone::UUID::data and Python's uuid.UUID.bytes. The managed side
+// converts to/from System.Guid via Uuid.ToBytes/FromBytes.
+void uuidToBytes(const endstone::UUID &u, uint8_t *out)
+{
+    std::memcpy(out, u.data, 16);
+}
+
+endstone::UUID uuidFromBytes(const uint8_t *in)
+{
+    endstone::UUID u;
+    std::memcpy(u.data, in, 16);
+    return u;
+}
+
+bool playerBanEntryGetUuid(void *e, uint8_t *out16)
 {
     auto uuid = static_cast<endstone::PlayerBanEntry *>(e)->getUniqueId();
-    return uuid ? strOut(uuid->str()) : nullptr;
+    if (!uuid) {
+        return false;
+    }
+    uuidToBytes(*uuid, out16);
+    return true;
 }
 
 const char *playerBanEntryGetXuid(void *e)
@@ -2745,6 +2775,7 @@ const BridgeTable &getBridgeTable()
         .server_broadcast_message = &serverBroadcastMessage,
         .server_get_online_players = &serverGetOnlinePlayers,
         .server_get_player = &serverGetPlayer,
+        .server_get_player_by_uuid = &serverGetPlayerByUuid,
         .server_get_console_sender = &serverGetConsoleSender,
         .server_dispatch_command = &serverDispatchCommand,
         .server_get_plugin_manager = &serverGetPluginManager,

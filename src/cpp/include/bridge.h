@@ -136,6 +136,7 @@ struct BridgeTable {
     void (*server_broadcast_message)(void *, const char *);
     int (*server_get_online_players)(void *, void **, int);
     void *(*server_get_player)(void *, const char *);
+    void *(*server_get_player_by_uuid)(void *, const uint8_t *);
     void *(*server_get_console_sender)(void *);
     bool (*server_dispatch_command)(void *, void *, const char *);
 
@@ -751,7 +752,7 @@ struct BridgeTable {
 
     // PlayerBanEntry accessors
     const char *(*player_ban_entry_get_name)(void *);
-    const char *(*player_ban_entry_get_uuid)(void *);
+    bool (*player_ban_entry_get_uuid)(void *, uint8_t *);
     const char *(*player_ban_entry_get_xuid)(void *);
 
     // IpBanEntry accessor

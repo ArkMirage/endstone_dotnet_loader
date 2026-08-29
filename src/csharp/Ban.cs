@@ -62,12 +62,12 @@ public sealed unsafe class PlayerBanEntry : BanEntry
     public string Name => Bridge.Str(T->PlayerBanEntryGetName(_ptr));
 
     /// <summary>The unique ID of the banned player, or null if not available.</summary>
-    public string? UniqueId
+    public Guid? UniqueId
     {
         get
         {
-            var p = T->PlayerBanEntryGetUuid(_ptr);
-            return p == null ? null : Bridge.Str(p);
+            byte* buf = stackalloc byte[16];
+            return T->PlayerBanEntryGetUuid(_ptr, buf) ? UuidMarshal.Read(new ReadOnlySpan<byte>(buf, 16)) : null;
         }
     }
 

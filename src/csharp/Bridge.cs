@@ -73,6 +73,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void> ServerBroadcastMessage;
         public delegate* unmanaged[Cdecl]<void*, void**, int, int> ServerGetOnlinePlayers;
         public delegate* unmanaged[Cdecl]<void*, byte*, void*> ServerGetPlayer;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> ServerGetPlayerByUuid;
         public delegate* unmanaged[Cdecl]<void*, void*> ServerGetConsoleSender;
         public delegate* unmanaged[Cdecl]<void*, void*, byte*, bool> ServerDispatchCommand;
 
@@ -628,7 +629,7 @@ internal static unsafe class Bridge
 
         // PlayerBanEntry accessors
         public delegate* unmanaged[Cdecl]<void*, byte*> PlayerBanEntryGetName;
-        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerBanEntryGetUuid;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> PlayerBanEntryGetUuid;
         public delegate* unmanaged[Cdecl]<void*, byte*> PlayerBanEntryGetXuid;
 
         // IpBanEntry accessor
