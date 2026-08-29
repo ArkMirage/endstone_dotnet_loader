@@ -239,36 +239,24 @@ public sealed unsafe class MapCanvas
     {
         var list = cursors.ToArray();
         var records = new sbyte[list.Length * 5];
-        var handles = new System.Runtime.InteropServices.GCHandle[list.Length];
-        try
+        for (var i = 0; i < list.Length; i++)
         {
-            var captions = stackalloc byte*[list.Length];
-            for (var i = 0; i < list.Length; i++)
-            {
-                var c = list[i];
-                records[i * 5] = c.X;
-                records[i * 5 + 1] = c.Y;
-                records[i * 5 + 2] = c.Direction;
-                records[i * 5 + 3] = (sbyte)c.Type;
-                records[i * 5 + 4] = (sbyte)(c.Visible ? 1 : 0);
-                var bytes = Bridge.ToUtf8(c.Caption);
-                handles[i] = System.Runtime.InteropServices.GCHandle.Alloc(bytes, System.Runtime.InteropServices.GCHandleType.Pinned);
-                captions[i] = (byte*)handles[i].AddrOfPinnedObject();
-            }
-            fixed (sbyte* r = records)
-            {
-                T->CanvasSetCursors(_ptr, r, list.Length, captions);
-            }
+            var c = list[i];
+            records[i * 5] = c.X;
+            records[i * 5 + 1] = c.Y;
+            records[i * 5 + 2] = c.Direction;
+            records[i * 5 + 3] = (sbyte)c.Type;
+            records[i * 5 + 4] = (sbyte)(c.Visible ? 1 : 0);
         }
-        finally
+        var captionsArray = new string[list.Length];
+        for (var i = 0; i < list.Length; i++)
         {
-            foreach (var h in handles)
-            {
-                if (h.IsAllocated)
-                {
-                    h.Free();
-                }
-            }
+            captionsArray[i] = list[i].Caption;
+        }
+        using var captions = new Bridge.PinnedUtf8Array(captionsArray);
+        fixed (sbyte* r = records)
+        {
+            T->CanvasSetCursors(_ptr, r, list.Length, captions.Pointers);
         }
     }
 

@@ -82,6 +82,11 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void*> PluginManagerGetPlugin;
         public delegate* unmanaged[Cdecl]<void*, void**, int, int> PluginManagerGetPlugins;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> PluginManagerIsPluginEnabled;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> PluginManagerEnablePlugin;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> PluginManagerDisablePlugin;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> PluginManagerLoadPlugin;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void**, int, int> PluginManagerLoadPluginsDir;
+        public delegate* unmanaged[Cdecl]<void*, byte**, int, void**, int, int> PluginManagerLoadPluginsFiles;
 
         // ---- plugin ----
         // Description is transferred as a JSON snapshot of the trivial fields;
@@ -666,6 +671,58 @@ internal static unsafe class Bridge
         var buf = new byte[bytes.Length + 1];
         bytes.CopyTo(buf, 0);
         return buf;
+    }
+
+    /// <summary>
+    /// Marshals a set of managed strings into a single unmanaged UTF-8
+    /// <c>const char**</c> buffer for the duration of a native call. Required
+    /// because the bridge table uses raw function pointers with no automatic
+    /// marshalling. The returned <see cref="Pointers"/> stays valid until
+    /// <see cref="Dispose"/> is called.
+    /// </summary>
+    /// <remarks>
+    /// The pointer array and every null-terminated UTF-8 string are laid out in
+    /// one unmanaged allocation, so there are no GCHandles and no managed array
+    /// allocations (unlike a GCHandle-per-string approach). UTF-8 is written
+    /// directly into the buffer via <see cref="Encoding.GetBytes(string, Span{byte})"/>.
+    /// </remarks>
+    internal sealed unsafe class PinnedUtf8Array : IDisposable
+    {
+        private void* _block;
+        private readonly int _count;
+
+        public PinnedUtf8Array(string[] values)
+        {
+            _count = values.Length;
+            // Layout: [byte* ptrs[N]] followed by each null-terminated UTF-8 string.
+            nuint ptrBytes = (nuint)(_count * nint.Size);
+            nuint total = ptrBytes;
+            for (var i = 0; i < _count; i++)
+            {
+                total += (nuint)(Encoding.UTF8.GetByteCount(values[i]) + 1);
+            }
+
+            _block = _count == 0 ? null : NativeMemory.Alloc(total);
+            var ptrs = (byte**)_block;
+            nuint offset = ptrBytes;
+            for (var i = 0; i < _count; i++)
+            {
+                var s = values[i];
+                var len = Encoding.UTF8.GetByteCount(s);
+                var dest = (byte*)_block + offset;
+                Encoding.UTF8.GetBytes(s, new Span<byte>(dest, len));
+                dest[len] = 0;
+                ptrs[i] = dest;
+                offset += (nuint)len + 1;
+            }
+        }
+
+        /// <summary>Stable pointer to the array of char* (const char**).</summary>
+        public byte** Pointers => (byte**)_block;
+
+        public int Length => _count;
+
+        public void Dispose() => NativeMemory.Free(_block);
     }
 
     internal static void Call1(delegate* unmanaged[Cdecl]<void*, byte*, void> fn, void* obj, string s)

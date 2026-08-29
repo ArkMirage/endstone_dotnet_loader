@@ -144,8 +144,11 @@ struct BridgeTable {
     void *(*server_get_plugin_manager)(void *);
     void *(*plugin_manager_get_plugin)(void *, const char *);
     int (*plugin_manager_get_plugins)(void *, void **, int);
-    bool (*plugin_manager_is_plugin_enabled)(void *, const char *);
-
+    bool (*plugin_manager_is_plugin_enabled)(void *, const char *);    void (*plugin_manager_enable_plugin)(void *, void *);
+    void (*plugin_manager_disable_plugin)(void *, void *);
+    void *(*plugin_manager_load_plugin)(void *, const char *);
+    int (*plugin_manager_load_plugins_dir)(void *, const char *, void **, int);
+    int (*plugin_manager_load_plugins_files)(void *, const char **, int, void **, int);
     // ---- plugin ----
     // Description is transferred as a JSON snapshot of the trivial fields
     // (name/version/.../defaultPermission); permissions are transferred as

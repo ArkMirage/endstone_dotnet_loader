@@ -235,6 +235,41 @@ bool pluginManagerIsPluginEnabled(void *pm, const char *name)
 {
     return asPluginManager(pm)->isPluginEnabled(name ? name : "");
 }
+void pluginManagerEnablePlugin(void *pm, void *plugin)
+{
+    asPluginManager(pm)->enablePlugin(*static_cast<endstone::Plugin *>(plugin));
+}
+void pluginManagerDisablePlugin(void *pm, void *plugin)
+{
+    asPluginManager(pm)->disablePlugin(*static_cast<endstone::Plugin *>(plugin));
+}
+void *pluginManagerLoadPlugin(void *pm, const char *file)
+{
+    return asPluginManager(pm)->loadPlugin(file ? file : "");
+}
+int pluginManagerLoadPluginsDir(void *pm, const char *dir, void **out, int capacity)
+{
+    const auto plugins = asPluginManager(pm)->loadPlugins(dir ? dir : "");
+    const int n = std::min(capacity, static_cast<int>(plugins.size()));
+    for (int i = 0; i < n; ++i) {
+        out[i] = plugins[static_cast<size_t>(i)];
+    }
+    return static_cast<int>(plugins.size());
+}
+int pluginManagerLoadPluginsFiles(void *pm, const char **files, int nfiles, void **out, int capacity)
+{
+    std::vector<std::string> v;
+    v.reserve(nfiles);
+    for (int i = 0; i < nfiles; ++i) {
+        v.emplace_back(files[i] ? files[i] : "");
+    }
+    const auto plugins = asPluginManager(pm)->loadPlugins(v);
+    const int n = std::min(capacity, static_cast<int>(plugins.size()));
+    for (int i = 0; i < n; ++i) {
+        out[i] = plugins[static_cast<size_t>(i)];
+    }
+    return static_cast<int>(plugins.size());
+}
 
 // ---- plugin ----
 
@@ -2782,6 +2817,11 @@ const BridgeTable &getBridgeTable()
         .plugin_manager_get_plugin = &pluginManagerGetPlugin,
         .plugin_manager_get_plugins = &pluginManagerGetPlugins,
         .plugin_manager_is_plugin_enabled = &pluginManagerIsPluginEnabled,
+        .plugin_manager_enable_plugin = &pluginManagerEnablePlugin,
+        .plugin_manager_disable_plugin = &pluginManagerDisablePlugin,
+        .plugin_manager_load_plugin = &pluginManagerLoadPlugin,
+        .plugin_manager_load_plugins_dir = &pluginManagerLoadPluginsDir,
+        .plugin_manager_load_plugins_files = &pluginManagerLoadPluginsFiles,
         .plugin_get_description_json = &pluginDescriptionToJson,
         .plugin_get_permission_count = &pluginGetPermissionCount,
         .plugin_get_permission = &pluginGetPermission,
