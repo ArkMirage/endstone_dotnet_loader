@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace Endstone.Loader;
@@ -157,30 +158,6 @@ public unsafe abstract class Event
     }
 }
 
-public readonly struct Location
-{
-    public Location(float x, float y, float z, float pitch = 0, float yaw = 0)
-    {
-        X = x;
-        Y = y;
-        Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
-    }
-
-    public float X { get; }
-    public float Y { get; }
-    public float Z { get; }
-    public float Pitch { get; }
-    public float Yaw { get; }
-
-    public override string ToString() => $"({X}, {Y}, {Z})";
-
-    public int GetBlockX() => (int)MathF.Floor(X);
-    public int GetBlockY() => (int)MathF.Floor(Y);
-    public int GetBlockZ() => (int)MathF.Floor(Z);
-}
-
 internal static class EventLocationHelper
 {
     internal static unsafe Location Read(delegate* unmanaged[Cdecl]<void*, float*, void> fn, void* ptr)
@@ -190,9 +167,35 @@ internal static class EventLocationHelper
         return new Location(values[0], values[1], values[2], values[3], values[4]);
     }
 
+    internal static unsafe Location Read(delegate* unmanaged[Cdecl]<void*, float*, void> fn,
+        delegate* unmanaged[Cdecl]<void*, void*> dimFn, void* ptr)
+    {
+        var values = stackalloc float[5];
+        fn(ptr, values);
+        var dim = dimFn(ptr);
+        var dimension = dim == null ? null : new Dimension((IntPtr)dim);
+        return new Location(values[0], values[1], values[2], values[3], values[4], dimension);
+    }
+
     internal static unsafe void Write(delegate* unmanaged[Cdecl]<void*, float*, void> fn, void* ptr, Location loc)
     {
         var values = stackalloc float[5] { loc.X, loc.Y, loc.Z, loc.Pitch, loc.Yaw };
+        fn(ptr, values);
+    }
+}
+
+internal static class EventVectorHelper
+{
+    internal static unsafe Vector3 Read(delegate* unmanaged[Cdecl]<void*, float*, void> fn, void* ptr)
+    {
+        var values = stackalloc float[3];
+        fn(ptr, values);
+        return new Vector3(values[0], values[1], values[2]);
+    }
+
+    internal static unsafe void Write(delegate* unmanaged[Cdecl]<void*, float*, void> fn, void* ptr, Vector3 v)
+    {
+        var values = stackalloc float[3] { v.X, v.Y, v.Z };
         fn(ptr, values);
     }
 }
@@ -282,13 +285,13 @@ public sealed unsafe class PlayerMoveEvent : Event
 
     public Location From
     {
-        get => EventLocationHelper.Read(T->MoveGetFrom, NativePtr);
+        get => EventLocationHelper.Read(T->MoveGetFrom, T->MoveGetFromDimension, NativePtr);
         set => EventLocationHelper.Write(T->MoveSetFrom, NativePtr, value);
     }
 
     public Location To
     {
-        get => EventLocationHelper.Read(T->MoveGetTo, NativePtr);
+        get => EventLocationHelper.Read(T->MoveGetTo, T->MoveGetToDimension, NativePtr);
         set => EventLocationHelper.Write(T->MoveSetTo, NativePtr, value);
     }
 }
@@ -300,13 +303,13 @@ public sealed unsafe class PlayerTeleportEvent : Event
 
     public Location From
     {
-        get => EventLocationHelper.Read(T->MoveGetFrom, NativePtr);
+        get => EventLocationHelper.Read(T->MoveGetFrom, T->MoveGetFromDimension, NativePtr);
         set => EventLocationHelper.Write(T->MoveSetFrom, NativePtr, value);
     }
 
     public Location To
     {
-        get => EventLocationHelper.Read(T->MoveGetTo, NativePtr);
+        get => EventLocationHelper.Read(T->MoveGetTo, T->MoveGetToDimension, NativePtr);
         set => EventLocationHelper.Write(T->MoveSetTo, NativePtr, value);
     }
 }
@@ -318,13 +321,13 @@ public sealed unsafe class PlayerPortalEvent : Event
 
     public Location From
     {
-        get => EventLocationHelper.Read(T->MoveGetFrom, NativePtr);
+        get => EventLocationHelper.Read(T->MoveGetFrom, T->MoveGetFromDimension, NativePtr);
         set => EventLocationHelper.Write(T->MoveSetFrom, NativePtr, value);
     }
 
     public Location To
     {
-        get => EventLocationHelper.Read(T->MoveGetTo, NativePtr);
+        get => EventLocationHelper.Read(T->MoveGetTo, T->MoveGetToDimension, NativePtr);
         set => EventLocationHelper.Write(T->MoveSetTo, NativePtr, value);
     }
 }
@@ -352,7 +355,7 @@ public sealed unsafe class PlayerInteractEvent : Event
 
     public InteractAction Action => (InteractAction)T->InteractGetAction(NativePtr);
 
-    public Location? ClickedPosition
+    public Vector3? ClickedPosition
     {
         get
         {
@@ -361,7 +364,7 @@ public sealed unsafe class PlayerInteractEvent : Event
             {
                 return null;
             }
-            return new Location(values[0], values[1], values[2]);
+            return new Vector3(values[0], values[1], values[2]);
         }
     }
 
@@ -566,7 +569,9 @@ public sealed unsafe class ActorExplodeEvent : Event
         {
             var values = stackalloc float[5];
             T->ActorExplodeGetLocation(NativePtr, values);
-            return new Location(values[0], values[1], values[2], values[3], values[4]);
+            var dim = T->ActorExplodeGetDimension(NativePtr);
+            var dimension = dim == null ? null : new Dimension((IntPtr)dim);
+            return new Location(values[0], values[1], values[2], values[3], values[4], dimension);
         }
     }
 
@@ -593,19 +598,10 @@ public sealed unsafe class ActorKnockbackEvent : Event
         }
     }
 
-    public Location Knockback
+    public Vector3 Knockback
     {
-        get
-        {
-            var values = stackalloc float[3];
-            T->ActorKnockbackGetVector(NativePtr, values);
-            return new Location(values[0], values[1], values[2]);
-        }
-        set
-        {
-            var values = stackalloc float[3] { value.X, value.Y, value.Z };
-            T->ActorKnockbackSetVector(NativePtr, values);
-        }
+        get => EventVectorHelper.Read(T->ActorKnockbackGetVector, NativePtr);
+        set => EventVectorHelper.Write(T->ActorKnockbackSetVector, NativePtr, value);
     }
 }
 
@@ -616,13 +612,13 @@ public sealed unsafe class ActorTeleportEvent : Event
 
     public Location From
     {
-        get => EventLocationHelper.Read(T->ActorTpGetFrom, NativePtr);
+        get => EventLocationHelper.Read(T->ActorTpGetFrom, T->ActorTpGetFromDimension, NativePtr);
         set => EventLocationHelper.Write(T->ActorTpSetFrom, NativePtr, value);
     }
 
     public Location To
     {
-        get => EventLocationHelper.Read(T->ActorTpGetTo, NativePtr);
+        get => EventLocationHelper.Read(T->ActorTpGetTo, T->ActorTpGetToDimension, NativePtr);
         set => EventLocationHelper.Write(T->ActorTpSetTo, NativePtr, value);
     }
 }

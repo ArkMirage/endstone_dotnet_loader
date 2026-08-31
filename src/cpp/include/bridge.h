@@ -185,10 +185,14 @@ struct BridgeTable {
     void (*move_get_to)(void *, float *);
     void (*move_set_from)(void *, const float *);
     void (*move_set_to)(void *, const float *);
+    void *(*move_get_from_dimension)(void *);
+    void *(*move_get_to_dimension)(void *);
     void (*actor_tp_get_from)(void *, float *);
-    void (*actor_tp_get_to)(void *, float *);
     void (*actor_tp_set_from)(void *, const float *);
+    void (*actor_tp_get_to)(void *, float *);
     void (*actor_tp_set_to)(void *, const float *);
+    void *(*actor_tp_get_from_dimension)(void *);
+    void *(*actor_tp_get_to_dimension)(void *);
 
     // ---- events: interact ----
     int (*interact_get_action)(void *);
@@ -205,6 +209,7 @@ struct BridgeTable {
     void (*actor_damage_set_damage)(void *, float);
     void *(*event_get_damage_source)(void *, int);
     void (*actor_explode_get_location)(void *, float *);
+    void *(*actor_explode_get_dimension)(void *);
     int (*actor_explode_get_block_count)(void *);
     void *(*actor_explode_get_block)(void *, int);
     void *(*actor_knockback_get_source)(void *);
@@ -377,6 +382,7 @@ struct BridgeTable {
     void (*block_set_type)(void *, const char *);
     void (*block_set_type_physics)(void *, const char *, bool);
     void (*block_get_location)(void *, float *);
+    void *(*block_get_dimension)(void *);
     const char *(*block_get_dimension_name)(void *);
     void *(*block_get_relative)(void *, int, int, int);
     void *(*block_capture_state)(void *);
@@ -387,6 +393,7 @@ struct BridgeTable {
     int (*block_state_get_z)(void *);
     void (*block_state_set_type)(void *, const char *);
     void (*block_state_get_location)(void *, float *);
+    void *(*block_state_get_dimension)(void *);
     bool (*block_state_update)(void *);
     bool (*block_state_update_force)(void *, bool);
     bool (*block_state_update_force_physics)(void *, bool, bool);

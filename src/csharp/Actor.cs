@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Endstone.Loader;
 
 /// <summary>Wraps a native endstone::Actor.</summary>
@@ -36,17 +38,19 @@ public unsafe class Actor : CommandSender
         {
             var values = stackalloc float[5];
             T->ActorGetLocation(_ptr, values);
-            return new Location(values[0], values[1], values[2], values[3], values[4]);
+            var dim = T->ActorGetDimension(_ptr);
+            var dimension = dim == null ? null : new Dimension((IntPtr)dim);
+            return new Location(values[0], values[1], values[2], values[3], values[4], dimension);
         }
     }
 
-    public Location Velocity
+    public Vector3 Velocity
     {
         get
         {
             var values = stackalloc float[3];
             T->ActorGetVelocity(_ptr, values);
-            return new Location(values[0], values[1], values[2]);
+            return new Vector3(values[0], values[1], values[2]);
         }
     }
 

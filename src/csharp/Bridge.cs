@@ -120,10 +120,14 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, float*, void> MoveGetTo;
         public delegate* unmanaged[Cdecl]<void*, float*, void> MoveSetFrom;
         public delegate* unmanaged[Cdecl]<void*, float*, void> MoveSetTo;
+        public delegate* unmanaged[Cdecl]<void*, void*> MoveGetFromDimension;
+        public delegate* unmanaged[Cdecl]<void*, void*> MoveGetToDimension;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpGetFrom;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpGetTo;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpSetFrom;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpSetTo;
+        public delegate* unmanaged[Cdecl]<void*, void*> ActorTpGetFromDimension;
+        public delegate* unmanaged[Cdecl]<void*, void*> ActorTpGetToDimension;
 
         // ---- events: interact ----
         public delegate* unmanaged[Cdecl]<void*, int> InteractGetAction;
@@ -140,6 +144,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, float, void> ActorDamageSetDamage;
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetDamageSource;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorExplodeGetLocation;
+        public delegate* unmanaged[Cdecl]<void*, void*> ActorExplodeGetDimension;
         public delegate* unmanaged[Cdecl]<void*, int> ActorExplodeGetBlockCount;
         public delegate* unmanaged[Cdecl]<void*, int, void*> ActorExplodeGetBlock;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorKnockbackGetSource;
@@ -306,6 +311,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void> BlockSetType;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool, void> BlockSetTypePhysics;
         public delegate* unmanaged[Cdecl]<void*, float*, void> BlockGetLocation;
+        public delegate* unmanaged[Cdecl]<void*, void*> BlockGetDimension;
         public delegate* unmanaged[Cdecl]<void*, byte*> BlockGetDimensionName;
         public delegate* unmanaged[Cdecl]<void*, int, int, int, void*> BlockGetRelative;
         public delegate* unmanaged[Cdecl]<void*, void*> BlockCaptureState;
@@ -316,6 +322,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int> BlockStateGetZ;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> BlockStateSetType;
         public delegate* unmanaged[Cdecl]<void*, float*, void> BlockStateGetLocation;
+        public delegate* unmanaged[Cdecl]<void*, void*> BlockStateGetDimension;
         public delegate* unmanaged[Cdecl]<void*, bool> BlockStateUpdate;
         public delegate* unmanaged[Cdecl]<void*, bool, bool> BlockStateUpdateForce;
         public delegate* unmanaged[Cdecl]<void*, bool, bool, bool> BlockStateUpdateForcePhysics;

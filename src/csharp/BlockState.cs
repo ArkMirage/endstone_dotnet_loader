@@ -27,7 +27,9 @@ public sealed unsafe class BlockState : IDisposable
         {
             var values = stackalloc float[5];
             T->BlockStateGetLocation(_ptr, values);
-            return new Location(values[0], values[1], values[2], values[3], values[4]);
+            var dim = T->BlockStateGetDimension(_ptr);
+            var dimension = dim == null ? null : new Dimension((IntPtr)dim);
+            return new Location(values[0], values[1], values[2], values[3], values[4], dimension);
         }
     }
 

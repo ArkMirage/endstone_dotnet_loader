@@ -555,6 +555,8 @@ void moveSetTo(void *e, const float *v)
     auto *ev = static_cast<endstone::PlayerMoveEvent *>(e);
     ev->setTo(locationFrom(v, ev->getTo()));
 }
+void *moveGetFromDimension(void *e) { return &static_cast<endstone::PlayerMoveEvent *>(e)->getFrom().getDimension(); }
+void *moveGetToDimension(void *e) { return &static_cast<endstone::PlayerMoveEvent *>(e)->getTo().getDimension(); }
 
 void actorTpGetFrom(void *e, float *out)
 {
@@ -573,6 +575,14 @@ void actorTpGetTo(void *e, float *out)
     out[2] = loc.getZ();
     out[3] = loc.getPitch();
     out[4] = loc.getYaw();
+}
+void *actorTpGetFromDimension(void *e)
+{
+    return &static_cast<endstone::ActorTeleportEvent *>(e)->getFrom().getDimension();
+}
+void *actorTpGetToDimension(void *e)
+{
+    return &static_cast<endstone::ActorTeleportEvent *>(e)->getTo().getDimension();
 }
 void actorTpSetFrom(void *e, const float *v)
 {
@@ -642,6 +652,10 @@ void actorExplodeGetLocation(void *e, float *out)
     out[2] = loc.getZ();
     out[3] = loc.getPitch();
     out[4] = loc.getYaw();
+}
+void *actorExplodeGetDimension(void *e)
+{
+    return &static_cast<endstone::ActorExplodeEvent *>(e)->getLocation().getDimension();
 }
 int actorExplodeGetBlockCount(void *e)
 {
@@ -1750,6 +1764,7 @@ void blockGetLocation(void *b, float *out)
     out[3] = loc.getPitch();
     out[4] = loc.getYaw();
 }
+void *blockGetDimension(void *b) { return &asBlock(b)->getDimension(); }
 const char *blockGetDimensionName(void *b) { return strOut(asBlock(b)->getDimension().getName()); }
 void *blockGetRelative(void *b, int dx, int dy, int dz)
 {
@@ -1782,6 +1797,7 @@ void blockStateGetLocation(void *b, float *out)
     out[3] = loc.getPitch();
     out[4] = loc.getYaw();
 }
+void *blockStateGetDimension(void *b) { return &static_cast<endstone::BlockState *>(b)->getLocation().getDimension(); }
 bool blockStateUpdate(void *b) { return static_cast<endstone::BlockState *>(b)->update(); }
 bool blockStateUpdateForce(void *b, bool force) { return static_cast<endstone::BlockState *>(b)->update(force); }
 bool blockStateUpdateForcePhysics(void *b, bool force, bool apply_physics)
@@ -2844,10 +2860,14 @@ const BridgeTable &getBridgeTable()
         .move_get_to = &moveGetTo,
         .move_set_from = &moveSetFrom,
         .move_set_to = &moveSetTo,
+        .move_get_from_dimension = &moveGetFromDimension,
+        .move_get_to_dimension = &moveGetToDimension,
         .actor_tp_get_from = &actorTpGetFrom,
-        .actor_tp_get_to = &actorTpGetTo,
         .actor_tp_set_from = &actorTpSetFrom,
+        .actor_tp_get_to = &actorTpGetTo,
         .actor_tp_set_to = &actorTpSetTo,
+        .actor_tp_get_from_dimension = &actorTpGetFromDimension,
+        .actor_tp_get_to_dimension = &actorTpGetToDimension,
         .interact_get_action = &interactGetAction,
         .interact_get_clicked_position = &interactGetClickedPosition,
         .interact_has_item = &interactHasItem,
@@ -2860,6 +2880,7 @@ const BridgeTable &getBridgeTable()
         .actor_damage_set_damage = &actorDamageSetDamage,
         .event_get_damage_source = &eventGetDamageSource,
         .actor_explode_get_location = &actorExplodeGetLocation,
+        .actor_explode_get_dimension = &actorExplodeGetDimension,
         .actor_explode_get_block_count = &actorExplodeGetBlockCount,
         .actor_explode_get_block = &actorExplodeGetBlock,
         .actor_knockback_get_source = &actorKnockbackGetSource,
@@ -3013,6 +3034,7 @@ const BridgeTable &getBridgeTable()
         .block_set_type = &blockSetType,
         .block_set_type_physics = &blockSetTypePhysics,
         .block_get_location = &blockGetLocation,
+        .block_get_dimension = &blockGetDimension,
         .block_get_dimension_name = &blockGetDimensionName,
         .block_get_relative = &blockGetRelative,
         .block_capture_state = &blockCaptureState,
@@ -3023,6 +3045,7 @@ const BridgeTable &getBridgeTable()
         .block_state_get_z = &blockStateGetZ,
         .block_state_set_type = &blockStateSetType,
         .block_state_get_location = &blockStateGetLocation,
+        .block_state_get_dimension = &blockStateGetDimension,
         .block_state_update = &blockStateUpdate,
         .block_state_update_force = &blockStateUpdateForce,
         .block_state_update_force_physics = &blockStateUpdateForcePhysics,
