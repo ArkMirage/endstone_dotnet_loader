@@ -123,8 +123,8 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*> MoveGetFromDimension;
         public delegate* unmanaged[Cdecl]<void*, void*> MoveGetToDimension;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpGetFrom;
-        public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpGetTo;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpSetFrom;
+        public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpGetTo;
         public delegate* unmanaged[Cdecl]<void*, float*, void> ActorTpSetTo;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorTpGetFromDimension;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorTpGetToDimension;
