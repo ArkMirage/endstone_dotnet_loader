@@ -14,6 +14,12 @@ public static class Vector3Extensions
         /// <summary>Gets the dot product of this vector with another.</summary>
         public float Dot(Vector3 other) => Vector3.Dot(v, other);
 
+        /// <summary>Gets the distance between this vector and another.</summary>
+        public float Distance(Vector3 other) => Vector3.Distance(v, other);
+
+        /// <summary>Gets the squared distance between this vector and another.</summary>
+        public float DistanceSquared(Vector3 other) => Vector3.DistanceSquared(v, other);
+
         /// <summary>Gets the cross product of this vector with another.</summary>
         public Vector3 CrossProduct(Vector3 other) => Vector3.Cross(v, other);
 
@@ -27,6 +33,24 @@ public static class Vector3Extensions
         /// <summary>Gets the midpoint between this vector and another.</summary>
         public Vector3 Midpoint(Vector3 other) =>
             new((v.X + other.X) / 2, (v.Y + other.Y) / 2, (v.Z + other.Z) / 2);
+
+        /// <summary>Gets the floored X component, i.e. the block coordinate containing this vector.</summary>
+        public int GetBlockX() => (int)MathF.Floor(v.X);
+
+        /// <summary>Gets the floored Y component, i.e. the block coordinate containing this vector.</summary>
+        public int GetBlockY() => (int)MathF.Floor(v.Y);
+
+        /// <summary>Gets the floored Z component, i.e. the block coordinate containing this vector.</summary>
+        public int GetBlockZ() => (int)MathF.Floor(v.Z);
+
+        /// <summary>Returns a copy of this vector with a new X component.</summary>
+        public Vector3 WithX(float x) => new(x, v.Y, v.Z);
+
+        /// <summary>Returns a copy of this vector with a new Y component.</summary>
+        public Vector3 WithY(float y) => new(v.X, y, v.Z);
+
+        /// <summary>Returns a copy of this vector with a new Z component.</summary>
+        public Vector3 WithZ(float z) => new(v.X, v.Y, z);
 
         /// <summary>Returns whether every component of this vector is zero.</summary>
         public bool IsZero() => v.X == 0 && v.Y == 0 && v.Z == 0;

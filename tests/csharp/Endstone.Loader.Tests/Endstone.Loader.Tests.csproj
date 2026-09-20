@@ -1,0 +1,17 @@
+<Project Sdk="MSTest.Sdk/4.0.2">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Endstone.Loader.Tests</RootNamespace>
+    <AssemblyName>Endstone.Loader.Tests</AssemblyName>
+    <!-- The pure-math parts under test (Location, Vector3Extensions) need no native host. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\csharp\Endstone.Loader.csproj" />
+  </ItemGroup>
+
+</Project>

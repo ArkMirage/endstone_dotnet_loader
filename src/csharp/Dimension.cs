@@ -21,6 +21,14 @@ public sealed unsafe class Dimension
         return b == null ? null : new Block((IntPtr)b, ownsPtr: true);
     }
 
+    /// <summary>
+    /// Gets the block at the given location. Mirrors the native
+    /// Dimension::getBlockAt(Location) overload, which uses the floored coordinates.
+    /// Caller owns the returned block (Dispose it).
+    /// </summary>
+    public Block? GetBlockAt(Location location) =>
+        GetBlockAt(location.GetBlockX(), location.GetBlockY(), location.GetBlockZ());
+
     public int GetHighestBlockYAt(int x, int z) => T->DimensionGetHighestBlockYAt(_ptr, x, z);
 
     /// <summary>Gets the highest block at the given coordinates. Caller owns the returned block (Dispose it).</summary>
@@ -29,6 +37,13 @@ public sealed unsafe class Dimension
         var b = T->DimensionGetHighestBlockAt(_ptr, x, z);
         return b == null ? null : new Block((IntPtr)b, ownsPtr: true);
     }
+
+    /// <summary>
+    /// Gets the highest block at the given location. Mirrors the native
+    /// Dimension::getHighestBlockAt(Location) overload. Caller owns the returned block (Dispose it).
+    /// </summary>
+    public Block? GetHighestBlockAt(Location location) =>
+        GetHighestBlockAt(location.GetBlockX(), location.GetBlockZ());
 
     /// <summary>Gets all loaded chunks. Each chunk is owned by the returned wrapper (Dispose it).</summary>
     public Chunk[] GetLoadedChunks()

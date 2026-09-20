@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/csharp/">
+    <Project Path="src/csharp/Endstone.Loader.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/csharp/">
+    <Project Path="tests/csharp/Endstone.Loader.Tests/Endstone.Loader.Tests.csproj" />
+  </Folder>
+</Solution>
