@@ -93,6 +93,12 @@ public unsafe class Plugin
     public string[] Provides => Description.Provides;
     public PermissionDefault DefaultPermission => Description.DefaultPermission;
 
+    /// <summary>Gets the folder that holds this plugin's data files. The path
+    /// is resolved natively (UTF-8), and the folder may not exist yet. Returns
+    /// an empty string when the plugin has no native handle.</summary>
+    public string DataFolder =>
+        NativeHandle == IntPtr.Zero ? "" : Bridge.Str(T->PluginGetDataFolder((void*)NativeHandle));
+
     /// <summary>Gets the permissions declared by this plugin. Native plugins
     /// are queried through the bridge; .NET plugins override the source.</summary>
     public Permission[] Permissions => GetPermissions();

@@ -157,6 +157,8 @@ struct BridgeTable {
     const char *(*plugin_get_description_json)(void *);
     int (*plugin_get_permission_count)(void *);
     void *(*plugin_get_permission)(void *, int);
+    // Plugin data folder as a UTF-8 path (the folder may not exist yet).
+    const char *(*plugin_get_data_folder)(void *);
 
     // ---- events: common ----
     // event kind identifies the concrete event class (see EventKind above); it

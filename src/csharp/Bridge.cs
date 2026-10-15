@@ -95,6 +95,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> PluginGetDescriptionJson;
         public delegate* unmanaged[Cdecl]<void*, int> PluginGetPermissionCount;
         public delegate* unmanaged[Cdecl]<void*, int, void*> PluginGetPermission;
+        public delegate* unmanaged[Cdecl]<void*, byte*> PluginGetDataFolder;
 
         // ---- events: common ----
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetPlayer;

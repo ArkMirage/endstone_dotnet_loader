@@ -308,6 +308,13 @@ void *pluginGetPermission(void *p, int index)
     }
     return &g_plugin_permissions[static_cast<size_t>(index)];
 }
+// The managed side decodes paths as UTF-8, so the native path is converted
+// explicitly (path::string() would use the ANSI code page on Windows).
+const char *pluginGetDataFolder(void *p)
+{
+    const auto u8 = asPlugin(p)->getDataFolder().u8string();
+    return strOut(std::string(reinterpret_cast<const char *>(u8.data()), u8.size()));
+}
 
 // ---- events ----
 //
@@ -2841,6 +2848,7 @@ const BridgeTable &getBridgeTable()
         .plugin_get_description_json = &pluginDescriptionToJson,
         .plugin_get_permission_count = &pluginGetPermissionCount,
         .plugin_get_permission = &pluginGetPermission,
+        .plugin_get_data_folder = &pluginGetDataFolder,
         .event_get_player = &eventGetPlayer,
         .event_get_actor = &eventGetActor,
         .event_is_cancelled = &eventIsCancelled,
