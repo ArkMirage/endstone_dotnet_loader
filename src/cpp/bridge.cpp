@@ -317,6 +317,106 @@ const char *pluginGetDataFolder(void *p)
     return strOut(std::string(reinterpret_cast<const char *>(u8.data()), u8.size()));
 }
 
+// ---- plugin: permissions ----
+
+endstone::PluginManager &pluginPermissions(void *p)
+{
+    return asPlugin(p)->getServer().getPluginManager();
+}
+
+// PermissionLevel enum values must match the managed PermissionLevel enum.
+int clampPermissionLevel(int level)
+{
+    return std::clamp(level, 0, 2);
+}
+
+void *pluginFindPermission(void *p, const char *name)
+{
+    return pluginPermissions(p).getPermission(name ? name : "");
+}
+bool pluginRemovePermission(void *p, const char *name)
+{
+    auto &pm = pluginPermissions(p);
+    auto *perm = pm.getPermission(name ? name : "");
+    if (perm == nullptr) {
+        return false;
+    }
+    pm.removePermission(*perm);
+    return true;
+}
+int pluginGetDefaultPermissions(void *p, int level, void **out, int capacity)
+{
+    const auto perms = pluginPermissions(p).getDefaultPermissions(
+        static_cast<endstone::PermissionLevel>(clampPermissionLevel(level)));
+    const auto n = static_cast<int>(perms.size());
+    if (out && capacity > 0) {
+        const auto copy = std::min(n, capacity);
+        for (int i = 0; i < copy; ++i) {
+            out[i] = perms[static_cast<size_t>(i)];
+        }
+    }
+    return n;
+}
+void pluginRecalculatePermissionDefaults(void *p, void *perm)
+{
+    pluginPermissions(p).recalculatePermissionDefaults(*asPermission(perm));
+}
+void pluginSubscribeToPermission(void *p, const char *name, void *permissible)
+{
+    pluginPermissions(p).subscribeToPermission(name ? name : "",
+                                              *static_cast<endstone::Permissible *>(permissible));
+}
+void pluginUnsubscribeFromPermission(void *p, const char *name, void *permissible)
+{
+    pluginPermissions(p).unsubscribeFromPermission(name ? name : "",
+                                                  *static_cast<endstone::Permissible *>(permissible));
+}
+int pluginGetPermissionSubscriptions(void *p, const char *name, void **out, int capacity)
+{
+    const auto subs = pluginPermissions(p).getPermissionSubscriptions(name ? name : "");
+    const auto n = static_cast<int>(subs.size());
+    if (out && capacity > 0) {
+        int count = 0;
+        for (auto *permissible : subs) {
+            if (count >= capacity) {
+                break;
+            }
+            // Permissible has no other subclass than CommandSender in endstone,
+            // so the pointers can be handed to the managed side as CommandSender.
+            out[count++] = static_cast<endstone::CommandSender *>(permissible);
+        }
+    }
+    return n;
+}
+void pluginSubscribeToDefaultPerms(void *p, int level, void *permissible)
+{
+    pluginPermissions(p).subscribeToDefaultPerms(
+        static_cast<endstone::PermissionLevel>(clampPermissionLevel(level)),
+        *static_cast<endstone::Permissible *>(permissible));
+}
+void pluginUnsubscribeFromDefaultPerms(void *p, int level, void *permissible)
+{
+    pluginPermissions(p).unsubscribeFromDefaultPerms(
+        static_cast<endstone::PermissionLevel>(clampPermissionLevel(level)),
+        *static_cast<endstone::Permissible *>(permissible));
+}
+int pluginGetDefaultPermSubscriptions(void *p, int level, void **out, int capacity)
+{
+    const auto subs = pluginPermissions(p).getDefaultPermSubscriptions(
+        static_cast<endstone::PermissionLevel>(clampPermissionLevel(level)));
+    const auto n = static_cast<int>(subs.size());
+    if (out && capacity > 0) {
+        int count = 0;
+        for (auto *permissible : subs) {
+            if (count >= capacity) {
+                break;
+            }
+            out[count++] = static_cast<endstone::CommandSender *>(permissible);
+        }
+    }
+    return n;
+}
+
 // ---- events ----
 //
 // The managed side always knows the exact event type (the server dispatches
@@ -2851,6 +2951,16 @@ const BridgeTable &getBridgeTable()
         .plugin_get_permission_count = &pluginGetPermissionCount,
         .plugin_get_permission = &pluginGetPermission,
         .plugin_get_data_folder = &pluginGetDataFolder,
+        .plugin_find_permission = &pluginFindPermission,
+        .plugin_remove_permission = &pluginRemovePermission,
+        .plugin_get_default_permissions = &pluginGetDefaultPermissions,
+        .plugin_recalculate_permission_defaults = &pluginRecalculatePermissionDefaults,
+        .plugin_subscribe_to_permission = &pluginSubscribeToPermission,
+        .plugin_unsubscribe_from_permission = &pluginUnsubscribeFromPermission,
+        .plugin_get_permission_subscriptions = &pluginGetPermissionSubscriptions,
+        .plugin_subscribe_to_default_perms = &pluginSubscribeToDefaultPerms,
+        .plugin_unsubscribe_from_default_perms = &pluginUnsubscribeFromDefaultPerms,
+        .plugin_get_default_perm_subscriptions = &pluginGetDefaultPermSubscriptions,
         .event_get_player = &eventGetPlayer,
         .event_get_actor = &eventGetActor,
         .event_is_cancelled = &eventIsCancelled,

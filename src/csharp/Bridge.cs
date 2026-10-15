@@ -98,6 +98,20 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, void*> PluginGetPermission;
         public delegate* unmanaged[Cdecl]<void*, byte*> PluginGetDataFolder;
 
+        // ---- plugin: permissions ----
+        // The permission registry lives on the native PluginManager but is
+        // reached through the plugin handle, mirroring Plugin::getServer().
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> PluginFindPermission;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> PluginRemovePermission;
+        public delegate* unmanaged[Cdecl]<void*, int, void**, int, int> PluginGetDefaultPermissions;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> PluginRecalculatePermissionDefaults;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*, void> PluginSubscribeToPermission;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*, void> PluginUnsubscribeFromPermission;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void**, int, int> PluginGetPermissionSubscriptions;
+        public delegate* unmanaged[Cdecl]<void*, int, void*, void> PluginSubscribeToDefaultPerms;
+        public delegate* unmanaged[Cdecl]<void*, int, void*, void> PluginUnsubscribeFromDefaultPerms;
+        public delegate* unmanaged[Cdecl]<void*, int, void**, int, int> PluginGetDefaultPermSubscriptions;
+
         // ---- events: common ----
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetPlayer;
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetActor;
@@ -896,6 +910,47 @@ internal static unsafe class Bridge
     internal static void CallRegisterLoader(void* pm, void* loaderGc, void* dirUtf8)
     {
         T->PluginManagerRegisterLoader(pm, loaderGc, dirUtf8);
+    }
+
+    // ---- two-phase pointer arrays ----
+    // The native side returns the total number of items and copies up to the
+    // requested capacity, so asking with (null, 0) first yields the exact size
+    // and the second call can never truncate.
+
+    internal static void*[] CallPtrArrayInt(delegate* unmanaged[Cdecl]<void*, int, void**, int, int> fn,
+                                            void* obj, int arg)
+    {
+        var count = fn(obj, arg, null, 0);
+        if (count <= 0)
+        {
+            return [];
+        }
+        var result = new void*[count];
+        fixed (void** p = result)
+        {
+            fn(obj, arg, p, count);
+        }
+        return result;
+    }
+
+    internal static void*[] CallPtrArrayStr(delegate* unmanaged[Cdecl]<void*, byte*, void**, int, int> fn,
+                                            void* obj, string arg)
+    {
+        var buf = ToUtf8(arg);
+        fixed (byte* s = buf)
+        {
+            var count = fn(obj, s, null, 0);
+            if (count <= 0)
+            {
+                return [];
+            }
+            var result = new void*[count];
+            fixed (void** p = result)
+            {
+                fn(obj, s, p, count);
+            }
+            return result;
+        }
     }
 
     // ---- score entry marshalling ----

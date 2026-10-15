@@ -161,6 +161,21 @@ struct BridgeTable {
     // Plugin data folder as a UTF-8 path (the folder may not exist yet).
     const char *(*plugin_get_data_folder)(void *);
 
+    // ---- plugin: permissions ----
+    // The permission registry lives on the server's PluginManager, but these
+    // are reachable from a Plugin (Plugin::getServer().getPluginManager()), so
+    // they are exposed on the Plugin handle, mirroring the C++ API location.
+    void *(*plugin_find_permission)(void *, const char *);
+    bool (*plugin_remove_permission)(void *, const char *);
+    int (*plugin_get_default_permissions)(void *, int, void **, int);
+    void (*plugin_recalculate_permission_defaults)(void *, void *);
+    void (*plugin_subscribe_to_permission)(void *, const char *, void *);
+    void (*plugin_unsubscribe_from_permission)(void *, const char *, void *);
+    int (*plugin_get_permission_subscriptions)(void *, const char *, void **, int);
+    void (*plugin_subscribe_to_default_perms)(void *, int, void *);
+    void (*plugin_unsubscribe_from_default_perms)(void *, int, void *);
+    int (*plugin_get_default_perm_subscriptions)(void *, int, void **, int);
+
     // ---- events: common ----
     // event kind identifies the concrete event class (see EventKind above); it
     // is required because multi-type accessors must not rely on RTTI (typeinfo
