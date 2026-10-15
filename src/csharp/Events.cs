@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -949,68 +950,79 @@ public sealed unsafe class WeatherChangeEvent : Event
 /// <summary>Creates typed event wrappers from the native event pointer.</summary>
 internal static class EventFactory
 {
-    internal static Event? Create(string eventName, IntPtr eventPtr)
-    {
-        return eventName switch
+    /// <summary>
+    /// The built-in events this loader can wrap, keyed by event name. This is the
+    /// single source of truth for both dispatch and registration: a name outside
+    /// this table belongs to no built-in event, so it is rejected at registration
+    /// rather than reaching a handler with no readable payload or cancellation state.
+    /// </summary>
+    private static readonly FrozenDictionary<string, Func<IntPtr, Event>> Factories =
+        new Dictionary<string, Func<IntPtr, Event>>(StringComparer.Ordinal)
         {
-            "PlayerJoinEvent" => new PlayerJoinEvent(eventPtr) { Kind = EventKind.PlayerJoinEvent },
-            "PlayerQuitEvent" => new PlayerQuitEvent(eventPtr) { Kind = EventKind.PlayerQuitEvent },
-            "PlayerLoginEvent" => new PlayerLoginEvent(eventPtr) { Kind = EventKind.PlayerLoginEvent },
-            "PlayerChatEvent" => new PlayerChatEvent(eventPtr) { Kind = EventKind.PlayerChatEvent },
-            "PlayerCommandEvent" => new PlayerCommandEvent(eventPtr) { Kind = EventKind.PlayerCommandEvent },
-            "PlayerMoveEvent" => new PlayerMoveEvent(eventPtr) { Kind = EventKind.PlayerMoveEvent },
-            "PlayerTeleportEvent" => new PlayerTeleportEvent(eventPtr) { Kind = EventKind.PlayerTeleportEvent },
-            "PlayerPortalEvent" => new PlayerPortalEvent(eventPtr) { Kind = EventKind.PlayerPortalEvent },
-            "PlayerDeathEvent" => new PlayerDeathEvent(eventPtr) { Kind = EventKind.PlayerDeathEvent },
-            "PlayerInteractEvent" => new PlayerInteractEvent(eventPtr) { Kind = EventKind.PlayerInteractEvent },
-            "PlayerInteractActorEvent" => new PlayerInteractActorEvent(eventPtr) { Kind = EventKind.PlayerInteractActorEvent },
-            "PlayerRespawnEvent" => new PlayerRespawnEvent(eventPtr) { Kind = EventKind.PlayerRespawnEvent },
-            "PlayerDropItemEvent" => new PlayerDropItemEvent(eventPtr) { Kind = EventKind.PlayerDropItemEvent },
-            "PlayerGameModeChangeEvent" => new PlayerGameModeChangeEvent(eventPtr) { Kind = EventKind.PlayerGameModeChangeEvent },
-            "PlayerItemHeldEvent" => new PlayerItemHeldEvent(eventPtr) { Kind = EventKind.PlayerItemHeldEvent },
-            "PlayerItemConsumeEvent" => new PlayerItemConsumeEvent(eventPtr) { Kind = EventKind.PlayerItemConsumeEvent },
-            "PlayerKickEvent" => new PlayerKickEvent(eventPtr) { Kind = EventKind.PlayerKickEvent },
-            "PlayerPickupItemEvent" => new PlayerPickupItemEvent(eventPtr) { Kind = EventKind.PlayerPickupItemEvent },
-            "PlayerJumpEvent" => new PlayerJumpEvent(eventPtr) { Kind = EventKind.PlayerJumpEvent },
-            "PlayerEmoteEvent" => new PlayerEmoteEvent(eventPtr) { Kind = EventKind.PlayerEmoteEvent },
-            "PlayerBedEnterEvent" => new PlayerBedEnterEvent(eventPtr) { Kind = EventKind.PlayerBedEnterEvent },
-            "PlayerBedLeaveEvent" => new PlayerBedLeaveEvent(eventPtr) { Kind = EventKind.PlayerBedLeaveEvent },
-            "PlayerDimensionChangeEvent" => new PlayerDimensionChangeEvent(eventPtr) { Kind = EventKind.PlayerDimensionChangeEvent },
-            "PlayerSkinChangeEvent" => new PlayerSkinChangeEvent(eventPtr) { Kind = EventKind.PlayerSkinChangeEvent },
-            "ActorDamageEvent" => new ActorDamageEvent(eventPtr) { Kind = EventKind.ActorDamageEvent },
-            "ActorDeathEvent" => new ActorDeathEvent(eventPtr) { Kind = EventKind.ActorDeathEvent },
-            "ActorExplodeEvent" => new ActorExplodeEvent(eventPtr) { Kind = EventKind.ActorExplodeEvent },
-            "ActorKnockbackEvent" => new ActorKnockbackEvent(eventPtr) { Kind = EventKind.ActorKnockbackEvent },
-            "ActorTeleportEvent" => new ActorTeleportEvent(eventPtr) { Kind = EventKind.ActorTeleportEvent },
-            "ActorSpawnEvent" => new ActorSpawnEvent(eventPtr) { Kind = EventKind.ActorSpawnEvent },
-            "ActorRemoveEvent" => new ActorRemoveEvent(eventPtr) { Kind = EventKind.ActorRemoveEvent },
-            "BlockBreakEvent" => new BlockBreakEvent(eventPtr) { Kind = EventKind.BlockBreakEvent },
-            "BlockPlaceEvent" => new BlockPlaceEvent(eventPtr) { Kind = EventKind.BlockPlaceEvent },
-            "BlockCookEvent" => new BlockCookEvent(eventPtr) { Kind = EventKind.BlockCookEvent },
-            "BlockExplodeEvent" => new BlockExplodeEvent(eventPtr) { Kind = EventKind.BlockExplodeEvent },
-            "BlockFormEvent" => new BlockFormEvent(eventPtr) { Kind = EventKind.BlockFormEvent },
-            "BlockGrowEvent" => new BlockGrowEvent(eventPtr) { Kind = EventKind.BlockGrowEvent },
-            "BlockFromToEvent" => new BlockFromToEvent(eventPtr) { Kind = EventKind.BlockFromToEvent },
-            "BlockPistonExtendEvent" => new BlockPistonExtendEvent(eventPtr) { Kind = EventKind.BlockPistonExtendEvent },
-            "BlockPistonRetractEvent" => new BlockPistonRetractEvent(eventPtr) { Kind = EventKind.BlockPistonRetractEvent },
-            "LeavesDecayEvent" => new LeavesDecayEvent(eventPtr) { Kind = EventKind.LeavesDecayEvent },
-            "ChunkLoadEvent" => new ChunkLoadEvent(eventPtr) { Kind = EventKind.ChunkLoadEvent },
-            "ChunkUnloadEvent" => new ChunkUnloadEvent(eventPtr) { Kind = EventKind.ChunkUnloadEvent },
-            "ServerCommandEvent" => new ServerCommandEvent(eventPtr) { Kind = EventKind.ServerCommandEvent },
-            "ServerLoadEvent" => new ServerLoadEvent(eventPtr) { Kind = EventKind.ServerLoadEvent },
-            "BroadcastMessageEvent" => new BroadcastMessageEvent(eventPtr) { Kind = EventKind.BroadcastMessageEvent },
-            "ServerListPingEvent" => new ServerListPingEvent(eventPtr) { Kind = EventKind.ServerListPingEvent },
-            "PacketReceiveEvent" => new PacketReceiveEvent(eventPtr) { Kind = EventKind.PacketReceiveEvent },
-            "PacketSendEvent" => new PacketSendEvent(eventPtr) { Kind = EventKind.PacketSendEvent },
-            "PluginEnableEvent" => new PluginEnableEvent(eventPtr) { Kind = EventKind.PluginEnableEvent },
-            "PluginDisableEvent" => new PluginDisableEvent(eventPtr) { Kind = EventKind.PluginDisableEvent },
-            "ScriptMessageEvent" => new ScriptMessageEvent(eventPtr) { Kind = EventKind.ScriptMessageEvent },
-            "MapInitializeEvent" => new MapInitializeEvent(eventPtr) { Kind = EventKind.MapInitializeEvent },
-            "ThunderChangeEvent" => new ThunderChangeEvent(eventPtr) { Kind = EventKind.ThunderChangeEvent },
-            "WeatherChangeEvent" => new WeatherChangeEvent(eventPtr) { Kind = EventKind.WeatherChangeEvent },
-            _ => null,
-        };
-    }
+            [nameof(PlayerJoinEvent)] = p => new PlayerJoinEvent(p) { Kind = EventKind.PlayerJoinEvent },
+            [nameof(PlayerQuitEvent)] = p => new PlayerQuitEvent(p) { Kind = EventKind.PlayerQuitEvent },
+            [nameof(PlayerLoginEvent)] = p => new PlayerLoginEvent(p) { Kind = EventKind.PlayerLoginEvent },
+            [nameof(PlayerChatEvent)] = p => new PlayerChatEvent(p) { Kind = EventKind.PlayerChatEvent },
+            [nameof(PlayerCommandEvent)] = p => new PlayerCommandEvent(p) { Kind = EventKind.PlayerCommandEvent },
+            [nameof(PlayerMoveEvent)] = p => new PlayerMoveEvent(p) { Kind = EventKind.PlayerMoveEvent },
+            [nameof(PlayerTeleportEvent)] = p => new PlayerTeleportEvent(p) { Kind = EventKind.PlayerTeleportEvent },
+            [nameof(PlayerPortalEvent)] = p => new PlayerPortalEvent(p) { Kind = EventKind.PlayerPortalEvent },
+            [nameof(PlayerDeathEvent)] = p => new PlayerDeathEvent(p) { Kind = EventKind.PlayerDeathEvent },
+            [nameof(PlayerInteractEvent)] = p => new PlayerInteractEvent(p) { Kind = EventKind.PlayerInteractEvent },
+            [nameof(PlayerInteractActorEvent)] = p => new PlayerInteractActorEvent(p) { Kind = EventKind.PlayerInteractActorEvent },
+            [nameof(PlayerRespawnEvent)] = p => new PlayerRespawnEvent(p) { Kind = EventKind.PlayerRespawnEvent },
+            [nameof(PlayerDropItemEvent)] = p => new PlayerDropItemEvent(p) { Kind = EventKind.PlayerDropItemEvent },
+            [nameof(PlayerGameModeChangeEvent)] = p => new PlayerGameModeChangeEvent(p) { Kind = EventKind.PlayerGameModeChangeEvent },
+            [nameof(PlayerItemHeldEvent)] = p => new PlayerItemHeldEvent(p) { Kind = EventKind.PlayerItemHeldEvent },
+            [nameof(PlayerItemConsumeEvent)] = p => new PlayerItemConsumeEvent(p) { Kind = EventKind.PlayerItemConsumeEvent },
+            [nameof(PlayerKickEvent)] = p => new PlayerKickEvent(p) { Kind = EventKind.PlayerKickEvent },
+            [nameof(PlayerPickupItemEvent)] = p => new PlayerPickupItemEvent(p) { Kind = EventKind.PlayerPickupItemEvent },
+            [nameof(PlayerJumpEvent)] = p => new PlayerJumpEvent(p) { Kind = EventKind.PlayerJumpEvent },
+            [nameof(PlayerEmoteEvent)] = p => new PlayerEmoteEvent(p) { Kind = EventKind.PlayerEmoteEvent },
+            [nameof(PlayerBedEnterEvent)] = p => new PlayerBedEnterEvent(p) { Kind = EventKind.PlayerBedEnterEvent },
+            [nameof(PlayerBedLeaveEvent)] = p => new PlayerBedLeaveEvent(p) { Kind = EventKind.PlayerBedLeaveEvent },
+            [nameof(PlayerDimensionChangeEvent)] = p => new PlayerDimensionChangeEvent(p) { Kind = EventKind.PlayerDimensionChangeEvent },
+            [nameof(PlayerSkinChangeEvent)] = p => new PlayerSkinChangeEvent(p) { Kind = EventKind.PlayerSkinChangeEvent },
+            [nameof(ActorDamageEvent)] = p => new ActorDamageEvent(p) { Kind = EventKind.ActorDamageEvent },
+            [nameof(ActorDeathEvent)] = p => new ActorDeathEvent(p) { Kind = EventKind.ActorDeathEvent },
+            [nameof(ActorExplodeEvent)] = p => new ActorExplodeEvent(p) { Kind = EventKind.ActorExplodeEvent },
+            [nameof(ActorKnockbackEvent)] = p => new ActorKnockbackEvent(p) { Kind = EventKind.ActorKnockbackEvent },
+            [nameof(ActorTeleportEvent)] = p => new ActorTeleportEvent(p) { Kind = EventKind.ActorTeleportEvent },
+            [nameof(ActorSpawnEvent)] = p => new ActorSpawnEvent(p) { Kind = EventKind.ActorSpawnEvent },
+            [nameof(ActorRemoveEvent)] = p => new ActorRemoveEvent(p) { Kind = EventKind.ActorRemoveEvent },
+            [nameof(BlockBreakEvent)] = p => new BlockBreakEvent(p) { Kind = EventKind.BlockBreakEvent },
+            [nameof(BlockPlaceEvent)] = p => new BlockPlaceEvent(p) { Kind = EventKind.BlockPlaceEvent },
+            [nameof(BlockCookEvent)] = p => new BlockCookEvent(p) { Kind = EventKind.BlockCookEvent },
+            [nameof(BlockExplodeEvent)] = p => new BlockExplodeEvent(p) { Kind = EventKind.BlockExplodeEvent },
+            [nameof(BlockFormEvent)] = p => new BlockFormEvent(p) { Kind = EventKind.BlockFormEvent },
+            [nameof(BlockGrowEvent)] = p => new BlockGrowEvent(p) { Kind = EventKind.BlockGrowEvent },
+            [nameof(BlockFromToEvent)] = p => new BlockFromToEvent(p) { Kind = EventKind.BlockFromToEvent },
+            [nameof(BlockPistonExtendEvent)] = p => new BlockPistonExtendEvent(p) { Kind = EventKind.BlockPistonExtendEvent },
+            [nameof(BlockPistonRetractEvent)] = p => new BlockPistonRetractEvent(p) { Kind = EventKind.BlockPistonRetractEvent },
+            [nameof(LeavesDecayEvent)] = p => new LeavesDecayEvent(p) { Kind = EventKind.LeavesDecayEvent },
+            [nameof(ChunkLoadEvent)] = p => new ChunkLoadEvent(p) { Kind = EventKind.ChunkLoadEvent },
+            [nameof(ChunkUnloadEvent)] = p => new ChunkUnloadEvent(p) { Kind = EventKind.ChunkUnloadEvent },
+            [nameof(ServerCommandEvent)] = p => new ServerCommandEvent(p) { Kind = EventKind.ServerCommandEvent },
+            [nameof(ServerLoadEvent)] = p => new ServerLoadEvent(p) { Kind = EventKind.ServerLoadEvent },
+            [nameof(BroadcastMessageEvent)] = p => new BroadcastMessageEvent(p) { Kind = EventKind.BroadcastMessageEvent },
+            [nameof(ServerListPingEvent)] = p => new ServerListPingEvent(p) { Kind = EventKind.ServerListPingEvent },
+            [nameof(PacketReceiveEvent)] = p => new PacketReceiveEvent(p) { Kind = EventKind.PacketReceiveEvent },
+            [nameof(PacketSendEvent)] = p => new PacketSendEvent(p) { Kind = EventKind.PacketSendEvent },
+            [nameof(PluginEnableEvent)] = p => new PluginEnableEvent(p) { Kind = EventKind.PluginEnableEvent },
+            [nameof(PluginDisableEvent)] = p => new PluginDisableEvent(p) { Kind = EventKind.PluginDisableEvent },
+            [nameof(ScriptMessageEvent)] = p => new ScriptMessageEvent(p) { Kind = EventKind.ScriptMessageEvent },
+            [nameof(MapInitializeEvent)] = p => new MapInitializeEvent(p) { Kind = EventKind.MapInitializeEvent },
+            [nameof(ThunderChangeEvent)] = p => new ThunderChangeEvent(p) { Kind = EventKind.ThunderChangeEvent },
+            [nameof(WeatherChangeEvent)] = p => new WeatherChangeEvent(p) { Kind = EventKind.WeatherChangeEvent },
+        }.ToFrozenDictionary(StringComparer.Ordinal);
+
+    /// <summary>True when <paramref name="eventName"/> maps to one of the
+    /// built-in event wrappers.</summary>
+    internal static bool IsKnown(string eventName) => Factories.ContainsKey(eventName);
+
+    /// <summary>Wraps a native event. The caller must have checked
+    /// <see cref="IsKnown"/>.</summary>
+    internal static Event Create(string eventName, IntPtr eventPtr) => Factories[eventName](eventPtr);
 }
 
 /// <summary>
@@ -1025,17 +1037,17 @@ internal sealed unsafe class EventManager
 
     internal void SetPluginHandle(IntPtr gcHandle) => _pluginHandle = gcHandle;
 
-    internal void Register(string eventName, EventPriority priority, bool ignoreCancelled, Action<Event> handler)
+    /// <summary>Registers <paramref name="handler"/> for the built-in event
+    /// class <paramref name="eventName"/>. Returns false when the name is not
+    /// one of the built-in events, in which case nothing is registered.</summary>
+    internal bool Register(string eventName, EventPriority priority, bool ignoreCancelled, Action<Event> handler)
     {
-        // The native callback receives the raw Event*; wrap it per event name.
-        Action<IntPtr> native = ptr =>
+        if (!EventFactory.IsKnown(eventName))
         {
-            var e = EventFactory.Create(eventName, ptr);
-            if (e != null)
-            {
-                handler(e);
-            }
-        };
+            return false;
+        }
+        // The native callback receives the raw Event*; wrap it per event name.
+        Action<IntPtr> native = ptr => handler(EventFactory.Create(eventName, ptr));
         var handle = GCHandle.Alloc(native);
         _callbackHandles.Add(handle);  // keep the delegate alive for the plugin's lifetime
         if (_pluginHandle != IntPtr.Zero)
@@ -1043,5 +1055,6 @@ internal sealed unsafe class EventManager
             Bridge.CallRegisterEvent((void*)_pluginHandle, eventName, (int)priority, ignoreCancelled,
                                      (void*)GCHandle.ToIntPtr(handle));
         }
+        return true;
     }
 }

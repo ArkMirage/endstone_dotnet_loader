@@ -121,15 +121,29 @@ public abstract class PluginBase : Plugin
         }
     }
 
-    /// <summary>Registers an event handler for the given Endstone event name.</summary>
+    /// <summary>
+    /// Registers an event handler by name. Only built-in Endstone event types are
+    /// supported; an unknown name is reported and no handler is registered, because
+    /// such an event could never expose its payload or cancellation state.
+    /// </summary>
     public void RegisterEvent(string eventName, Action<Event> handler,
                               EventPriority priority = EventPriority.Normal, bool ignoreCancelled = false)
-        => _events.Register(eventName, priority, ignoreCancelled, handler);
+    {
+        if (!_events.Register(eventName, priority, ignoreCancelled, handler))
+        {
+            Logger.Error($"Unknown event '{eventName}'. RegisterEvent<T>(...) accepts only built-in Endstone event types.");
+        }
+    }
 
     /// <summary>Registers a strongly-typed event handler.</summary>
     public void RegisterEvent<T>(Action<T> handler, EventPriority priority = EventPriority.Normal,
                                  bool ignoreCancelled = false) where T : Event
-        => _events.Register(typeof(T).Name, priority, ignoreCancelled, e => handler((T)e));
+    {
+        if (!_events.Register(typeof(T).Name, priority, ignoreCancelled, e => handler((T)e)))
+        {
+            Logger.Error($"Unknown event '{typeof(T).Name}'. RegisterEvent<T>(...) accepts only built-in Endstone event types.");
+        }
+    }
 
     internal bool DispatchCommand(string name, CommandSender sender, IReadOnlyList<string> args)
         => _commands.Dispatch(name, sender, args);
