@@ -107,6 +107,7 @@ bool playerPerformCommand(void *p, const char *cmd) { return asPlayer(p)->perfor
 bool playerIsOp(void *p) { return asPlayer(p)->isOp(); }
 void playerSetOp(void *p, bool v) { asPlayer(p)->setOp(v); }
 const char *playerGetXuid(void *p) { return strOut(asPlayer(p)->getXuid()); }
+void playerGetUniqueId(void *p, uint8_t *out16) { uuidToBytes(asPlayer(p)->getUniqueId(), out16); }
 const char *playerGetAddress(void *p)
 {
     const auto addr = asPlayer(p)->getAddress();
@@ -2787,6 +2788,7 @@ const BridgeTable &getBridgeTable()
         .player_is_op = &playerIsOp,
         .player_set_op = &playerSetOp,
         .player_get_xuid = &playerGetXuid,
+        .player_get_unique_id = &playerGetUniqueId,
         .player_get_address = &playerGetAddress,
         .player_is_sneaking = &playerIsSneaking,
         .player_set_sneaking = &playerSetSneaking,

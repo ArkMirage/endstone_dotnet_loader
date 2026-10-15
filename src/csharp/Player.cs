@@ -18,6 +18,18 @@ public sealed unsafe class Player : Mob
     private static Bridge.Table* T => Bridge.Raw;
 
     public string Xuid => Bridge.Str(T->PlayerGetXuid(_ptr));
+
+    /// <summary>The player's unique ID (UUID).</summary>
+    public Guid UniqueId
+    {
+        get
+        {
+            byte* buf = stackalloc byte[16];
+            T->PlayerGetUniqueId(_ptr, buf);
+            return UuidMarshal.Read(new ReadOnlySpan<byte>(buf, 16));
+        }
+    }
+
     public string Address => Bridge.Str(T->PlayerGetAddress(_ptr));
     public string Locale => Bridge.Str(T->PlayerGetLocale(_ptr));
     public string DeviceOS => Bridge.Str(T->PlayerGetDeviceOS(_ptr));

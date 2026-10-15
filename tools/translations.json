@@ -151,6 +151,7 @@
       "summary": "包装原生 endstone::Player 的托管对象(继承 Actor),提供消息、操作、物品、模式、飞行、传送等玩家功能。",
       "members": {
         "IsOp": "玩家是否为服务器管理员 (OP)。",
+        "UniqueId": "玩家的唯一 ID (UUID)。",
         "GameMode": "玩家的游戏模式。",
         "SendTitle(string, string)": "向玩家发送 Title。",
         "SendToast(string, string)": "向玩家发送系统提示 (toast)。",

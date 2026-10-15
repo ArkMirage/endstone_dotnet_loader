@@ -88,6 +88,7 @@ struct BridgeTable {
     bool (*player_is_op)(void *);
     void (*player_set_op)(void *, bool);
     const char *(*player_get_xuid)(void *);
+    void (*player_get_unique_id)(void *, uint8_t *);
     const char *(*player_get_address)(void *);
     bool (*player_is_sneaking)(void *);
     void (*player_set_sneaking)(void *, bool);

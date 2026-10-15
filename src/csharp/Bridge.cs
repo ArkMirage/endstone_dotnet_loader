@@ -25,6 +25,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, bool> PlayerIsOp;
         public delegate* unmanaged[Cdecl]<void*, bool, void> PlayerSetOp;
         public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetXuid;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerGetUniqueId;
         public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetAddress;
         public delegate* unmanaged[Cdecl]<void*, bool> PlayerIsSneaking;
         public delegate* unmanaged[Cdecl]<void*, bool, void> PlayerSetSneaking;
