@@ -61,8 +61,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void> PlayerUpdateCommands;
         public delegate* unmanaged[Cdecl]<void*, void> PlayerCloseForm;
         public delegate* unmanaged[Cdecl]<void*, int, void*, int, void> PlayerSendPacket;
-        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetSkinId;
-        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetSkinCapeId;
+        public delegate* unmanaged[Cdecl]<void*, void*> PlayerGetSkin;
         public delegate* unmanaged[Cdecl]<void*, void*> PlayerGetItemInHand;
 
         // ---- server ----
@@ -191,8 +190,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> LoginGetKickMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> LoginSetKickMessage;
         public delegate* unmanaged[Cdecl]<void*, void*> PickupGetItem;
-        public delegate* unmanaged[Cdecl]<void*, byte*> SkinChangeGetNewSkinId;
-        public delegate* unmanaged[Cdecl]<void*, byte*> SkinChangeGetNewSkinCapeId;
+        public delegate* unmanaged[Cdecl]<void*, void*> SkinChangeGetNewSkin;
         public delegate* unmanaged[Cdecl]<void*, byte*> SkinChangeGetMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> SkinChangeSetMessage;
 
@@ -482,6 +480,23 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, int, uint, void> CanvasSetPixel;
         public delegate* unmanaged[Cdecl]<void*, int, int, uint> CanvasGetPixel;
         public delegate* unmanaged[Cdecl]<void*, int, int, uint> CanvasGetBasePixel;
+        public delegate* unmanaged[Cdecl]<void*, int, int, int, int, int, void*, void> CanvasDrawImage;
+
+        // ---- objects: skin ----
+        // Skin pointers are heap-allocated copies owned by the managed side
+        // (release with SkinDelete); see the C++ declaration for image semantics.
+        public delegate* unmanaged[Cdecl]<void*, void> SkinDelete;
+        public delegate* unmanaged[Cdecl]<void*, byte*> SkinGetId;
+        public delegate* unmanaged[Cdecl]<void*, int> SkinGetImageDepth;
+        public delegate* unmanaged[Cdecl]<void*, int> SkinGetImageWidth;
+        public delegate* unmanaged[Cdecl]<void*, int> SkinGetImageHeight;
+        public delegate* unmanaged[Cdecl]<void*, int*, byte*> SkinGetImageData;
+        public delegate* unmanaged[Cdecl]<void*, byte*> SkinGetCapeId;
+        public delegate* unmanaged[Cdecl]<void*, int> SkinGetCapeImageDepth;
+        public delegate* unmanaged[Cdecl]<void*, int> SkinGetCapeImageWidth;
+        public delegate* unmanaged[Cdecl]<void*, int> SkinGetCapeImageHeight;
+        public delegate* unmanaged[Cdecl]<void*, int*, byte*> SkinGetCapeImageData;
+
         public delegate* unmanaged[Cdecl]<void*, bool> ItemHasMapView;
         public delegate* unmanaged[Cdecl]<void*, void*> ItemGetMapView;
         public delegate* unmanaged[Cdecl]<void*, void*, bool> ItemSetMapView;

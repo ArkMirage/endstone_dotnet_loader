@@ -513,16 +513,9 @@ public sealed unsafe class PlayerSkinChangeEvent : Event
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerSkinChangeEvent(IntPtr ptr) : base(ptr) { }
 
-    public string NewSkinId => Bridge.Str(T->SkinChangeGetNewSkinId(NativePtr));
-
-    public string? NewSkinCapeId
-    {
-        get
-        {
-            var p = T->SkinChangeGetNewSkinCapeId(NativePtr);
-            return p == null ? null : Bridge.Str(p);
-        }
-    }
+    /// <summary>The skin that will be applied. Reading it copies the native
+    /// skin; cache the result if you need it more than once.</summary>
+    public Skin NewSkin => new((IntPtr)T->SkinChangeGetNewSkin(NativePtr));
 
     public string? SkinChangeMessage
     {

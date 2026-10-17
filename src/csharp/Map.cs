@@ -272,4 +272,13 @@ public sealed unsafe class MapCanvas
     public uint GetPixel(int x, int y) => T->CanvasGetPixel(_ptr, x, y);
 
     public uint GetBasePixel(int x, int y) => T->CanvasGetBasePixel(_ptr, x, y);
+
+    /// <summary>Draws an image onto the canvas, clipped to its bounds.</summary>
+    public void DrawImage(int x, int y, Image image)
+    {
+        fixed (byte* p = image.Data)
+        {
+            T->CanvasDrawImage(_ptr, x, y, image.Depth, image.Width, image.Height, p);
+        }
+    }
 }

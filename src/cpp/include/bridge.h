@@ -124,8 +124,10 @@ struct BridgeTable {
     void (*player_update_commands)(void *);
     void (*player_close_form)(void *);
     void (*player_send_packet)(void *, int, const void *, int);
-    const char *(*player_get_skin_id)(void *);
-    const char *(*player_get_skin_cape_id)(void *);
+    // Returns a skin holder owned by the managed side (destroy with
+    // skin_delete). Player::getSkin() hands out a copy, so the holder always
+    // owns its endstone::Skin.
+    void *(*player_get_skin)(void *);
     void *(*player_get_item_in_hand)(void *);
 
     // ---- server ----
@@ -258,8 +260,9 @@ struct BridgeTable {
     const char *(*login_get_kick_message)(void *);
     void (*login_set_kick_message)(void *, const char *);
     void *(*pickup_get_item)(void *);
-    const char *(*skin_change_get_new_skin_id)(void *);
-    const char *(*skin_change_get_new_skin_cape_id)(void *);
+    // Same ownership as player_get_skin; PlayerSkinChangeEvent::getNewSkin()
+    // also returns by value.
+    void *(*skin_change_get_new_skin)(void *);
     const char *(*skin_change_get_message)(void *);
     void (*skin_change_set_message)(void *, const char *);
 
@@ -573,6 +576,31 @@ struct BridgeTable {
     void (*canvas_set_pixel)(void *, int, int, uint32_t);
     uint32_t (*canvas_get_pixel)(void *, int, int);
     uint32_t (*canvas_get_base_pixel)(void *, int, int);
+    // Draws a copy of an image onto the canvas, clipped to its bounds; the
+    // pixels are width * height * 4 bytes in the Image layout.
+    void (*canvas_draw_image)(void *, int, int, int, int, int, const void *);
+
+    // ---- objects: skin ----
+    // A skin holder is a heap-allocated endstone::Skin owned by the managed
+    // side (release with skin_delete). The skin is immutable, so the accessors
+    // are read-only. Image data is always width * height * 4 bytes, returned as
+    // a pointer into the skin's own buffer: it stays valid for as long as the
+    // holder lives and must not be freed or copied out past it. The image depth
+    // acts as the type (Image has no getType()): 1=Grayscale, 3=RGB, 4=RGBA.
+    // skin_get_cape_id returns nullptr and skin_get_cape_image_depth returns -1
+    // when the skin has no cape, or cape image, respectively.
+    void (*skin_delete)(void *);
+    const char *(*skin_get_id)(void *);
+    int (*skin_get_image_depth)(void *);
+    int (*skin_get_image_width)(void *);
+    int (*skin_get_image_height)(void *);
+    const char *(*skin_get_image_data)(void *, int *);
+    const char *(*skin_get_cape_id)(void *);
+    int (*skin_get_cape_image_depth)(void *);
+    int (*skin_get_cape_image_width)(void *);
+    int (*skin_get_cape_image_height)(void *);
+    const char *(*skin_get_cape_image_data)(void *, int *);
+
     // item map meta
     bool (*item_has_map_view)(void *);
     void *(*item_get_map_view)(void *);

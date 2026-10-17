@@ -35,15 +35,9 @@ public sealed unsafe class Player : Mob
     public string DeviceOS => Bridge.Str(T->PlayerGetDeviceOS(_ptr));
     public string DeviceId => Bridge.Str(T->PlayerGetDeviceId(_ptr));
     public string GameVersion => Bridge.Str(T->PlayerGetGameVersion(_ptr));
-    public string SkinId => Bridge.Str(T->PlayerGetSkinId(_ptr));
-    public string? SkinCapeId
-    {
-        get
-        {
-            var p = T->PlayerGetSkinCapeId(_ptr);
-            return p == null ? null : Bridge.Str(p);
-        }
-    }
+    /// <summary>The player's skin. Reading it copies the native skin, including
+    /// its images, so cache the result when using it repeatedly.</summary>
+    public Skin Skin => new((IntPtr)T->PlayerGetSkin(_ptr));
 
     /// <summary>Item held in the main hand, or null when empty. Read-only snapshot.</summary>
     public ItemStack? ItemInHand

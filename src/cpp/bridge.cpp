@@ -169,12 +169,7 @@ void playerSendPacket(void *p, int packet_id, const void *payload, int len)
 {
     asPlayer(p)->sendPacket(packet_id, std::string_view(static_cast<const char *>(payload), static_cast<size_t>(len)));
 }
-const char *playerGetSkinId(void *p) { return strOut(asPlayer(p)->getSkin().getId()); }
-const char *playerGetSkinCapeId(void *p)
-{
-    const auto cape = asPlayer(p)->getSkin().getCapeId();
-    return cape ? strOut(cape.value()) : nullptr;
-}
+void *playerGetSkin(void *p) { return new endstone::Skin(asPlayer(p)->getSkin()); }
 void *playerGetItemInHand(void *p)
 {
     g_item_slot = asPlayer(p)->getInventory().getItemInMainHand();
@@ -850,14 +845,9 @@ const char *loginGetKickMessage(void *e)
 }
 void loginSetKickMessage(void *e, const char *m) { static_cast<endstone::PlayerLoginEvent *>(e)->setKickMessage(m); }
 void *pickupGetItem(void *e) { return &static_cast<endstone::PlayerPickupItemEvent *>(e)->getItem(); }
-const char *skinChangeGetNewSkinId(void *e)
+void *skinChangeGetNewSkin(void *e)
 {
-    return strOut(static_cast<endstone::PlayerSkinChangeEvent *>(e)->getNewSkin().getId());
-}
-const char *skinChangeGetNewSkinCapeId(void *e)
-{
-    const auto cape = static_cast<endstone::PlayerSkinChangeEvent *>(e)->getNewSkin().getCapeId();
-    return cape ? strOut(cape.value()) : nullptr;
+    return new endstone::Skin(static_cast<endstone::PlayerSkinChangeEvent *>(e)->getNewSkin());
 }
 const char *skinChangeGetMessage(void *e)
 {
@@ -1450,6 +1440,70 @@ void canvasSetPixel(void *c, int x, int y, uint32_t color)
 }
 uint32_t canvasGetPixel(void *c, int x, int y) { return static_cast<endstone::MapCanvas *>(c)->getPixel(x, y); }
 uint32_t canvasGetBasePixel(void *c, int x, int y) { return static_cast<endstone::MapCanvas *>(c)->getBasePixel(x, y); }
+void canvasDrawImage(void *c, int x, int y, int depth, int width, int height, const void *data)
+{
+    if (!data || depth <= 0 || width <= 0 || height <= 0) {
+        return;
+    }
+    // The bridge transfers the Image's underlying buffer (width * height * 4
+    // bytes); Image's variadic constructor picks the bytes matching width/height.
+    const auto *bytes = static_cast<const char *>(data);
+    const std::string buffer(bytes, static_cast<size_t>(width) * height * 4);
+    static_cast<endstone::MapCanvas *>(c)->drawImage(x, y, endstone::Image(endstone::Image::Type(depth), width, height, buffer));
+}
+
+// ---- skin ----
+
+endstone::Skin *asSkin(void *s) { return static_cast<endstone::Skin *>(s); }
+
+void skinDelete(void *s) { delete asSkin(s); }
+const char *skinGetId(void *s) { return strOut(asSkin(s)->getId()); }
+int skinGetImageDepth(void *s) { return asSkin(s)->getImage().getDepth(); }
+int skinGetImageWidth(void *s) { return asSkin(s)->getImage().getWidth(); }
+int skinGetImageHeight(void *s) { return asSkin(s)->getImage().getHeight(); }
+const char *skinGetImageData(void *s, int *len)
+{
+    const auto data = asSkin(s)->getImage().getData();
+    if (len) {
+        *len = static_cast<int>(data.size());
+    }
+    return data.data();
+}
+const char *skinGetCapeId(void *s)
+{
+    const auto cape = asSkin(s)->getCapeId();
+    return cape ? strOut(cape.value()) : nullptr;
+}
+int skinGetCapeImageDepth(void *s)
+{
+    const auto *image = asSkin(s)->getCapeImage();
+    return image ? image->getDepth() : -1;
+}
+int skinGetCapeImageWidth(void *s)
+{
+    const auto *image = asSkin(s)->getCapeImage();
+    return image ? image->getWidth() : 0;
+}
+int skinGetCapeImageHeight(void *s)
+{
+    const auto *image = asSkin(s)->getCapeImage();
+    return image ? image->getHeight() : 0;
+}
+const char *skinGetCapeImageData(void *s, int *len)
+{
+    const auto *image = asSkin(s)->getCapeImage();
+    if (!image) {
+        if (len) {
+            *len = 0;
+        }
+        return nullptr;
+    }
+    const auto data = image->getData();
+    if (len) {
+        *len = static_cast<int>(data.size());
+    }
+    return data.data();
+}
 
 bool itemHasMapView(void *i)
 {
@@ -3016,8 +3070,7 @@ const BridgeTable &getBridgeTable()
         .player_update_commands = &playerUpdateCommands,
         .player_close_form = &playerCloseForm,
         .player_send_packet = &playerSendPacket,
-        .player_get_skin_id = &playerGetSkinId,
-        .player_get_skin_cape_id = &playerGetSkinCapeId,
+        .player_get_skin = &playerGetSkin,
         .player_get_item_in_hand = &playerGetItemInHand,
         .server_get_name = &serverGetName,
         .server_get_version = &serverGetVersion,
@@ -3121,8 +3174,7 @@ const BridgeTable &getBridgeTable()
         .login_get_kick_message = &loginGetKickMessage,
         .login_set_kick_message = &loginSetKickMessage,
         .pickup_get_item = &pickupGetItem,
-        .skin_change_get_new_skin_id = &skinChangeGetNewSkinId,
-        .skin_change_get_new_skin_cape_id = &skinChangeGetNewSkinCapeId,
+        .skin_change_get_new_skin = &skinChangeGetNewSkin,
         .skin_change_get_message = &skinChangeGetMessage,
         .skin_change_set_message = &skinChangeSetMessage,
         .cook_get_source = &cookGetSource,
@@ -3384,6 +3436,18 @@ const BridgeTable &getBridgeTable()
         .canvas_set_pixel = &canvasSetPixel,
         .canvas_get_pixel = &canvasGetPixel,
         .canvas_get_base_pixel = &canvasGetBasePixel,
+        .canvas_draw_image = &canvasDrawImage,
+        .skin_delete = &skinDelete,
+        .skin_get_id = &skinGetId,
+        .skin_get_image_depth = &skinGetImageDepth,
+        .skin_get_image_width = &skinGetImageWidth,
+        .skin_get_image_height = &skinGetImageHeight,
+        .skin_get_image_data = &skinGetImageData,
+        .skin_get_cape_id = &skinGetCapeId,
+        .skin_get_cape_image_depth = &skinGetCapeImageDepth,
+        .skin_get_cape_image_width = &skinGetCapeImageWidth,
+        .skin_get_cape_image_height = &skinGetCapeImageHeight,
+        .skin_get_cape_image_data = &skinGetCapeImageData,
         .item_has_map_view = &itemHasMapView,
         .item_get_map_view = &itemGetMapView,
         .item_set_map_view = &itemSetMapView,
