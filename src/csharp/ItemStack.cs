@@ -1,8 +1,19 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using Endstone.Loader.Nbt;
 
 namespace Endstone.Loader;
+
+/// <summary>Kind of metadata an item stack carries (endstone::ItemMeta::Type).</summary>
+public enum ItemMetaType
+{
+    Item = 0,
+    Book = 1,
+    Crossbow = 2,
+    Map = 3,
+    WritableBook = 4,
+}
 
 /// <summary>Wraps a native endstone::ItemStack read-only view. When created via
 /// ItemStack.Create, Dispose() frees the native stack. When wrapping a dropped
@@ -59,15 +70,105 @@ public sealed unsafe class ItemStack : IDisposable
     public int MaxStackSize => _isItemActor ? 0 : T->ItemGetMaxStackSize(_ptr);
     public string TranslationKey => Bridge.Str(_isItemActor ? T->ItemActorGetTranslationKey(_ptr) : T->ItemGetTranslationKey(_ptr));
 
-    /// <summary>ItemMeta: display name, or empty when unset (not available on item actors).</summary>
+    /// <summary>ItemMeta: display name, or empty when unset (not available on item actors).
+    /// Setting null or an empty string clears it. The native side reports whether
+    /// the change was applied; a property setter cannot surface that.</summary>
     public bool HasDisplayName => !_isItemActor && T->ItemHasDisplayName(_ptr);
-    public string DisplayName => _isItemActor ? "" : Bridge.Str(T->ItemGetDisplayName(_ptr));
+    [AllowNull]
+    public string DisplayName
+    {
+        get => _isItemActor ? "" : Bridge.Str(T->ItemGetDisplayName(_ptr));
+        set
+        {
+            if (!_isItemActor)
+            {
+                Bridge.CallBoolStrOrNull(T->ItemSetDisplayName, _ptr, value);
+            }
+        }
+    }
+
     public bool HasLore => !_isItemActor && T->ItemHasLore(_ptr);
     public int LoreCount => _isItemActor ? 0 : T->ItemGetLoreCount(_ptr);
     public string GetLoreLine(int index) => _isItemActor ? "" : Bridge.Str(T->ItemGetLoreLine(_ptr, index));
+
+    /// <summary>All lore lines as a snapshot (empty when no lore is set). Setting
+    /// null or an empty list clears the lore.</summary>
+    [AllowNull]
+    public IReadOnlyList<string> Lore
+    {
+        get
+        {
+            var lines = new List<string>(LoreCount);
+            for (var i = 0; i < LoreCount; i++)
+            {
+                lines.Add(GetLoreLine(i));
+            }
+            return lines;
+        }
+        set
+        {
+            if (!_isItemActor)
+            {
+                Bridge.CallItemSetLore(T->ItemSetLore, _ptr, value);
+            }
+        }
+    }
+
     public bool HasDamage => !_isItemActor && T->ItemHasDamage(_ptr);
-    public int Damage => _isItemActor ? 0 : T->ItemGetDamage(_ptr);
-    public bool IsUnbreakable => !_isItemActor && T->ItemIsUnbreakable(_ptr);
+    public int Damage
+    {
+        get => _isItemActor ? 0 : T->ItemGetDamage(_ptr);
+        set
+        {
+            if (!_isItemActor)
+            {
+                T->ItemSetDamage(_ptr, value);
+            }
+        }
+    }
+
+    public bool IsUnbreakable
+    {
+        get => !_isItemActor && T->ItemIsUnbreakable(_ptr);
+        set
+        {
+            if (!_isItemActor)
+            {
+                T->ItemSetUnbreakable(_ptr, value);
+            }
+        }
+    }
+
+    /// <summary>Whether the item carries a repair penalty.</summary>
+    public bool HasRepairCost => !_isItemActor && T->ItemHasRepairCost(_ptr);
+
+    /// <summary>The repair penalty, or 0 when unset.</summary>
+    public int RepairCost
+    {
+        get => _isItemActor ? 0 : T->ItemGetRepairCost(_ptr);
+        set
+        {
+            if (!_isItemActor)
+            {
+                T->ItemSetRepairCost(_ptr, value);
+            }
+        }
+    }
+
+    /// <summary>Kind of metadata the item carries, or null when it carries none.</summary>
+    public ItemMetaType? MetaType
+    {
+        get
+        {
+            if (_isItemActor)
+            {
+                return null;
+            }
+            var type = T->ItemGetMetaType(_ptr);
+            return type < 0 ? null : (ItemMetaType)type;
+        }
+    }
+
     public bool HasEnchants => !_isItemActor && T->ItemHasEnchants(_ptr);
     public int EnchantCount => _isItemActor ? 0 : T->ItemGetEnchantCount(_ptr);
     public string GetEnchantName(int index) => _isItemActor ? "" : Bridge.Str(T->ItemGetEnchantName(_ptr, index));

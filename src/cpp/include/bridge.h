@@ -393,6 +393,20 @@ struct BridgeTable {
     bool (*item_remove_enchant)(void *, const char *);
     void (*item_remove_enchants)(void *);
     bool (*item_has_conflicting_enchant)(void *, const char *);
+    // ItemMeta extras. ItemStack::getItemMeta() hands out a copy, so every
+    // setter mutates that copy and writes it back with setItemMeta; the return
+    // value is false when there is no metadata and otherwise whether the change
+    // was applied (a no-op counts as applied). item_get_meta_type returns -1
+    // when the stack has no metadata. A nullptr name clears the display name; a
+    // null array or count <= 0 clears the lore.
+    bool (*item_has_repair_cost)(void *);
+    int (*item_get_repair_cost)(void *);
+    int (*item_get_meta_type)(void *);
+    bool (*item_set_display_name)(void *, const char *);
+    bool (*item_set_lore)(void *, const char *const *, int);
+    bool (*item_set_damage)(void *, int);
+    bool (*item_set_unbreakable)(void *, bool);
+    bool (*item_set_repair_cost)(void *, int);
     const char *(*block_get_type)(void *);
     int (*block_get_x)(void *);
     int (*block_get_y)(void *);

@@ -1832,6 +1832,98 @@ bool itemHasConflictingEnchant(void *i, const char *id)
     return meta && meta->hasConflictingEnchant(enchantId(id));
 }
 
+// ItemMeta extras. ItemStack::getItemMeta() hands out a copy, so a change only
+// reaches the stack through setItemMeta on the mutated copy. Every setter
+// returns false when the stack has no meta at all, true when nothing needed
+// changing, and otherwise whether that write was applied.
+bool itemHasRepairCost(void *i)
+{
+    const auto meta = itemMeta(i);
+    return meta && meta->hasRepairCost();
+}
+int itemGetRepairCost(void *i)
+{
+    const auto meta = itemMeta(i);
+    return meta ? meta->getRepairCost() : 0;
+}
+int itemGetMetaType(void *i)
+{
+    const auto meta = itemMeta(i);
+    return meta ? static_cast<int>(meta->getType()) : -1;
+}
+bool itemSetDisplayName(void *i, const char *name)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    const std::string value = name ? name : "";
+    // getDisplayName() is the stored string, so this covers both "already
+    // unset" and "already equal".
+    if (meta->getDisplayName() == value) {
+        return true;
+    }
+    meta->setDisplayName(name ? std::optional<std::string>(value) : std::nullopt);
+    return asItem(i)->setItemMeta(meta.get());
+}
+bool itemSetLore(void *i, const char *const *lines, int count)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    std::vector<std::string> lore;
+    for (int k = 0; lines && k < count; ++k) {
+        lore.emplace_back(lines[k] ? lines[k] : "");
+    }
+    if (meta->getLore() == lore) {
+        return true;
+    }
+    if (lore.empty()) {
+        meta->setLore(std::nullopt);
+    }
+    else {
+        meta->setLore(std::move(lore));
+    }
+    return asItem(i)->setItemMeta(meta.get());
+}
+bool itemSetDamage(void *i, int damage)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    if (meta->getDamage() == damage) {
+        return true;
+    }
+    meta->setDamage(damage);
+    return asItem(i)->setItemMeta(meta.get());
+}
+bool itemSetUnbreakable(void *i, bool unbreakable)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    if (meta->isUnbreakable() == unbreakable) {
+        return true;
+    }
+    meta->setUnbreakable(unbreakable);
+    return asItem(i)->setItemMeta(meta.get());
+}
+bool itemSetRepairCost(void *i, int cost)
+{
+    const auto meta = itemMeta(i);
+    if (!meta) {
+        return false;
+    }
+    if (meta->getRepairCost() == cost) {
+        return true;
+    }
+    meta->setRepairCost(cost);
+    return asItem(i)->setItemMeta(meta.get());
+}
+
 const endstone::Enchantment *asEnchantment(const void *e) { return static_cast<const endstone::Enchantment *>(e); }
 
 const void *enchantGetById(const char *id)
@@ -3147,6 +3239,14 @@ const BridgeTable &getBridgeTable()
         .item_remove_enchant = &itemRemoveEnchant,
         .item_remove_enchants = &itemRemoveEnchants,
         .item_has_conflicting_enchant = &itemHasConflictingEnchant,
+        .item_has_repair_cost = &itemHasRepairCost,
+        .item_get_repair_cost = &itemGetRepairCost,
+        .item_get_meta_type = &itemGetMetaType,
+        .item_set_display_name = &itemSetDisplayName,
+        .item_set_lore = &itemSetLore,
+        .item_set_damage = &itemSetDamage,
+        .item_set_unbreakable = &itemSetUnbreakable,
+        .item_set_repair_cost = &itemSetRepairCost,
         .block_get_type = &blockGetType,
         .block_get_x = &blockGetX,
         .block_get_y = &blockGetY,

@@ -320,6 +320,14 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemRemoveEnchant;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> ItemRemoveEnchants;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemHasConflictingEnchant;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasRepairCost;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemGetRepairCost;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemGetMetaType;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemSetDisplayName;
+        public delegate* unmanaged[Cdecl]<void*, byte**, int, bool> ItemSetLore;
+        public delegate* unmanaged[Cdecl]<void*, int, bool> ItemSetDamage;
+        public delegate* unmanaged[Cdecl]<void*, bool, bool> ItemSetUnbreakable;
+        public delegate* unmanaged[Cdecl]<void*, int, bool> ItemSetRepairCost;
         public delegate* unmanaged[Cdecl]<void*, byte*> BlockGetType;
         public delegate* unmanaged[Cdecl]<void*, int> BlockGetX;
         public delegate* unmanaged[Cdecl]<void*, int> BlockGetY;
@@ -865,6 +873,39 @@ internal static unsafe class Bridge
         fixed (byte* pm = molangBuf)
         {
             fn(obj, pn, values, pm);
+        }
+    }
+
+    /// <summary>Sets an item's lore from a managed list. A null or empty array
+    /// clears the lore, matching the native <c>setLore(nullopt)</c> behaviour.</summary>
+    internal static bool CallItemSetLore(delegate* unmanaged[Cdecl]<void*, byte**, int, bool> fn, void* obj,
+                                        IReadOnlyList<string>? lore)
+    {
+        if (lore == null || lore.Count == 0)
+        {
+            return fn(obj, null, 0);
+        }
+        var lines = new string[lore.Count];
+        for (var i = 0; i < lines.Length; i++)
+        {
+            lines[i] = lore[i];
+        }
+        using var pinned = new PinnedUtf8Array(lines);
+        return fn(obj, pinned.Pointers, pinned.Length);
+    }
+
+    /// <summary>Passes a string argument that carries meaning when absent (a null
+    /// pointer selects the native "clear" branch), unlike <see cref="CallBoolStr"/>.</summary>
+    internal static bool CallBoolStrOrNull(delegate* unmanaged[Cdecl]<void*, byte*, bool> fn, void* obj, string? s)
+    {
+        if (s == null)
+        {
+            return fn(obj, null);
+        }
+        var buf = ToUtf8(s);
+        fixed (byte* p = buf)
+        {
+            return fn(obj, p);
         }
     }
 
