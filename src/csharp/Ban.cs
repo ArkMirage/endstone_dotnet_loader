@@ -108,6 +108,18 @@ public sealed unsafe class PlayerBanList
 
     internal PlayerBanList(void* ptr) => _ptr = ptr;
 
+    // Writes an optional UUID into the supplied stack buffer (16 bytes) and
+    // returns null when no UUID was given, matching std::optional<UUID>.
+    private static byte* UuidBytes(Guid? uuid, byte* buffer)
+    {
+        if (!uuid.HasValue)
+        {
+            return null;
+        }
+        UuidMarshal.Write(uuid.Value, new Span<byte>(buffer, 16));
+        return buffer;
+    }
+
     /// <summary>
     /// Gets the ban entry for the given player name, or null if not banned.
     /// </summary>
@@ -117,6 +129,25 @@ public sealed unsafe class PlayerBanList
         fixed (byte* p = buf)
         {
             var entry = T->PlayerBanListGetBanEntry(_ptr, p);
+            return entry == null ? null : new PlayerBanEntry(entry);
+        }
+    }
+
+    /// <summary>
+    /// Gets the ban entry matching a name together with an optional UUID and
+    /// XUID (mirrors PlayerBanList::getBanEntry(name, uuid, xuid)). Any of the
+    /// identity fields may be null.
+    /// </summary>
+    public PlayerBanEntry? GetBanEntry(string name, Guid? uuid, string? xuid = null)
+    {
+        var nameBuf = Bridge.ToUtf8(name);
+        var xuidBuf = xuid == null ? null : Bridge.ToUtf8(xuid);
+        byte* uuidBuffer = stackalloc byte[16];
+        var uuidPtr = UuidBytes(uuid, uuidBuffer);
+        fixed (byte* pn = nameBuf)
+        fixed (byte* px = xuidBuf)
+        {
+            var entry = T->PlayerBanListGetBanEntryByIdentity(_ptr, pn, uuidPtr, px);
             return entry == null ? null : new PlayerBanEntry(entry);
         }
     }
@@ -158,6 +189,43 @@ public sealed unsafe class PlayerBanList
     }
 
     /// <summary>
+    /// Adds (or updates) a ban with an optional UUID and XUID, using an
+    /// explicit expiration time. Mirrors PlayerBanList::addBan(name, uuid,
+    /// xuid, reason, expires, source).
+    /// </summary>
+    public PlayerBanEntry AddBan(string name, Guid? uuid, string? xuid, string? reason = null,
+                                 DateTimeOffset? expires = null, string? source = null)
+    {
+        var nameBuf = Bridge.ToUtf8(name);
+        var xuidBuf = xuid == null ? null : Bridge.ToUtf8(xuid);
+        var reasonBuf = reason == null ? null : Bridge.ToUtf8(reason);
+        var sourceBuf = source == null ? null : Bridge.ToUtf8(source);
+        byte* uuidBuffer = stackalloc byte[16];
+        var uuidPtr = UuidBytes(uuid, uuidBuffer);
+        fixed (byte* pn = nameBuf)
+        fixed (byte* px = xuidBuf)
+        fixed (byte* pr = reasonBuf)
+        fixed (byte* ps = sourceBuf)
+        {
+            var entry = T->PlayerBanListAddBanByIdentity(_ptr, pn, uuidPtr, px, pr,
+                expires.HasValue ? expires.Value.ToUnixTimeSeconds() : -1, ps);
+            return new PlayerBanEntry(entry);
+        }
+    }
+
+    /// <summary>
+    /// Adds (or updates) a ban with an optional UUID and XUID, using a
+    /// duration from now. Mirrors the corresponding PlayerBanList::addBan
+    /// duration overload.
+    /// </summary>
+    public PlayerBanEntry AddBan(string name, Guid? uuid, string? xuid, string? reason,
+                                 TimeSpan duration, string? source = null)
+    {
+        var expires = DateTimeOffset.UtcNow + duration;
+        return AddBan(name, uuid, xuid, reason, expires, source);
+    }
+
+    /// <summary>
     /// Gets all ban entries in this list.
     /// </summary>
     public IReadOnlyList<PlayerBanEntry> GetEntries()
@@ -187,6 +255,23 @@ public sealed unsafe class PlayerBanList
     }
 
     /// <summary>
+    /// Returns whether a player matching the name plus optional UUID/XUID is
+    /// banned. Mirrors PlayerBanList::isBanned(name, uuid, xuid).
+    /// </summary>
+    public bool IsBanned(string name, Guid? uuid, string? xuid = null)
+    {
+        var nameBuf = Bridge.ToUtf8(name);
+        var xuidBuf = xuid == null ? null : Bridge.ToUtf8(xuid);
+        byte* uuidBuffer = stackalloc byte[16];
+        var uuidPtr = UuidBytes(uuid, uuidBuffer);
+        fixed (byte* pn = nameBuf)
+        fixed (byte* px = xuidBuf)
+        {
+            return T->PlayerBanListIsBannedByIdentity(_ptr, pn, uuidPtr, px);
+        }
+    }
+
+    /// <summary>
     /// Removes the ban for the given player.
     /// </summary>
     public void RemoveBan(string name)
@@ -195,6 +280,23 @@ public sealed unsafe class PlayerBanList
         fixed (byte* p = buf)
         {
             T->PlayerBanListRemoveBan(_ptr, p);
+        }
+    }
+
+    /// <summary>
+    /// Removes the ban matching a name plus optional UUID/XUID. Mirrors
+    /// PlayerBanList::removeBan(name, uuid, xuid).
+    /// </summary>
+    public void RemoveBan(string name, Guid? uuid, string? xuid = null)
+    {
+        var nameBuf = Bridge.ToUtf8(name);
+        var xuidBuf = xuid == null ? null : Bridge.ToUtf8(xuid);
+        byte* uuidBuffer = stackalloc byte[16];
+        var uuidPtr = UuidBytes(uuid, uuidBuffer);
+        fixed (byte* pn = nameBuf)
+        fixed (byte* px = xuidBuf)
+        {
+            T->PlayerBanListRemoveBanByIdentity(_ptr, pn, uuidPtr, px);
         }
     }
 }

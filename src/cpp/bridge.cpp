@@ -2931,6 +2931,48 @@ endstone::UUID uuidFromBytes(const uint8_t *in)
     return u;
 }
 
+std::optional<endstone::UUID> optionalUuid(const uint8_t *in)
+{
+    if (!in) {
+        return std::nullopt;
+    }
+    return uuidFromBytes(in);
+}
+
+void *playerBanListGetBanEntryByIdentity(void *l, const char *name, const uint8_t *uuid, const char *xuid)
+{
+    auto entry = asPlayerBanList(l)->getBanEntry(
+        name ? name : "", optionalUuid(uuid),
+        xuid ? std::optional<std::string>(xuid) : std::nullopt);
+    return entry ? entry.get().get() : nullptr;
+}
+
+void *playerBanListAddBanByIdentity(void *l, const char *name, const uint8_t *uuid, const char *xuid,
+                                    const char *reason, int64_t expires, const char *source)
+{
+    auto entry = asPlayerBanList(l)->addBan(
+        name ? name : "", optionalUuid(uuid),
+        xuid ? std::optional<std::string>(xuid) : std::nullopt,
+        reason ? std::optional<std::string>(reason) : std::nullopt,
+        epochToOptional(expires),
+        source ? std::optional<std::string>(source) : std::nullopt);
+    return entry.get().get();
+}
+
+bool playerBanListIsBannedByIdentity(void *l, const char *name, const uint8_t *uuid, const char *xuid)
+{
+    return asPlayerBanList(l)->isBanned(
+        name ? name : "", optionalUuid(uuid),
+        xuid ? std::optional<std::string>(xuid) : std::nullopt);
+}
+
+void playerBanListRemoveBanByIdentity(void *l, const char *name, const uint8_t *uuid, const char *xuid)
+{
+    asPlayerBanList(l)->removeBan(
+        name ? name : "", optionalUuid(uuid),
+        xuid ? std::optional<std::string>(xuid) : std::nullopt);
+}
+
 bool playerBanEntryGetUuid(void *e, uint8_t *out16)
 {
     auto uuid = static_cast<endstone::PlayerBanEntry *>(e)->getUniqueId();
@@ -3581,6 +3623,10 @@ const BridgeTable &getBridgeTable()
         .player_ban_list_get_entries = &playerBanListGetEntries,
         .player_ban_list_is_banned = &playerBanListIsBanned,
         .player_ban_list_remove_ban = &playerBanListRemoveBan,
+        .player_ban_list_get_ban_entry_by_identity = &playerBanListGetBanEntryByIdentity,
+        .player_ban_list_add_ban_by_identity = &playerBanListAddBanByIdentity,
+        .player_ban_list_is_banned_by_identity = &playerBanListIsBannedByIdentity,
+        .player_ban_list_remove_ban_by_identity = &playerBanListRemoveBanByIdentity,
         .ip_ban_list_get_ban_entry = &ipBanListGetBanEntry,
         .ip_ban_list_add_ban = &ipBanListAddBan,
         .ip_ban_list_get_entries = &ipBanListGetEntries,

@@ -37,15 +37,51 @@ public enum MapCursorType
     TrialChambers = 24
 }
 
-/// <summary>RGBA color used for map canvas pixels.</summary>
+/// <summary>RGBA color used for map canvas pixels (mirrors endstone::Color).</summary>
 public readonly record struct MapColor(byte R, byte G, byte B, byte A = 255)
 {
+    public static MapColor White => new(255, 255, 255);
+    public static MapColor Black => new(0, 0, 0);
+
+    /// <summary>Integer representation as 0xRRGGBBAA (endstone::Color::asRGBA).</summary>
     public int AsRgba => (R << 24) | (G << 16) | (B << 8) | A;
+
+    /// <summary>Integer representation as 0xRRGGBB (endstone::Color::asRGB).</summary>
+    public int AsRgb => (R << 16) | (G << 8) | B;
+
+    /// <summary>Integer representation as 0xBBGGRR (endstone::Color::asBGR).</summary>
+    public int AsBgr => (B << 16) | (G << 8) | R;
+
+    /// <summary>Integer representation as 0xAABBGGRR (endstone::Color::asABGR).</summary>
+    public int AsAbgr => (A << 24) | (B << 16) | (G << 8) | R;
 
     public static MapColor FromRgba(int rgba) =>
         new((byte)(rgba >> 24), (byte)(rgba >> 16), (byte)(rgba >> 8), (byte)rgba);
 
+    public static MapColor FromRgba(byte r, byte g, byte b, byte a = 255) => new(r, g, b, a);
+
     public static MapColor FromRgb(byte r, byte g, byte b) => new(r, g, b);
+
+    /// <summary>Creates a color from 0xRRGGBB (endstone::Color::fromRGB(int)).</summary>
+    public static MapColor FromRgb(int rgb) =>
+        new((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);
+
+    /// <summary>Creates a color from blue, green and red components
+    /// (endstone::Color::fromBGR(blue, green, red)).</summary>
+    public static MapColor FromBgr(byte b, byte g, byte r) => new(r, g, b);
+
+    /// <summary>Creates a color from 0xBBGGRR (endstone::Color::fromBGR(int)).</summary>
+    public static MapColor FromBgr(int bgr) =>
+        FromBgr((byte)(bgr >> 16), (byte)(bgr >> 8), (byte)bgr);
+
+    /// <summary>Creates a color from 0xAABBGGRR (endstone::Color::fromABGR(int)).</summary>
+    public static MapColor FromAbgr(int abgr) =>
+        new((byte)abgr, (byte)(abgr >> 8), (byte)(abgr >> 16), (byte)(abgr >> 24));
+
+    public MapColor WithRed(byte red) => new(red, G, B, A);
+    public MapColor WithGreen(byte green) => new(R, green, B, A);
+    public MapColor WithBlue(byte blue) => new(R, G, blue, A);
+    public MapColor WithAlpha(byte alpha) => new(R, G, B, alpha);
 }
 
 /// <summary>A marker shown on a map.</summary>

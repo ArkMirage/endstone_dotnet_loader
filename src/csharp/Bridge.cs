@@ -669,6 +669,10 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void**, int, int> PlayerBanListGetEntries;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> PlayerBanListIsBanned;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerBanListRemoveBan;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, byte*, void*> PlayerBanListGetBanEntryByIdentity;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, byte*, byte*, long, byte*, void*> PlayerBanListAddBanByIdentity;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, byte*, bool> PlayerBanListIsBannedByIdentity;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, byte*, void> PlayerBanListRemoveBanByIdentity;
 
         // IpBanList operations
         public delegate* unmanaged[Cdecl]<void*, byte*, void*> IpBanListGetBanEntry;

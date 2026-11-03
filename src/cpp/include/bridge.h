@@ -811,6 +811,13 @@ struct BridgeTable {
     int (*player_ban_list_get_entries)(void *, void **, int);
     bool (*player_ban_list_is_banned)(void *, const char *);
     void (*player_ban_list_remove_ban)(void *, const char *);
+    // Identity-aware overloads: uuid16 is a 16-byte UUID or nullptr, xuid is a
+    // UTF-8 string or nullptr. The name is still required by the native API.
+    void *(*player_ban_list_get_ban_entry_by_identity)(void *, const char *, const uint8_t *, const char *);
+    void *(*player_ban_list_add_ban_by_identity)(void *, const char *, const uint8_t *, const char *,
+                                                 const char *, int64_t, const char *);
+    bool (*player_ban_list_is_banned_by_identity)(void *, const char *, const uint8_t *, const char *);
+    void (*player_ban_list_remove_ban_by_identity)(void *, const char *, const uint8_t *, const char *);
 
     // IpBanList operations
     void *(*ip_ban_list_get_ban_entry)(void *, const char *);
