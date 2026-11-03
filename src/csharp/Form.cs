@@ -29,8 +29,10 @@ internal interface IFormHandler
 
 /// <summary>Fluent base for the three form kinds. Send() hands ownership to the
 /// native side (the holder is freed after send) and auto-unregisters callbacks
-/// on submit/close. The builder must not be reused afterwards.</summary>
-public abstract unsafe class FormBase<T> : IFormHandler where T : FormBase<T>
+/// on submit/close. If the builder is abandoned without Send(), Dispose() or
+/// finalization frees the native holder. The builder must not be reused after
+/// Send() or Dispose().</summary>
+public abstract unsafe class FormBase<T> : IFormHandler, IDisposable where T : FormBase<T>
 {
     private void* _holder;
     private bool _sent;
@@ -43,11 +45,13 @@ public abstract unsafe class FormBase<T> : IFormHandler where T : FormBase<T>
         _id = FormRegistry.NextId();
     }
 
-    protected void* Holder => _holder;
+    protected void* Holder => _holder != null
+        ? _holder
+        : throw new ObjectDisposedException(GetType().Name);
 
     public T Title(string text)
     {
-        Bridge.Call1(Bridge.Raw->FormSetTitle, _holder, text);
+        Bridge.Call1(Bridge.Raw->FormSetTitle, Holder, text);
         return (T)this;
     }
 
@@ -64,12 +68,28 @@ public abstract unsafe class FormBase<T> : IFormHandler where T : FormBase<T>
         {
             return;
         }
-        Bridge.Raw->FormSetCallbacks(_holder, (ulong)_id);
+        var holder = Holder;
+        Bridge.Raw->FormSetCallbacks(holder, (ulong)_id);
         FormRegistry.Register(_id, this);
-        Bridge.Raw->FormSend((void*)player.NativePtr, _holder);
+        Bridge.Raw->FormSend((void*)player.NativePtr, holder);
         _sent = true;
         _holder = null;
+        GC.SuppressFinalize(this);
     }
+
+    /// <summary>Frees the native form holder if the form was never sent. Does
+    /// nothing after Send(), which transfers ownership to the native side.</summary>
+    public void Dispose()
+    {
+        if (_holder != null)
+        {
+            Bridge.Raw->FormDestroy(_holder);
+            _holder = null;
+        }
+        GC.SuppressFinalize(this);
+    }
+
+    ~FormBase() => Dispose();
 
     void IFormHandler.InvokeClose(Player player) => _onClose?.Invoke(player);
 

@@ -259,7 +259,6 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, bool> ActorIsInLava;
         public delegate* unmanaged[Cdecl]<void*, bool> ActorIsDead;
         public delegate* unmanaged[Cdecl]<void*, bool> ActorIsValid;
-        public delegate* unmanaged[Cdecl]<void*, byte*> ActorGetDimensionName;
         public delegate* unmanaged[Cdecl]<void*, byte*> ActorGetNameTag;
         public delegate* unmanaged[Cdecl]<void*, byte*> ActorGetScoreTag;
         public delegate* unmanaged[Cdecl]<void*, long> ActorGetId;

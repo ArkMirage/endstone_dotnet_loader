@@ -330,7 +330,6 @@ struct BridgeTable {
     bool (*actor_is_in_lava)(void *);
     bool (*actor_is_dead)(void *);
     bool (*actor_is_valid)(void *);
-    const char *(*actor_get_dimension_name)(void *);
     const char *(*actor_get_name_tag)(void *);
     const char *(*actor_get_score_tag)(void *);
     int64_t (*actor_get_id)(void *);

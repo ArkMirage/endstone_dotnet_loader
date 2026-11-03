@@ -1133,7 +1133,6 @@ bool actorIsInWater(void *a) { return static_cast<endstone::Actor *>(a)->isInWat
 bool actorIsInLava(void *a) { return static_cast<endstone::Actor *>(a)->isInLava(); }
 bool actorIsDead(void *a) { return static_cast<endstone::Actor *>(a)->isDead(); }
 bool actorIsValid(void *a) { return static_cast<endstone::Actor *>(a)->isValid(); }
-const char *actorGetDimensionName(void *a) { return strOut(static_cast<endstone::Actor *>(a)->getDimension().getName()); }
 const char *actorGetNameTag(void *a) { return strOut(static_cast<endstone::Actor *>(a)->getNameTag()); }
 const char *actorGetScoreTag(void *a) { return strOut(static_cast<endstone::Actor *>(a)->getScoreTag()); }
 int64_t actorGetId(void *a) { return static_cast<endstone::Actor *>(a)->getId(); }
@@ -3234,7 +3233,6 @@ const BridgeTable &getBridgeTable()
         .actor_is_in_lava = &actorIsInLava,
         .actor_is_dead = &actorIsDead,
         .actor_is_valid = &actorIsValid,
-        .actor_get_dimension_name = &actorGetDimensionName,
         .actor_get_name_tag = &actorGetNameTag,
         .actor_get_score_tag = &actorGetScoreTag,
         .actor_get_id = &actorGetId,
