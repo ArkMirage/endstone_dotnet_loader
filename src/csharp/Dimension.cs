@@ -84,12 +84,13 @@ public sealed unsafe class Dimension
         }
     }
 
-    /// <summary>Drops the item stack at the location. The returned wrapper reads the
-    /// resulting item entity (call RemoveFromWorld after pickup-related cleanup no longer needed).</summary>
-    public ItemStack DropItem(Location location, ItemStack item)
+    /// <summary>Drops the item stack at the location and returns the resulting
+    /// Item actor, mirroring Dimension::dropItem. The server owns the actor;
+    /// use Item.Remove() when it should be deleted.</summary>
+    public Item DropItem(Location location, ItemStack item)
     {
         var values = stackalloc float[5] { location.X, location.Y, location.Z, location.Pitch, location.Yaw };
         var i = T->DimensionDropItem(_ptr, values, (void*)item.NativePtr);
-        return i == null ? throw new InvalidOperationException("Failed to drop item") : new ItemStack((IntPtr)i, isItemActor: true);
+        return i == null ? throw new InvalidOperationException("Failed to drop item") : new Item((IntPtr)i);
     }
 }

@@ -15,19 +15,18 @@ public enum ItemMetaType
     WritableBook = 4,
 }
 
-/// <summary>Wraps a native endstone::ItemStack read-only view. When created via
-/// ItemStack.Create, Dispose() frees the native stack. When wrapping a dropped
-/// item entity (isItemActor), RemoveFromWorld() removes it from the level.</summary>
+/// <summary>Wraps a native endstone::ItemStack. When created via
+/// ItemStack.Create or ItemType.CreateItemStack, Dispose() frees the native
+/// stack. Wrappers returned by getters are transient read-only views and must
+/// not outlive the next item call on the same thread.</summary>
 public sealed unsafe class ItemStack : IDisposable
 {
     private void* _ptr;
-    private readonly bool _isItemActor;
     private readonly bool _ownsNative;
 
-    internal ItemStack(IntPtr ptr, bool isItemActor = false, bool ownsNative = false)
+    internal ItemStack(IntPtr ptr, bool ownsNative = false)
     {
         _ptr = (void*)ptr;
-        _isItemActor = isItemActor;
         _ownsNative = ownsNative;
     }
 
@@ -46,15 +45,6 @@ public sealed unsafe class ItemStack : IDisposable
         }
     }
 
-    /// <summary>Removes the dropped item entity from the world (only valid for DropItem results).</summary>
-    public void RemoveFromWorld()
-    {
-        if (_isItemActor && _ptr != null)
-        {
-            T->ActorRemove(_ptr);
-        }
-    }
-
     public void Dispose()
     {
         if (_ownsNative && _ptr != null)
@@ -64,32 +54,26 @@ public sealed unsafe class ItemStack : IDisposable
         }
     }
 
-    public string Type => Bridge.Str(_isItemActor ? T->ItemActorGetType(_ptr) : T->ItemGetType(_ptr));
-    public int Amount => _isItemActor ? T->ItemActorGetAmount(_ptr) : T->ItemGetAmount(_ptr);
-    public int Data => _isItemActor ? 0 : T->ItemGetData(_ptr);
-    public int MaxStackSize => _isItemActor ? 0 : T->ItemGetMaxStackSize(_ptr);
-    public string TranslationKey => Bridge.Str(_isItemActor ? T->ItemActorGetTranslationKey(_ptr) : T->ItemGetTranslationKey(_ptr));
+    public string Type => Bridge.Str(T->ItemGetType(_ptr));
+    public int Amount => T->ItemGetAmount(_ptr);
+    public int Data => T->ItemGetData(_ptr);
+    public int MaxStackSize => T->ItemGetMaxStackSize(_ptr);
+    public string TranslationKey => Bridge.Str(T->ItemGetTranslationKey(_ptr));
 
-    /// <summary>ItemMeta: display name, or empty when unset (not available on item actors).
+    /// <summary>ItemMeta: display name, or empty when unset.
     /// Setting null or an empty string clears it. The native side reports whether
     /// the change was applied; a property setter cannot surface that.</summary>
-    public bool HasDisplayName => !_isItemActor && T->ItemHasDisplayName(_ptr);
+    public bool HasDisplayName => T->ItemHasDisplayName(_ptr);
     [AllowNull]
     public string DisplayName
     {
-        get => _isItemActor ? "" : Bridge.Str(T->ItemGetDisplayName(_ptr));
-        set
-        {
-            if (!_isItemActor)
-            {
-                Bridge.CallBoolStrOrNull(T->ItemSetDisplayName, _ptr, value);
-            }
-        }
+        get => Bridge.Str(T->ItemGetDisplayName(_ptr));
+        set => Bridge.CallBoolStrOrNull(T->ItemSetDisplayName, _ptr, value);
     }
 
-    public bool HasLore => !_isItemActor && T->ItemHasLore(_ptr);
-    public int LoreCount => _isItemActor ? 0 : T->ItemGetLoreCount(_ptr);
-    public string GetLoreLine(int index) => _isItemActor ? "" : Bridge.Str(T->ItemGetLoreLine(_ptr, index));
+    public bool HasLore => T->ItemHasLore(_ptr);
+    public int LoreCount => T->ItemGetLoreCount(_ptr);
+    public string GetLoreLine(int index) => Bridge.Str(T->ItemGetLoreLine(_ptr, index));
 
     /// <summary>All lore lines as a snapshot (empty when no lore is set). Setting
     /// null or an empty list clears the lore.</summary>
@@ -105,54 +89,30 @@ public sealed unsafe class ItemStack : IDisposable
             }
             return lines;
         }
-        set
-        {
-            if (!_isItemActor)
-            {
-                Bridge.CallItemSetLore(T->ItemSetLore, _ptr, value);
-            }
-        }
+        set => Bridge.CallItemSetLore(T->ItemSetLore, _ptr, value);
     }
 
-    public bool HasDamage => !_isItemActor && T->ItemHasDamage(_ptr);
+    public bool HasDamage => T->ItemHasDamage(_ptr);
     public int Damage
     {
-        get => _isItemActor ? 0 : T->ItemGetDamage(_ptr);
-        set
-        {
-            if (!_isItemActor)
-            {
-                T->ItemSetDamage(_ptr, value);
-            }
-        }
+        get => T->ItemGetDamage(_ptr);
+        set => T->ItemSetDamage(_ptr, value);
     }
 
     public bool IsUnbreakable
     {
-        get => !_isItemActor && T->ItemIsUnbreakable(_ptr);
-        set
-        {
-            if (!_isItemActor)
-            {
-                T->ItemSetUnbreakable(_ptr, value);
-            }
-        }
+        get => T->ItemIsUnbreakable(_ptr);
+        set => T->ItemSetUnbreakable(_ptr, value);
     }
 
     /// <summary>Whether the item carries a repair penalty.</summary>
-    public bool HasRepairCost => !_isItemActor && T->ItemHasRepairCost(_ptr);
+    public bool HasRepairCost => T->ItemHasRepairCost(_ptr);
 
     /// <summary>The repair penalty, or 0 when unset.</summary>
     public int RepairCost
     {
-        get => _isItemActor ? 0 : T->ItemGetRepairCost(_ptr);
-        set
-        {
-            if (!_isItemActor)
-            {
-                T->ItemSetRepairCost(_ptr, value);
-            }
-        }
+        get => T->ItemGetRepairCost(_ptr);
+        set => T->ItemSetRepairCost(_ptr, value);
     }
 
     /// <summary>Kind of metadata the item carries, or null when it carries none.</summary>
@@ -160,47 +120,37 @@ public sealed unsafe class ItemStack : IDisposable
     {
         get
         {
-            if (_isItemActor)
-            {
-                return null;
-            }
             var type = T->ItemGetMetaType(_ptr);
             return type < 0 ? null : (ItemMetaType)type;
         }
     }
 
-    public bool HasEnchants => !_isItemActor && T->ItemHasEnchants(_ptr);
-    public int EnchantCount => _isItemActor ? 0 : T->ItemGetEnchantCount(_ptr);
-    public string GetEnchantName(int index) => _isItemActor ? "" : Bridge.Str(T->ItemGetEnchantName(_ptr, index));
-    public int GetEnchantLevel(int index) => _isItemActor ? 0 : T->ItemGetEnchantLevel(_ptr, index);
+    public bool HasEnchants => T->ItemHasEnchants(_ptr);
+    public int EnchantCount => T->ItemGetEnchantCount(_ptr);
+    public string GetEnchantName(int index) => Bridge.Str(T->ItemGetEnchantName(_ptr, index));
+    public int GetEnchantLevel(int index) => T->ItemGetEnchantLevel(_ptr, index);
 
     /// <summary>Whether the item carries the given enchantment (id like "minecraft:sharpness").</summary>
-    public bool HasEnchant(string id) => !_isItemActor && Bridge.CallBoolStr(T->ItemHasEnchant, _ptr, id);
+    public bool HasEnchant(string id) => Bridge.CallBoolStr(T->ItemHasEnchant, _ptr, id);
 
     /// <summary>Gets the level of the given enchantment, or 0 when absent.</summary>
-    public int GetEnchantLevel(string id) => _isItemActor ? 0 : Bridge.CallIntStr(T->ItemGetEnchantLevelById, _ptr, id);
+    public int GetEnchantLevel(string id) => Bridge.CallIntStr(T->ItemGetEnchantLevelById, _ptr, id);
 
     /// <summary>Adds the enchantment at the given level. When force is false the
     /// level must be within the enchantment's start..max range. Conflicts with
     /// existing enchantments are not checked; use HasConflictingEnchant first.</summary>
     public bool AddEnchant(string id, int level, bool force = false)
-        => !_isItemActor && Bridge.CallBoolStrInt(T->ItemAddEnchant, _ptr, id, level, force);
+        => Bridge.CallBoolStrInt(T->ItemAddEnchant, _ptr, id, level, force);
 
     /// <summary>Removes the enchantment if present. Returns true if it was removed.</summary>
-    public bool RemoveEnchant(string id) => !_isItemActor && Bridge.CallBoolStr(T->ItemRemoveEnchant, _ptr, id);
+    public bool RemoveEnchant(string id) => Bridge.CallBoolStr(T->ItemRemoveEnchant, _ptr, id);
 
     /// <summary>Removes all enchantments from the item.</summary>
-    public void RemoveEnchants()
-    {
-        if (!_isItemActor)
-        {
-            Bridge.CallVoidStr(T->ItemRemoveEnchants, _ptr, "");
-        }
-    }
+    public void RemoveEnchants() => Bridge.CallVoidStr(T->ItemRemoveEnchants, _ptr, "");
 
     /// <summary>Whether any enchantment on the item conflicts with the given one.</summary>
     public bool HasConflictingEnchant(string id)
-        => !_isItemActor && Bridge.CallBoolStr(T->ItemHasConflictingEnchant, _ptr, id);
+        => Bridge.CallBoolStr(T->ItemHasConflictingEnchant, _ptr, id);
 
     /// <summary>All enchantments applied to the item, as (enchantment, level) pairs.</summary>
     public IReadOnlyList<ItemEnchantment> Enchantments
@@ -221,34 +171,26 @@ public sealed unsafe class ItemStack : IDisposable
     }
 
     /// <summary>Map meta: whether this item is a map bound to a server map view.</summary>
-    public bool HasMapView => !_isItemActor && T->ItemHasMapView(_ptr);
+    public bool HasMapView => T->ItemHasMapView(_ptr);
 
     /// <summary>Gets the map view bound to this map item, or null.</summary>
     public MapView? MapView
     {
         get
         {
-            if (_isItemActor)
-            {
-                return null;
-            }
             var m = T->ItemGetMapView(_ptr);
             return m == null ? null : new MapView((IntPtr)m);
         }
     }
 
     /// <summary>Binds this map item to the given map view (only works on map item stacks).</summary>
-    public bool SetMapView(MapView map) => !_isItemActor && T->ItemSetMapView(_ptr, (void*)map.NativePtr);
+    public bool SetMapView(MapView map) => T->ItemSetMapView(_ptr, (void*)map.NativePtr);
 
-    /// <summary>Gets the item's NBT compound tag, or null when the item has no NBT
-    /// (not available on item actors). The native side hands back already-serialized
-    /// CBOR; we decode it into the managed NbtTag placeholder.</summary>
+    /// <summary>Gets the item's NBT compound tag, or null when the item has no NBT.
+    /// The native side hands back already-serialized CBOR; we decode it into the
+    /// managed NbtTag placeholder.</summary>
     public NbtTag? GetNbt()
     {
-        if (_isItemActor)
-        {
-            return null;
-        }
         int len = 0;
         var data = T->ItemGetNbt(_ptr, &len);
         if (len <= 0 || data == null)
@@ -261,13 +203,9 @@ public sealed unsafe class ItemStack : IDisposable
         return NbtCbor.Read(bytes);
     }
 
-    /// <summary>Sets the item's NBT compound tag (not available on item actors).</summary>
+    /// <summary>Sets the item's NBT compound tag.</summary>
     public void SetNbt(NbtTag root)
     {
-        if (_isItemActor)
-        {
-            return;
-        }
         var bytes = NbtCbor.Write(root);
         fixed (byte* p = bytes)
         {

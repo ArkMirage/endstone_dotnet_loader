@@ -89,7 +89,7 @@ struct BridgeTable {
     void (*player_set_op)(void *, bool);
     const char *(*player_get_xuid)(void *);
     void (*player_get_unique_id)(void *, uint8_t *);
-    const char *(*player_get_address)(void *);
+    const char *(*player_get_address)(void *, uint32_t *);
     bool (*player_is_sneaking)(void *);
     void (*player_set_sneaking)(void *, bool);
     bool (*player_is_sprinting)(void *);
@@ -304,13 +304,13 @@ struct BridgeTable {
     const char *(*packet_get_payload)(void *, int, int *);
     void (*packet_set_payload)(void *, int, const void *, int);
     void *(*packet_get_player)(void *, int);
-    const char *(*packet_get_address)(void *, int);
+    const char *(*packet_get_address)(void *, int, uint32_t *);
     int (*packet_get_sub_client_id)(void *, int);
     void *(*plugin_event_get_plugin)(void *, int);
     const char *(*script_get_message_id)(void *);
     const char *(*script_get_message)(void *);
     const char *(*script_get_sender_name)(void *);
-    const char *(*ping_get_address)(void *);
+    const char *(*ping_get_address)(void *, uint32_t *);
     const char *(*ping_get_server_guid)(void *);
     void (*ping_set_server_guid)(void *, const char *);
     int (*ping_get_local_port)(void *);
@@ -367,6 +367,7 @@ struct BridgeTable {
     void (*mob_set_max_health)(void *, int);
     bool (*mob_is_gliding)(void *);
     void *(*actor_as_mob)(void *);
+    void *(*actor_as_item)(void *);
     void *(*actor_get_dimension)(void *);
     const char *(*dimension_get_name)(void *);
     void *(*dimension_get_block_at)(void *, int, int, int);
@@ -378,9 +379,25 @@ struct BridgeTable {
     int (*item_get_data)(void *);
     int (*item_get_max_stack_size)(void *);
     const char *(*item_get_translation_key)(void *);
-    const char *(*item_actor_get_type)(void *);
-    int (*item_actor_get_amount)(void *);
-    const char *(*item_actor_get_translation_key)(void *);
+    // Item actor (dropped item entity) API.
+    void *(*item_actor_get_item_stack)(void *);
+    void (*item_actor_set_item_stack)(void *, void *);
+    int (*item_actor_get_pickup_delay)(void *);
+    void (*item_actor_set_pickup_delay)(void *, int);
+    void (*item_actor_set_unlimited_lifetime)(void *, bool);
+    bool (*item_actor_is_unlimited_lifetime)(void *);
+    bool (*item_actor_get_thrower)(void *, int64_t *);
+    void (*item_actor_set_thrower)(void *, bool, int64_t);
+
+    // ---- item type ----
+    void *(*item_type_get)(const char *);
+    const char *(*item_type_get_id)(void *);
+    const char *(*item_type_get_translation_key)(void *);
+    const char *(*item_type_get_translation_key_data)(void *, int);
+    int (*item_type_get_max_stack_size)(void *);
+    int (*item_type_get_max_durability)(void *);
+    void *(*item_type_create_item_stack)(void *, int);
+
     // Item NBT is transferred as already-serialized CBOR (see nbt.cpp); raw
     // Endstone NBT pointers are never exposed across the bridge.
     // item_get_nbt heap-allocates the CBOR bytes; the managed side copies them

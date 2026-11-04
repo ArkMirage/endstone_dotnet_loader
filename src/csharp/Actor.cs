@@ -90,6 +90,13 @@ public unsafe class Actor : CommandSender
         return m == null ? null : new Mob((IntPtr)m);
     }
 
+    /// <summary>Downcasts this actor to Item, or null if it is not a dropped item.</summary>
+    public Item? AsItem()
+    {
+        var i = T->ActorAsItem(_ptr);
+        return i == null ? null : new Item((IntPtr)i);
+    }
+
     /// <summary>Spawns an actor of the given type (e.g. "minecraft:zombie") at a
     /// location in this actor's dimension. Returns null if spawning failed.</summary>
     public Actor? SpawnActor(string type, Location? location = null)

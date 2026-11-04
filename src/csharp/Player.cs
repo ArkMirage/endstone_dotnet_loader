@@ -1,3 +1,4 @@
+using System.Net;
 using System.Runtime.InteropServices;
 
 namespace Endstone.Loader;
@@ -30,7 +31,8 @@ public sealed unsafe class Player : Mob
         }
     }
 
-    public string Address => Bridge.Str(T->PlayerGetAddress(_ptr));
+    /// <summary>The player's IP socket address, mirroring Player::getAddress.</summary>
+    public DnsEndPoint Address => Bridge.ReadEndPoint(T->PlayerGetAddress, _ptr);
     public string Locale => Bridge.Str(T->PlayerGetLocale(_ptr));
     public string DeviceOS => Bridge.Str(T->PlayerGetDeviceOS(_ptr));
     public string DeviceId => Bridge.Str(T->PlayerGetDeviceId(_ptr));

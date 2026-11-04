@@ -1,3 +1,4 @@
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -26,7 +27,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, bool, void> PlayerSetOp;
         public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetXuid;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerGetUniqueId;
-        public delegate* unmanaged[Cdecl]<void*, byte*> PlayerGetAddress;
+        public delegate* unmanaged[Cdecl]<void*, uint*, byte*> PlayerGetAddress;
         public delegate* unmanaged[Cdecl]<void*, bool> PlayerIsSneaking;
         public delegate* unmanaged[Cdecl]<void*, bool, void> PlayerSetSneaking;
         public delegate* unmanaged[Cdecl]<void*, bool> PlayerIsSprinting;
@@ -233,13 +234,13 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, void*, int, void> PacketSetPayload;
 
         public delegate* unmanaged[Cdecl]<void*, int, void*> PacketGetPlayer;
-        public delegate* unmanaged[Cdecl]<void*, int, byte*> PacketGetAddress;
+        public delegate* unmanaged[Cdecl]<void*, int, uint*, byte*> PacketGetAddress;
         public delegate* unmanaged[Cdecl]<void*, int, int> PacketGetSubClientId;
         public delegate* unmanaged[Cdecl]<void*, int, void*> PluginEventGetPlugin;
         public delegate* unmanaged[Cdecl]<void*, byte*> ScriptGetMessageId;
         public delegate* unmanaged[Cdecl]<void*, byte*> ScriptGetMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*> ScriptGetSenderName;
-        public delegate* unmanaged[Cdecl]<void*, byte*> PingGetAddress;
+        public delegate* unmanaged[Cdecl]<void*, uint*, byte*> PingGetAddress;
         public delegate* unmanaged[Cdecl]<void*, byte*> PingGetServerGuid;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PingSetServerGuid;
         public delegate* unmanaged[Cdecl]<void*, int> PingGetLocalPort;
@@ -296,6 +297,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, void> MobSetMaxHealth;
         public delegate* unmanaged[Cdecl]<void*, bool> MobIsGliding;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorAsMob;
+        public delegate* unmanaged[Cdecl]<void*, void*> ActorAsItem;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorGetDimension;
         public delegate* unmanaged[Cdecl]<void*, byte*> DimensionGetName;
         public delegate* unmanaged[Cdecl]<void*, int, int, int, void*> DimensionGetBlockAt;
@@ -307,9 +309,24 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int> ItemGetData;
         public delegate* unmanaged[Cdecl]<void*, int> ItemGetMaxStackSize;
         public delegate* unmanaged[Cdecl]<void*, byte*> ItemGetTranslationKey;
-        public delegate* unmanaged[Cdecl]<void*, byte*> ItemActorGetType;
-        public delegate* unmanaged[Cdecl]<void*, int> ItemActorGetAmount;
-        public delegate* unmanaged[Cdecl]<void*, byte*> ItemActorGetTranslationKey;
+        public delegate* unmanaged[Cdecl]<void*, void*> ItemActorGetItemStack;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> ItemActorSetItemStack;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemActorGetPickupDelay;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ItemActorSetPickupDelay;
+        public delegate* unmanaged[Cdecl]<void*, bool, void> ItemActorSetUnlimitedLifetime;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemActorIsUnlimitedLifetime;
+        public delegate* unmanaged[Cdecl]<void*, long*, bool> ItemActorGetThrower;
+        public delegate* unmanaged[Cdecl]<void*, bool, long, void> ItemActorSetThrower;
+
+        // ---- item type ----
+        public delegate* unmanaged[Cdecl]<byte*, void*> ItemTypeGet;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ItemTypeGetId;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ItemTypeGetTranslationKey;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*> ItemTypeGetTranslationKeyData;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemTypeGetMaxStackSize;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemTypeGetMaxDurability;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> ItemTypeCreateItemStack;
+
         public delegate* unmanaged[Cdecl]<void*, int*, byte*> ItemGetNbt;
         public delegate* unmanaged[Cdecl]<void*, byte*, int, void> ItemSetNbt;
         public delegate* unmanaged[Cdecl]<void*, void> NbtFreeBuffer;
@@ -873,6 +890,24 @@ internal static unsafe class Bridge
     internal static void CallKind3(delegate* unmanaged[Cdecl]<void*, int, void*, int, void> fn, void* obj,
                                    EventKind kind, void* data, int len)
         => fn(obj, (int)kind, data, len);
+
+    // SocketAddress is exposed as System.Net.DnsEndPoint: it is the standard
+    // .NET type for a hostname plus port and preserves the native hostname
+    // string without assuming it is an IP literal.
+    internal static DnsEndPoint ReadEndPoint(delegate* unmanaged[Cdecl]<void*, uint*, byte*> fn, void* obj)
+    {
+        uint port;
+        var host = Str(fn(obj, &port));
+        return new DnsEndPoint(host, (int)port);
+    }
+
+    internal static DnsEndPoint ReadEndPoint(delegate* unmanaged[Cdecl]<void*, int, uint*, byte*> fn, void* obj,
+                                             EventKind kind)
+    {
+        uint port;
+        var host = Str(fn(obj, (int)kind, &port));
+        return new DnsEndPoint(host, (int)port);
+    }
 
     internal static void CallHostPort(delegate* unmanaged[Cdecl]<void*, byte*, int, void> fn, void* obj, string host,
                                       int port)

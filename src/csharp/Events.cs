@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Net;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -465,7 +466,10 @@ public sealed unsafe class PlayerPickupItemEvent : Event
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerPickupItemEvent(IntPtr ptr) : base(ptr) { }
 
-    public ItemStack Item => new((IntPtr)T->PickupGetItem(NativePtr), isItemActor: true);
+    /// <summary>The dropped item actor being picked up, mirroring
+    /// PlayerPickupItemEvent::getItem. The server owns it; do not remove it
+    /// from within this event.</summary>
+    public Item Item => new((IntPtr)T->PickupGetItem(NativePtr));
 }
 
 public sealed unsafe class PlayerJumpEvent : Event
@@ -778,7 +782,9 @@ public sealed unsafe class ServerListPingEvent : Event
     private static Bridge.Table* T => Bridge.Raw;
     internal ServerListPingEvent(IntPtr ptr) : base(ptr) { }
 
-    public string Address => Bridge.Str(T->PingGetAddress(NativePtr));
+    /// <summary>The client's socket address, mirroring
+    /// ServerListPingEvent::getAddress.</summary>
+    public DnsEndPoint Address => Bridge.ReadEndPoint(T->PingGetAddress, NativePtr);
     public string ServerGuid => Bridge.Str(T->PingGetServerGuid(NativePtr));
     public int LocalPort => T->PingGetLocalPort(NativePtr);
     public int LocalPortV6 => T->PingGetLocalPortV6(NativePtr);
@@ -839,7 +845,10 @@ public sealed unsafe class PacketReceiveEvent : Event
         }
     }
 
-    public string Address => Bridge.Str(Bridge.CallKindStr(T->PacketGetAddress, NativePtr, EventKind.PacketReceiveEvent));
+    /// <summary>The destination client's socket address, mirroring
+    /// PacketReceiveEvent::getAddress.</summary>
+    public DnsEndPoint Address =>
+        Bridge.ReadEndPoint(T->PacketGetAddress, NativePtr, EventKind.PacketReceiveEvent);
     public int SubClientId => Bridge.CallKindInt(T->PacketGetSubClientId, NativePtr, EventKind.PacketReceiveEvent);
 }
 
@@ -881,7 +890,10 @@ public sealed unsafe class PacketSendEvent : Event
         }
     }
 
-    public string Address => Bridge.Str(Bridge.CallKindStr(T->PacketGetAddress, NativePtr, EventKind.PacketSendEvent));
+    /// <summary>The destination client's socket address, mirroring
+    /// PacketSendEvent::getAddress.</summary>
+    public DnsEndPoint Address =>
+        Bridge.ReadEndPoint(T->PacketGetAddress, NativePtr, EventKind.PacketSendEvent);
     public int SubClientId => Bridge.CallKindInt(T->PacketGetSubClientId, NativePtr, EventKind.PacketSendEvent);
 }
 

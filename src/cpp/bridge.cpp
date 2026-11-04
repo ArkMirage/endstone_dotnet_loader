@@ -74,6 +74,7 @@ endstone::PermissionAttachmentInfo *asAttachmentInfo(void *i)
     return static_cast<endstone::PermissionAttachmentInfo *>(i);
 }
 endstone::ItemStack *asItem(void *i) { return static_cast<endstone::ItemStack *>(i); }
+endstone::Item *asItemActor(void *i) { return static_cast<endstone::Item *>(i); }
 std::unique_ptr<endstone::ItemMeta> itemMeta(void *i) { return asItem(i)->getItemMeta(); }
 endstone::Block *asBlock(void *b) { return static_cast<endstone::Block *>(b); }
 
@@ -109,10 +110,13 @@ bool playerIsOp(void *p) { return asPlayer(p)->isOp(); }
 void playerSetOp(void *p, bool v) { asPlayer(p)->setOp(v); }
 const char *playerGetXuid(void *p) { return strOut(asPlayer(p)->getXuid()); }
 void playerGetUniqueId(void *p, uint8_t *out16) { uuidToBytes(asPlayer(p)->getUniqueId(), out16); }
-const char *playerGetAddress(void *p)
+const char *playerGetAddress(void *p, uint32_t *out_port)
 {
     const auto addr = asPlayer(p)->getAddress();
-    return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
+    if (out_port) {
+        *out_port = addr.getPort();
+    }
+    return strOut(addr.getHostname());
 }
 bool playerIsSneaking(void *p) { return asPlayer(p)->isSneaking(); }
 void playerSetSneaking(void *p, bool v) { asPlayer(p)->setSneaking(v); }
@@ -1041,16 +1045,22 @@ void *packetGetPlayer(void *e, int kind)
         return nullptr;
     }
 }
-const char *packetGetAddress(void *e, int kind)
+const char *packetGetAddress(void *e, int kind, uint32_t *out_port)
 {
     switch (static_cast<EventKind>(kind)) {
     case EventKind::PacketReceiveEvent: {
         const auto addr = static_cast<endstone::PacketReceiveEvent *>(e)->getAddress();
-        return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
+        if (out_port) {
+            *out_port = addr.getPort();
+        }
+        return strOut(addr.getHostname());
     }
     case EventKind::PacketSendEvent: {
         const auto addr = static_cast<endstone::PacketSendEvent *>(e)->getAddress();
-        return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
+        if (out_port) {
+            *out_port = addr.getPort();
+        }
+        return strOut(addr.getHostname());
     }
     default:
         return nullptr;
@@ -1090,10 +1100,13 @@ const char *scriptGetSenderName(void *e)
 {
     return strOut(static_cast<endstone::ScriptMessageEvent *>(e)->getSender().getName());
 }
-const char *pingGetAddress(void *e)
+const char *pingGetAddress(void *e, uint32_t *out_port)
 {
     const auto addr = static_cast<endstone::ServerListPingEvent *>(e)->getAddress();
-    return strOut(std::format("{}:{}", addr.getHostname(), addr.getPort()));
+    if (out_port) {
+        *out_port = addr.getPort();
+    }
+    return strOut(addr.getHostname());
 }
 const char *pingGetServerGuid(void *e)
 {
@@ -1207,6 +1220,7 @@ int mobGetMaxHealth(void *m) { return static_cast<endstone::Mob *>(m)->getMaxHea
 void mobSetMaxHealth(void *m, int v) { static_cast<endstone::Mob *>(m)->setMaxHealth(v); }
 bool mobIsGliding(void *m) { return static_cast<endstone::Mob *>(m)->isGliding(); }
 void *actorAsMob(void *a) { return static_cast<endstone::Actor *>(a)->asMob(); }
+void *actorAsItem(void *a) { return static_cast<endstone::Actor *>(a)->asItem(); }
 void *actorGetDimension(void *a) { return &static_cast<endstone::Actor *>(a)->getDimension(); }
 const char *dimensionGetName(void *d) { return strOut(static_cast<endstone::Dimension *>(d)->getName()); }
 void *dimensionGetBlockAt(void *d, int x, int y, int z)
@@ -1773,15 +1787,62 @@ int itemGetAmount(void *i) { return asItem(i)->getAmount(); }
 int itemGetData(void *i) { return asItem(i)->getData(); }
 int itemGetMaxStackSize(void *i) { return asItem(i)->getMaxStackSize(); }
 const char *itemGetTranslationKey(void *i) { return strOut(asItem(i)->getTranslationKey()); }
-const char *itemActorGetType(void *i)
+void *itemActorGetItemStack(void *i)
 {
-    const auto &type = static_cast<endstone::Item *>(i)->getItemStack().getType();
-    return strOut(static_cast<std::string>(type.getId()));
+    return itemSnapshot(std::optional<endstone::ItemStack>(asItemActor(i)->getItemStack()));
 }
-int itemActorGetAmount(void *i) { return static_cast<endstone::Item *>(i)->getItemStack().getAmount(); }
-const char *itemActorGetTranslationKey(void *i)
+
+void itemActorSetItemStack(void *i, void *stack)
 {
-    return strOut(static_cast<endstone::Item *>(i)->getItemStack().getTranslationKey());
+    if (stack) {
+        asItemActor(i)->setItemStack(*asItem(stack));
+    }
+}
+
+int itemActorGetPickupDelay(void *i) { return asItemActor(i)->getPickupDelay(); }
+void itemActorSetPickupDelay(void *i, int delay) { asItemActor(i)->setPickupDelay(delay); }
+void itemActorSetUnlimitedLifetime(void *i, bool unlimited) { asItemActor(i)->setUnlimitedLifetime(unlimited); }
+bool itemActorIsUnlimitedLifetime(void *i) { return asItemActor(i)->isUnlimitedLifetime(); }
+
+bool itemActorGetThrower(void *i, int64_t *out)
+{
+    const auto thrower = asItemActor(i)->getThrower();
+    if (!thrower.has_value()) {
+        return false;
+    }
+    if (out) {
+        *out = *thrower;
+    }
+    return true;
+}
+
+void itemActorSetThrower(void *i, bool has_value, int64_t value)
+{
+    asItemActor(i)->setThrower(has_value ? std::optional<int64_t>(value) : std::nullopt);
+}
+
+// ---- item type ----
+
+const endstone::ItemType *asItemType(void *t) { return static_cast<const endstone::ItemType *>(t); }
+
+void *itemTypeGet(const char *id)
+{
+    if (!id) {
+        return nullptr;
+    }
+    return const_cast<endstone::ItemType *>(
+        endstone::ItemType::get(endstone::ItemTypeId{std::string(id)}));
+}
+
+const char *itemTypeGetId(void *t) { return strOut(static_cast<std::string>(asItemType(t)->getId())); }
+const char *itemTypeGetTranslationKey(void *t) { return strOut(asItemType(t)->getTranslationKey()); }
+const char *itemTypeGetTranslationKeyData(void *t, int data) { return strOut(asItemType(t)->getTranslationKey(data)); }
+int itemTypeGetMaxStackSize(void *t) { return asItemType(t)->getMaxStackSize(); }
+int itemTypeGetMaxDurability(void *t) { return asItemType(t)->getMaxDurability(); }
+
+void *itemTypeCreateItemStack(void *t, int amount)
+{
+    return new endstone::ItemStack(asItemType(t)->createItemStack(amount));
 }
 
 std::unique_ptr<endstone::ItemMeta> itemMeta(void *i);
@@ -3335,6 +3396,7 @@ const BridgeTable &getBridgeTable()
         .mob_set_max_health = &mobSetMaxHealth,
         .mob_is_gliding = &mobIsGliding,
         .actor_as_mob = &actorAsMob,
+        .actor_as_item = &actorAsItem,
         .actor_get_dimension = &actorGetDimension,
         .dimension_get_name = &dimensionGetName,
         .dimension_get_block_at = &dimensionGetBlockAt,
@@ -3344,9 +3406,21 @@ const BridgeTable &getBridgeTable()
         .item_get_data = &itemGetData,
         .item_get_max_stack_size = &itemGetMaxStackSize,
         .item_get_translation_key = &itemGetTranslationKey,
-        .item_actor_get_type = &itemActorGetType,
-        .item_actor_get_amount = &itemActorGetAmount,
-        .item_actor_get_translation_key = &itemActorGetTranslationKey,
+        .item_actor_get_item_stack = &itemActorGetItemStack,
+        .item_actor_set_item_stack = &itemActorSetItemStack,
+        .item_actor_get_pickup_delay = &itemActorGetPickupDelay,
+        .item_actor_set_pickup_delay = &itemActorSetPickupDelay,
+        .item_actor_set_unlimited_lifetime = &itemActorSetUnlimitedLifetime,
+        .item_actor_is_unlimited_lifetime = &itemActorIsUnlimitedLifetime,
+        .item_actor_get_thrower = &itemActorGetThrower,
+        .item_actor_set_thrower = &itemActorSetThrower,
+        .item_type_get = &itemTypeGet,
+        .item_type_get_id = &itemTypeGetId,
+        .item_type_get_translation_key = &itemTypeGetTranslationKey,
+        .item_type_get_translation_key_data = &itemTypeGetTranslationKeyData,
+        .item_type_get_max_stack_size = &itemTypeGetMaxStackSize,
+        .item_type_get_max_durability = &itemTypeGetMaxDurability,
+        .item_type_create_item_stack = &itemTypeCreateItemStack,
         .item_get_nbt = &itemGetNbt,
         .item_set_nbt = &itemSetNbt,
         .nbt_free_buffer = &nbtFreeBuffer,
