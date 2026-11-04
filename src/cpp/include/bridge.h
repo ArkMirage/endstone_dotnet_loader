@@ -143,6 +143,20 @@ struct BridgeTable {
     void *(*server_get_console_sender)(void *);
     bool (*server_dispatch_command)(void *, void *, const char *);
 
+    // ---- server: info ----
+    void (*server_set_max_players)(void *, int);
+    int (*server_get_port)(void *);
+    int (*server_get_port_v6)(void *);
+    bool (*server_get_online_mode)(void *);
+    bool (*server_is_primary_thread)(void *);
+    float (*server_get_current_milliseconds_per_tick)(void *);
+    float (*server_get_average_milliseconds_per_tick)(void *);
+    float (*server_get_current_ticks_per_second)(void *);
+    float (*server_get_average_ticks_per_second)(void *);
+    float (*server_get_current_tick_usage)(void *);
+    float (*server_get_average_tick_usage)(void *);
+    int64_t (*server_get_start_time)(void *);
+
     // ---- plugin manager ----
     void *(*server_get_plugin_manager)(void *);
     void *(*plugin_manager_get_plugin)(void *, const char *);

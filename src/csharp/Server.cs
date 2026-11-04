@@ -13,7 +13,46 @@ public sealed unsafe class Server
     public string Version => Bridge.Str(T->ServerGetVersion(_ptr));
     public string MinecraftVersion => Bridge.Str(T->ServerGetMinecraftVersion(_ptr));
     public int ProtocolVersion => T->ServerGetProtocolVersion(_ptr);
-    public int MaxPlayers => T->ServerGetMaxPlayers(_ptr);
+
+    /// <summary>Gets or sets the maximum number of players allowed online.</summary>
+    public int MaxPlayers
+    {
+        get => T->ServerGetMaxPlayers(_ptr);
+        set => T->ServerSetMaxPlayers(_ptr, value);
+    }
+
+    /// <summary>Gets the game port the server runs on.</summary>
+    public int Port => T->ServerGetPort(_ptr);
+
+    /// <summary>Gets the IPv6 game port the server runs on.</summary>
+    public int PortV6 => T->ServerGetPortV6(_ptr);
+
+    /// <summary>Gets whether the server authenticates clients (online mode).</summary>
+    public bool OnlineMode => T->ServerGetOnlineMode(_ptr);
+
+    /// <summary>Gets whether the current thread is the primary server thread.</summary>
+    public bool IsPrimaryThread => T->ServerIsPrimaryThread(_ptr);
+
+    /// <summary>Gets the current milliseconds per tick (MSPT).</summary>
+    public float CurrentMillisecondsPerTick => T->ServerGetCurrentMillisecondsPerTick(_ptr);
+
+    /// <summary>Gets the average milliseconds per tick (MSPT).</summary>
+    public float AverageMillisecondsPerTick => T->ServerGetAverageMillisecondsPerTick(_ptr);
+
+    /// <summary>Gets the current ticks per second (TPS).</summary>
+    public float CurrentTicksPerSecond => T->ServerGetCurrentTicksPerSecond(_ptr);
+
+    /// <summary>Gets the average ticks per second (TPS).</summary>
+    public float AverageTicksPerSecond => T->ServerGetAverageTicksPerSecond(_ptr);
+
+    /// <summary>Gets the current tick usage as a percentage.</summary>
+    public float CurrentTickUsage => T->ServerGetCurrentTickUsage(_ptr);
+
+    /// <summary>Gets the average tick usage as a percentage.</summary>
+    public float AverageTickUsage => T->ServerGetAverageTickUsage(_ptr);
+
+    /// <summary>Gets the server start time (UTC).</summary>
+    public DateTimeOffset StartTime => DateTimeOffset.FromUnixTimeMilliseconds(T->ServerGetStartTime(_ptr));
 
     public void BroadcastMessage(string message) => Bridge.Call1(T->ServerBroadcastMessage, _ptr, message);
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstring>
 #include <cstdint>
 #include <type_traits>
@@ -209,6 +210,30 @@ void *serverGetPlayerByUuid(void *p, const uint8_t *uuid16)
 bool serverDispatchCommand(void *p, void *sender, const char *cmd)
 {
     return asServer(p)->dispatchCommand(*static_cast<endstone::CommandSender *>(sender), cmd);
+}
+
+// ---- server: info ----
+
+void serverSetMaxPlayers(void *p, int max_players)
+{
+    asServer(p)->setMaxPlayers(max_players);
+}
+
+int serverGetPort(void *p) { return asServer(p)->getPort(); }
+int serverGetPortV6(void *p) { return asServer(p)->getPortV6(); }
+bool serverGetOnlineMode(void *p) { return asServer(p)->getOnlineMode(); }
+bool serverIsPrimaryThread(void *p) { return asServer(p)->isPrimaryThread(); }
+float serverGetCurrentMillisecondsPerTick(void *p) { return asServer(p)->getCurrentMillisecondsPerTick(); }
+float serverGetAverageMillisecondsPerTick(void *p) { return asServer(p)->getAverageMillisecondsPerTick(); }
+float serverGetCurrentTicksPerSecond(void *p) { return asServer(p)->getCurrentTicksPerSecond(); }
+float serverGetAverageTicksPerSecond(void *p) { return asServer(p)->getAverageTicksPerSecond(); }
+float serverGetCurrentTickUsage(void *p) { return asServer(p)->getCurrentTickUsage(); }
+float serverGetAverageTickUsage(void *p) { return asServer(p)->getAverageTickUsage(); }
+
+int64_t serverGetStartTime(void *p)
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        asServer(p)->getStartTime().time_since_epoch()).count();
 }
 
 // ---- plugin manager ----
@@ -3124,6 +3149,18 @@ const BridgeTable &getBridgeTable()
         .server_get_player_by_uuid = &serverGetPlayerByUuid,
         .server_get_console_sender = &serverGetConsoleSender,
         .server_dispatch_command = &serverDispatchCommand,
+        .server_set_max_players = &serverSetMaxPlayers,
+        .server_get_port = &serverGetPort,
+        .server_get_port_v6 = &serverGetPortV6,
+        .server_get_online_mode = &serverGetOnlineMode,
+        .server_is_primary_thread = &serverIsPrimaryThread,
+        .server_get_current_milliseconds_per_tick = &serverGetCurrentMillisecondsPerTick,
+        .server_get_average_milliseconds_per_tick = &serverGetAverageMillisecondsPerTick,
+        .server_get_current_ticks_per_second = &serverGetCurrentTicksPerSecond,
+        .server_get_average_ticks_per_second = &serverGetAverageTicksPerSecond,
+        .server_get_current_tick_usage = &serverGetCurrentTickUsage,
+        .server_get_average_tick_usage = &serverGetAverageTickUsage,
+        .server_get_start_time = &serverGetStartTime,
         .server_get_plugin_manager = &serverGetPluginManager,
         .plugin_manager_get_plugin = &pluginManagerGetPlugin,
         .plugin_manager_get_plugins = &pluginManagerGetPlugins,

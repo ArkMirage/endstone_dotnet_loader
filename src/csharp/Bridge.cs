@@ -77,6 +77,20 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*> ServerGetConsoleSender;
         public delegate* unmanaged[Cdecl]<void*, void*, byte*, bool> ServerDispatchCommand;
 
+        // ---- server: info ----
+        public delegate* unmanaged[Cdecl]<void*, int, void> ServerSetMaxPlayers;
+        public delegate* unmanaged[Cdecl]<void*, int> ServerGetPort;
+        public delegate* unmanaged[Cdecl]<void*, int> ServerGetPortV6;
+        public delegate* unmanaged[Cdecl]<void*, bool> ServerGetOnlineMode;
+        public delegate* unmanaged[Cdecl]<void*, bool> ServerIsPrimaryThread;
+        public delegate* unmanaged[Cdecl]<void*, float> ServerGetCurrentMillisecondsPerTick;
+        public delegate* unmanaged[Cdecl]<void*, float> ServerGetAverageMillisecondsPerTick;
+        public delegate* unmanaged[Cdecl]<void*, float> ServerGetCurrentTicksPerSecond;
+        public delegate* unmanaged[Cdecl]<void*, float> ServerGetAverageTicksPerSecond;
+        public delegate* unmanaged[Cdecl]<void*, float> ServerGetCurrentTickUsage;
+        public delegate* unmanaged[Cdecl]<void*, float> ServerGetAverageTickUsage;
+        public delegate* unmanaged[Cdecl]<void*, long> ServerGetStartTime;
+
         // ---- plugin manager ----
         public delegate* unmanaged[Cdecl]<void*, void*> ServerGetPluginManager;
         public delegate* unmanaged[Cdecl]<void*, byte*, void*> PluginManagerGetPlugin;
