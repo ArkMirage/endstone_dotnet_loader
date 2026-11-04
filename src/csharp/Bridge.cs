@@ -376,11 +376,14 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*, bool, void> BlockSetDataPhysics;
         public delegate* unmanaged[Cdecl]<void*, void*> BlockCaptureState;
         public delegate* unmanaged[Cdecl]<void*, void> BlockDelete;
+        public delegate* unmanaged[Cdecl]<void*, void*> BlockStateGetBlock;
         public delegate* unmanaged[Cdecl]<void*, byte*> BlockStateGetType;
         public delegate* unmanaged[Cdecl]<void*, int> BlockStateGetX;
         public delegate* unmanaged[Cdecl]<void*, int> BlockStateGetY;
         public delegate* unmanaged[Cdecl]<void*, int> BlockStateGetZ;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> BlockStateSetType;
+        public delegate* unmanaged[Cdecl]<void*, void*> BlockStateGetData;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> BlockStateSetData;
         public delegate* unmanaged[Cdecl]<void*, float*, void> BlockStateGetLocation;
         public delegate* unmanaged[Cdecl]<void*, void*> BlockStateGetDimension;
         public delegate* unmanaged[Cdecl]<void*, bool> BlockStateUpdate;
@@ -485,6 +488,7 @@ internal static unsafe class Bridge
         // ---- objects: chunk / item stack ----
         public delegate* unmanaged[Cdecl]<void*, int> ChunkObjGetX;
         public delegate* unmanaged[Cdecl]<void*, int> ChunkObjGetZ;
+        public delegate* unmanaged[Cdecl]<void*, void*> ChunkObjGetLevel;
         public delegate* unmanaged[Cdecl]<void*, void*> ChunkObjGetDimension;
         public delegate* unmanaged[Cdecl]<void*, void> ChunkObjDelete;
         public delegate* unmanaged[Cdecl]<byte*, int, int, void*> ItemStackCreate;

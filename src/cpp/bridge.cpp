@@ -1332,6 +1332,7 @@ void *dimensionDropItem(void *d, const float *loc, void *stack)
 
 int chunkObjGetX(void *c) { return static_cast<endstone::Chunk *>(c)->getX(); }
 int chunkObjGetZ(void *c) { return static_cast<endstone::Chunk *>(c)->getZ(); }
+void *chunkObjGetLevel(void *c) { return &static_cast<endstone::Chunk *>(c)->getLevel(); }
 void *chunkObjGetDimension(void *c) { return &static_cast<endstone::Chunk *>(c)->getDimension(); }
 void chunkObjDelete(void *c) { delete static_cast<endstone::Chunk *>(c); }
 void *itemStackCreate(const char *type, int amount, int data)
@@ -2158,6 +2159,11 @@ void *blockCaptureState(void *b)
     return state ? state.release() : nullptr;
 }
 void blockDelete(void *b) { delete static_cast<endstone::Block *>(b); }
+void *blockStateGetBlock(void *b)
+{
+    auto block = static_cast<endstone::BlockState *>(b)->getBlock();
+    return block ? block.release() : nullptr;
+}
 const char *blockStateGetType(void *b)
 {
     return strOut(static_cast<endstone::BlockState *>(b)->getType());
@@ -2168,6 +2174,17 @@ int blockStateGetZ(void *b) { return static_cast<endstone::BlockState *>(b)->get
 void blockStateSetType(void *b, const char *type)
 {
     static_cast<endstone::BlockState *>(b)->setType(std::string(type ? type : ""));
+}
+void *blockStateGetData(void *b)
+{
+    auto data = static_cast<endstone::BlockState *>(b)->getData();
+    return data ? data.release() : nullptr;
+}
+void blockStateSetData(void *b, void *data)
+{
+    if (data) {
+        static_cast<endstone::BlockState *>(b)->setData(*static_cast<endstone::BlockData *>(data));
+    }
 }
 void blockStateGetLocation(void *b, float *out)
 {
@@ -3533,11 +3550,14 @@ const BridgeTable &getBridgeTable()
         .block_set_data_physics = &blockSetDataPhysics,
         .block_capture_state = &blockCaptureState,
         .block_delete = &blockDelete,
+        .block_state_get_block = &blockStateGetBlock,
         .block_state_get_type = &blockStateGetType,
         .block_state_get_x = &blockStateGetX,
         .block_state_get_y = &blockStateGetY,
         .block_state_get_z = &blockStateGetZ,
         .block_state_set_type = &blockStateSetType,
+        .block_state_get_data = &blockStateGetData,
+        .block_state_set_data = &blockStateSetData,
         .block_state_get_location = &blockStateGetLocation,
         .block_state_get_dimension = &blockStateGetDimension,
         .block_state_update = &blockStateUpdate,
@@ -3624,6 +3644,7 @@ const BridgeTable &getBridgeTable()
         .dimension_drop_item = &dimensionDropItem,
         .chunk_obj_get_x = &chunkObjGetX,
         .chunk_obj_get_z = &chunkObjGetZ,
+        .chunk_obj_get_level = &chunkObjGetLevel,
         .chunk_obj_get_dimension = &chunkObjGetDimension,
         .chunk_obj_delete = &chunkObjDelete,
         .item_stack_create = &itemStackCreate,

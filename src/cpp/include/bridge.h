@@ -460,11 +460,14 @@ struct BridgeTable {
     void (*block_set_data_physics)(void *, void *, bool);
     void *(*block_capture_state)(void *);
     void (*block_delete)(void *);
+    void *(*block_state_get_block)(void *);
     const char *(*block_state_get_type)(void *);
     int (*block_state_get_x)(void *);
     int (*block_state_get_y)(void *);
     int (*block_state_get_z)(void *);
     void (*block_state_set_type)(void *, const char *);
+    void *(*block_state_get_data)(void *);
+    void (*block_state_set_data)(void *, void *);
     void (*block_state_get_location)(void *, float *);
     void *(*block_state_get_dimension)(void *);
     bool (*block_state_update)(void *);
@@ -577,6 +580,7 @@ struct BridgeTable {
     // ---- objects: chunk / item stack ----
     int (*chunk_obj_get_x)(void *);
     int (*chunk_obj_get_z)(void *);
+    void *(*chunk_obj_get_level)(void *);
     void *(*chunk_obj_get_dimension)(void *);
     void (*chunk_obj_delete)(void *);
     void *(*item_stack_create)(const char *, int, int);

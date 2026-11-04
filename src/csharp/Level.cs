@@ -81,6 +81,7 @@ public sealed unsafe class Chunk : IDisposable
 
     public int X => T->ChunkObjGetX(_ptr);
     public int Z => T->ChunkObjGetZ(_ptr);
+    public Level Level => new((IntPtr)T->ChunkObjGetLevel(_ptr));
     public Dimension Dimension => new((IntPtr)T->ChunkObjGetDimension(_ptr));
 
     public void Dispose()
