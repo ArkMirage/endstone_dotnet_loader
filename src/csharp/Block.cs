@@ -52,6 +52,37 @@ public sealed unsafe class Block : IDisposable
         return b == null ? throw new InvalidOperationException("Failed to get relative block") : new Block((IntPtr)b, ownsPtr: true);
     }
 
+    /// <summary>Gets the block adjacent to this block in the given direction.
+    /// Caller owns the returned block (Dispose it).</summary>
+    public Block GetRelative(BlockFace face)
+    {
+        var b = T->BlockGetRelativeFace(_ptr, (int)face);
+        return b == null ? throw new InvalidOperationException("Failed to get relative block") : new Block((IntPtr)b, ownsPtr: true);
+    }
+
+    /// <summary>Gets the block at the given distance in the given direction.
+    /// Caller owns the returned block (Dispose it).</summary>
+    public Block GetRelative(BlockFace face, int distance)
+    {
+        var b = T->BlockGetRelativeFaceDistance(_ptr, (int)face, distance);
+        return b == null ? throw new InvalidOperationException("Failed to get relative block") : new Block((IntPtr)b, ownsPtr: true);
+    }
+
+    /// <summary>Gets the complete block data, or null when the native block has
+    /// no valid data. Caller owns the returned data (Dispose it).</summary>
+    public BlockData? GetData()
+    {
+        var data = T->BlockGetData(_ptr);
+        return data == null ? null : new BlockData((IntPtr)data, ownsPtr: true);
+    }
+
+    /// <summary>Sets the complete block data.</summary>
+    public void SetData(BlockData data) => T->BlockSetData(_ptr, (void*)data.NativePtr);
+
+    /// <summary>Sets the complete block data, optionally suppressing physics.</summary>
+    public void SetData(BlockData data, bool applyPhysics)
+        => T->BlockSetDataPhysics(_ptr, (void*)data.NativePtr, applyPhysics);
+
     /// <summary>Captures the current state of this block. Caller owns the returned state (Dispose it).</summary>
     public BlockState CaptureState()
     {

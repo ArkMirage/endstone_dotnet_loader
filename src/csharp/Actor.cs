@@ -26,6 +26,9 @@ public unsafe class Actor : CommandSender
         }
     }
 
+    /// <summary>The level containing this actor.</summary>
+    public Level Level => new((IntPtr)T->ActorGetLevel(_ptr));
+
     public string NameTag => Bridge.Str(T->ActorGetNameTag(_ptr));
     public string ScoreTag => Bridge.Str(T->ActorGetScoreTag(_ptr));
     public bool IsNameTagVisible => T->ActorIsNameTagVisible(_ptr);

@@ -76,6 +76,20 @@ public sealed unsafe class Player : Mob
     public void SendTip(string message) => Bridge.Call1(T->PlayerSendTip, _ptr, message);
     public void SendToast(string title, string content) => Bridge.Call2(T->PlayerSendToast, _ptr, title, content);
     public void SendTitle(string title, string subtitle) => Bridge.Call2(T->PlayerSendTitle, _ptr, title, subtitle);
+
+    /// <summary>Sends a title and subtitle with explicit fade-in, stay and
+    /// fade-out times, in ticks.</summary>
+    public void SendTitle(string title, string subtitle, int fadeIn, int stay, int fadeOut)
+    {
+        var titleBuf = Bridge.ToUtf8(title);
+        var subtitleBuf = Bridge.ToUtf8(subtitle);
+        fixed (byte* pt = titleBuf)
+        fixed (byte* ps = subtitleBuf)
+        {
+            T->PlayerSendTitleTimes(_ptr, pt, ps, fadeIn, stay, fadeOut);
+        }
+    }
+
     public void ResetTitle() => T->PlayerResetTitle(_ptr);
     public void Kick(string reason) => Bridge.Call1(T->PlayerKick, _ptr, reason);
     public bool PerformCommand(string command) => Bridge.CallBoolStr(T->PlayerPerformCommand, _ptr, command);
@@ -90,6 +104,15 @@ public sealed unsafe class Player : Mob
         => Bridge.CallParticle(T->PlayerSpawnParticle, _ptr, name, location, null);
     public void SpawnParticle(string name, Location location, string molangVariablesJson)
         => Bridge.CallParticle(T->PlayerSpawnParticle, _ptr, name, location, molangVariablesJson);
+
+    /// <summary>Spawns a particle at the given coordinates.</summary>
+    public void SpawnParticle(string name, float x, float y, float z)
+        => Bridge.CallParticleXyz(T->PlayerSpawnParticleXyz, _ptr, name, x, y, z, null);
+
+    /// <summary>Spawns a particle at the given coordinates with optional
+    /// Molang variable JSON.</summary>
+    public void SpawnParticle(string name, float x, float y, float z, string? molangVariablesJson)
+        => Bridge.CallParticleXyz(T->PlayerSpawnParticleXyz, _ptr, name, x, y, z, molangVariablesJson);
 
     public void SetOp(bool value) => T->PlayerSetOp(_ptr, value);
     public void SetSneaking(bool value) => T->PlayerSetSneaking(_ptr, value);

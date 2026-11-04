@@ -103,6 +103,10 @@ void playerSendPopup(void *p, const char *msg) { asPlayer(p)->sendPopup(msg); }
 void playerSendTip(void *p, const char *msg) { asPlayer(p)->sendTip(msg); }
 void playerSendToast(void *p, const char *title, const char *content) { asPlayer(p)->sendToast(title, content); }
 void playerSendTitle(void *p, const char *title, const char *subtitle) { asPlayer(p)->sendTitle(title, subtitle); }
+void playerSendTitleTimes(void *p, const char *title, const char *subtitle, int fade_in, int stay, int fade_out)
+{
+    asPlayer(p)->sendTitle(title, subtitle, fade_in, stay, fade_out);
+}
 void playerResetTitle(void *p) { asPlayer(p)->resetTitle(); }
 void playerKick(void *p, const char *reason) { asPlayer(p)->kick(reason); }
 bool playerPerformCommand(void *p, const char *cmd) { return asPlayer(p)->performCommand(cmd); }
@@ -162,6 +166,16 @@ void playerSpawnParticle(void *p, const char *name, const float *loc, const char
     }
     else {
         player->spawnParticle(name, location);
+    }
+}
+void playerSpawnParticleXyz(void *p, const char *name, float x, float y, float z, const char *molang)
+{
+    auto *player = asPlayer(p);
+    if (molang && *molang) {
+        player->spawnParticle(name, x, y, z, std::string(molang));
+    }
+    else {
+        player->spawnParticle(name, x, y, z);
     }
 }
 float playerGetFlySpeed(void *p) { return asPlayer(p)->getFlySpeed(); }
@@ -1222,6 +1236,7 @@ bool mobIsGliding(void *m) { return static_cast<endstone::Mob *>(m)->isGliding()
 void *actorAsMob(void *a) { return static_cast<endstone::Actor *>(a)->asMob(); }
 void *actorAsItem(void *a) { return static_cast<endstone::Actor *>(a)->asItem(); }
 void *actorGetDimension(void *a) { return &static_cast<endstone::Actor *>(a)->getDimension(); }
+void *actorGetLevel(void *a) { return &static_cast<endstone::Actor *>(a)->getLevel(); }
 const char *dimensionGetName(void *d) { return strOut(static_cast<endstone::Dimension *>(d)->getName()); }
 void *dimensionGetBlockAt(void *d, int x, int y, int z)
 {
@@ -2110,6 +2125,33 @@ void *blockGetRelative(void *b, int dx, int dy, int dz)
     auto rel = asBlock(b)->getRelative(dx, dy, dz);
     return rel ? rel.release() : nullptr;
 }
+void *blockGetRelativeFace(void *b, int face)
+{
+    auto rel = asBlock(b)->getRelative(static_cast<endstone::BlockFace>(face));
+    return rel ? rel.release() : nullptr;
+}
+void *blockGetRelativeFaceDistance(void *b, int face, int distance)
+{
+    auto rel = asBlock(b)->getRelative(static_cast<endstone::BlockFace>(face), distance);
+    return rel ? rel.release() : nullptr;
+}
+void *blockGetData(void *b)
+{
+    auto data = asBlock(b)->getData();
+    return data ? data.release() : nullptr;
+}
+void blockSetData(void *b, void *data)
+{
+    if (data) {
+        asBlock(b)->setData(*static_cast<endstone::BlockData *>(data));
+    }
+}
+void blockSetDataPhysics(void *b, void *data, bool apply_physics)
+{
+    if (data) {
+        asBlock(b)->setData(*static_cast<endstone::BlockData *>(data), apply_physics);
+    }
+}
 void *blockCaptureState(void *b)
 {
     auto state = asBlock(b)->captureState();
@@ -2144,6 +2186,27 @@ bool blockStateUpdateForcePhysics(void *b, bool force, bool apply_physics)
     return static_cast<endstone::BlockState *>(b)->update(force, apply_physics);
 }
 void blockStateDelete(void *b) { delete static_cast<endstone::BlockState *>(b); }
+
+// ---- block data ----
+
+const char *blockDataGetType(void *d)
+{
+    return strOut(static_cast<endstone::BlockData *>(d)->getType());
+}
+uint32_t blockDataGetRuntimeId(void *d)
+{
+    return static_cast<endstone::BlockData *>(d)->getRuntimeId();
+}
+const char *blockDataGetBlockStatesJson(void *d)
+{
+    nlohmann::json j = nlohmann::json::object();
+    const auto states = static_cast<endstone::BlockData *>(d)->getBlockStates();
+    for (const auto &[key, value] : states) {
+        std::visit([&](const auto &v) { j[key] = v; }, value);
+    }
+    return strOut(j.dump());
+}
+void blockDataDelete(void *d) { delete static_cast<endstone::BlockData *>(d); }
 
 // ---- form ----
 struct FormHolder {
@@ -3155,6 +3218,7 @@ const BridgeTable &getBridgeTable()
         .player_send_tip = &playerSendTip,
         .player_send_toast = &playerSendToast,
         .player_send_title = &playerSendTitle,
+        .player_send_title_times = &playerSendTitleTimes,
         .player_reset_title = &playerResetTitle,
         .player_kick = &playerKick,
         .player_perform_command = &playerPerformCommand,
@@ -3190,6 +3254,7 @@ const BridgeTable &getBridgeTable()
         .player_stop_sound = &playerStopSound,
         .player_stop_all_sounds = &playerStopAllSounds,
         .player_spawn_particle = &playerSpawnParticle,
+        .player_spawn_particle_xyz = &playerSpawnParticleXyz,
         .player_get_fly_speed = &playerGetFlySpeed,
         .player_set_fly_speed = &playerSetFlySpeed,
         .player_get_walk_speed = &playerGetWalkSpeed,
@@ -3398,6 +3463,7 @@ const BridgeTable &getBridgeTable()
         .actor_as_mob = &actorAsMob,
         .actor_as_item = &actorAsItem,
         .actor_get_dimension = &actorGetDimension,
+        .actor_get_level = &actorGetLevel,
         .dimension_get_name = &dimensionGetName,
         .dimension_get_block_at = &dimensionGetBlockAt,
         .actor_spawn_actor = &actorSpawnActor,
@@ -3460,6 +3526,11 @@ const BridgeTable &getBridgeTable()
         .block_get_dimension = &blockGetDimension,
         .block_get_dimension_name = &blockGetDimensionName,
         .block_get_relative = &blockGetRelative,
+        .block_get_relative_face = &blockGetRelativeFace,
+        .block_get_relative_face_distance = &blockGetRelativeFaceDistance,
+        .block_get_data = &blockGetData,
+        .block_set_data = &blockSetData,
+        .block_set_data_physics = &blockSetDataPhysics,
         .block_capture_state = &blockCaptureState,
         .block_delete = &blockDelete,
         .block_state_get_type = &blockStateGetType,
@@ -3473,6 +3544,10 @@ const BridgeTable &getBridgeTable()
         .block_state_update_force = &blockStateUpdateForce,
         .block_state_update_force_physics = &blockStateUpdateForcePhysics,
         .block_state_delete = &blockStateDelete,
+        .block_data_get_type = &blockDataGetType,
+        .block_data_get_runtime_id = &blockDataGetRuntimeId,
+        .block_data_get_block_states_json = &blockDataGetBlockStatesJson,
+        .block_data_delete = &blockDataDelete,
         .damage_source_get_type = &damageSourceGetType,
         .damage_source_get_actor = &damageSourceGetActor,
         .damage_source_get_damaging_actor = &damageSourceGetDamagingActor,

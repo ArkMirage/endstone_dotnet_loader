@@ -82,6 +82,7 @@ struct BridgeTable {
     void (*player_send_tip)(void *, const char *);
     void (*player_send_toast)(void *, const char *, const char *);
     void (*player_send_title)(void *, const char *, const char *);
+    void (*player_send_title_times)(void *, const char *, const char *, int, int, int);
     void (*player_reset_title)(void *);
     void (*player_kick)(void *, const char *);
     bool (*player_perform_command)(void *, const char *);
@@ -117,6 +118,7 @@ struct BridgeTable {
     void (*player_stop_sound)(void *, const char *);
     void (*player_stop_all_sounds)(void *);
     void (*player_spawn_particle)(void *, const char *, const float *, const char *);
+    void (*player_spawn_particle_xyz)(void *, const char *, float, float, float, const char *);
     float (*player_get_fly_speed)(void *);
     void (*player_set_fly_speed)(void *, float);
     float (*player_get_walk_speed)(void *);
@@ -369,6 +371,7 @@ struct BridgeTable {
     void *(*actor_as_mob)(void *);
     void *(*actor_as_item)(void *);
     void *(*actor_get_dimension)(void *);
+    void *(*actor_get_level)(void *);
     const char *(*dimension_get_name)(void *);
     void *(*dimension_get_block_at)(void *, int, int, int);
     void *(*actor_spawn_actor)(void *, const float *, const char *);
@@ -450,6 +453,11 @@ struct BridgeTable {
     void *(*block_get_dimension)(void *);
     const char *(*block_get_dimension_name)(void *);
     void *(*block_get_relative)(void *, int, int, int);
+    void *(*block_get_relative_face)(void *, int);
+    void *(*block_get_relative_face_distance)(void *, int, int);
+    void *(*block_get_data)(void *);
+    void (*block_set_data)(void *, void *);
+    void (*block_set_data_physics)(void *, void *, bool);
     void *(*block_capture_state)(void *);
     void (*block_delete)(void *);
     const char *(*block_state_get_type)(void *);
@@ -463,6 +471,13 @@ struct BridgeTable {
     bool (*block_state_update_force)(void *, bool);
     bool (*block_state_update_force_physics)(void *, bool, bool);
     void (*block_state_delete)(void *);
+
+    // ---- block data ----
+    const char *(*block_data_get_type)(void *);
+    uint32_t (*block_data_get_runtime_id)(void *);
+    const char *(*block_data_get_block_states_json)(void *);
+    void (*block_data_delete)(void *);
+
     const char *(*damage_source_get_type)(void *);
     void *(*damage_source_get_actor)(void *);
     void *(*damage_source_get_damaging_actor)(void *);

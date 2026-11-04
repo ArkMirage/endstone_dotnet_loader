@@ -20,6 +20,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerSendTip;
         public delegate* unmanaged[Cdecl]<void*, byte*, byte*, void> PlayerSendToast;
         public delegate* unmanaged[Cdecl]<void*, byte*, byte*, void> PlayerSendTitle;
+        public delegate* unmanaged[Cdecl]<void*, byte*, byte*, int, int, int, void> PlayerSendTitleTimes;
         public delegate* unmanaged[Cdecl]<void*, void> PlayerResetTitle;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerKick;
         public delegate* unmanaged[Cdecl]<void*, byte*, bool> PlayerPerformCommand;
@@ -55,6 +56,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void> PlayerStopSound;
         public delegate* unmanaged[Cdecl]<void*, void> PlayerStopAllSounds;
         public delegate* unmanaged[Cdecl]<void*, byte*, float*, byte*, void> PlayerSpawnParticle;
+        public delegate* unmanaged[Cdecl]<void*, byte*, float, float, float, byte*, void> PlayerSpawnParticleXyz;
         public delegate* unmanaged[Cdecl]<void*, float> PlayerGetFlySpeed;
         public delegate* unmanaged[Cdecl]<void*, float, void> PlayerSetFlySpeed;
         public delegate* unmanaged[Cdecl]<void*, float> PlayerGetWalkSpeed;
@@ -299,6 +301,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*> ActorAsMob;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorAsItem;
         public delegate* unmanaged[Cdecl]<void*, void*> ActorGetDimension;
+        public delegate* unmanaged[Cdecl]<void*, void*> ActorGetLevel;
         public delegate* unmanaged[Cdecl]<void*, byte*> DimensionGetName;
         public delegate* unmanaged[Cdecl]<void*, int, int, int, void*> DimensionGetBlockAt;
         public delegate* unmanaged[Cdecl]<void*, float*, byte*, void*> ActorSpawnActor;
@@ -366,6 +369,11 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, void*> BlockGetDimension;
         public delegate* unmanaged[Cdecl]<void*, byte*> BlockGetDimensionName;
         public delegate* unmanaged[Cdecl]<void*, int, int, int, void*> BlockGetRelative;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> BlockGetRelativeFace;
+        public delegate* unmanaged[Cdecl]<void*, int, int, void*> BlockGetRelativeFaceDistance;
+        public delegate* unmanaged[Cdecl]<void*, void*> BlockGetData;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> BlockSetData;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool, void> BlockSetDataPhysics;
         public delegate* unmanaged[Cdecl]<void*, void*> BlockCaptureState;
         public delegate* unmanaged[Cdecl]<void*, void> BlockDelete;
         public delegate* unmanaged[Cdecl]<void*, byte*> BlockStateGetType;
@@ -379,6 +387,13 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, bool, bool> BlockStateUpdateForce;
         public delegate* unmanaged[Cdecl]<void*, bool, bool, bool> BlockStateUpdateForcePhysics;
         public delegate* unmanaged[Cdecl]<void*, void> BlockStateDelete;
+
+        // ---- block data ----
+        public delegate* unmanaged[Cdecl]<void*, byte*> BlockDataGetType;
+        public delegate* unmanaged[Cdecl]<void*, uint> BlockDataGetRuntimeId;
+        public delegate* unmanaged[Cdecl]<void*, byte*> BlockDataGetBlockStatesJson;
+        public delegate* unmanaged[Cdecl]<void*, void> BlockDataDelete;
+
         public delegate* unmanaged[Cdecl]<void*, byte*> DamageSourceGetType;
         public delegate* unmanaged[Cdecl]<void*, void*> DamageSourceGetActor;
         public delegate* unmanaged[Cdecl]<void*, void*> DamageSourceGetDamagingActor;
@@ -940,6 +955,18 @@ internal static unsafe class Bridge
         fixed (byte* pm = molangBuf)
         {
             fn(obj, pn, values, pm);
+        }
+    }
+
+    internal static void CallParticleXyz(delegate* unmanaged[Cdecl]<void*, byte*, float, float, float, byte*, void> fn,
+                                         void* obj, string name, float x, float y, float z, string? molang)
+    {
+        var nameBuf = ToUtf8(name);
+        var molangBuf = molang == null ? null : ToUtf8(molang);
+        fixed (byte* pn = nameBuf)
+        fixed (byte* pm = molangBuf)
+        {
+            fn(obj, pn, x, y, z, pm);
         }
     }
 
