@@ -13,10 +13,11 @@ namespace Endstone.Loader.Tests;
 [TestClass]
 public class EventNameTests
 {
-    // Event is abstract, so GetTypes() yields the concrete wrappers alone.
+    // Abstract event base classes (PlayerEvent, BlockEvent, ...) are not
+    // individually dispatchable; only the concrete wrappers are built-ins.
     private static readonly Type[] BuiltInEvents = typeof(Event).Assembly
         .GetTypes()
-        .Where(t => t.IsSubclassOf(typeof(Event)) && t.Namespace == "Endstone.Loader")
+        .Where(t => t.IsSubclassOf(typeof(Event)) && !t.IsAbstract && t.Namespace == "Endstone.Loader")
         .ToArray();
 
     [TestMethod]

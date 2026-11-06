@@ -202,6 +202,14 @@ struct BridgeTable {
     void *(*event_get_actor)(void *, int);
     bool (*event_is_cancelled)(void *, int);
     void (*event_set_cancelled)(void *, int, bool);
+    const char *(*event_get_name)(void *);
+    bool (*event_is_asynchronous)(void *);
+    void *(*event_get_block)(void *, int);
+    void *(*event_get_level)(void *, int);
+    void *(*event_get_dimension)(void *, int);
+    void *(*event_get_chunk)(void *, int);
+    void *(*event_get_map)(void *);
+    void *(*event_get_script_sender)(void *);
 
     // ---- events: chat/command ----
     const char *(*chat_get_message)(void *);
@@ -209,6 +217,8 @@ struct BridgeTable {
     const char *(*chat_get_format)(void *);
     void (*chat_set_format)(void *, const char *);
     int (*chat_get_recipient_count)(void *);
+    void *(*chat_get_recipient)(void *, int);
+    void (*chat_set_player)(void *, void *);
     const char *(*command_get_command)(void *);
     void (*command_set_command)(void *, const char *);
     const char *(*server_cmd_get_command)(void *);
@@ -258,6 +268,8 @@ struct BridgeTable {
     void *(*bed_get_bed)(void *, int);
     const char *(*dim_change_get_from)(void *);
     const char *(*dim_change_get_to)(void *);
+    void *(*dim_change_get_from_dimension)(void *);
+    void *(*dim_change_get_to_dimension)(void *);
     void *(*drop_get_item)(void *);
     const char *(*emote_get_id)(void *);
     bool (*emote_is_muted)(void *);
@@ -285,6 +297,7 @@ struct BridgeTable {
     // ---- events: block ----
     void *(*cook_get_source)(void *);
     void *(*cook_get_result)(void *);
+    void (*cook_set_result)(void *, void *);
     int (*block_explode_get_block_count)(void *);
     void *(*block_explode_get_block)(void *, int);
     void *(*grow_get_new_state)(void *, int);
@@ -302,6 +315,7 @@ struct BridgeTable {
     const char *(*broadcast_get_message)(void *);
     void (*broadcast_set_message)(void *, const char *);
     int (*broadcast_get_recipient_count)(void *);
+    void *(*broadcast_get_recipient)(void *, int);
     int (*packet_get_id)(void *, int);
     const char *(*packet_get_payload)(void *, int, int *);
     void (*packet_set_payload)(void *, int, const void *, int);

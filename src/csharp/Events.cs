@@ -128,10 +128,17 @@ public unsafe abstract class Event
     /// <summary>Concrete event kind, set by the factory; used by multi-type native accessors.</summary>
     internal EventKind Kind
     {
+        get => _kind;
         set => _kind = value;
     }
 
     private static Bridge.Table* T => Bridge.Raw;
+
+    /// <summary>The native event name, e.g. "PlayerJoinEvent".</summary>
+    public string EventName => Bridge.Str(T->EventGetName(_ptr));
+
+    /// <summary>Whether this event is fired asynchronously.</summary>
+    public bool IsAsynchronous => T->EventIsAsynchronous(_ptr);
 
     public bool IsCancelled
     {
@@ -158,6 +165,73 @@ public unsafe abstract class Event
             return a == null ? null : new Actor((IntPtr)a);
         }
     }
+}
+
+/// <summary>Base class for events involving a player, mirroring endstone::PlayerEvent.</summary>
+public abstract unsafe class PlayerEvent : Event
+{
+    internal PlayerEvent(IntPtr ptr) : base(ptr) { }
+
+    public new Player Player => base.Player ?? throw new InvalidOperationException("Event has no player");
+}
+
+/// <summary>Base class for events involving an actor, mirroring endstone::ActorEvent.</summary>
+public abstract unsafe class ActorEvent : Event
+{
+    internal ActorEvent(IntPtr ptr) : base(ptr) { }
+
+    public new Actor Actor => base.Actor ?? throw new InvalidOperationException("Event has no actor");
+}
+
+/// <summary>Base class for server events, mirroring endstone::ServerEvent.</summary>
+public abstract unsafe class ServerEvent : Event
+{
+    internal ServerEvent(IntPtr ptr) : base(ptr) { }
+}
+
+/// <summary>Base class for level events, mirroring endstone::LevelEvent.</summary>
+public abstract unsafe class LevelEvent : Event
+{
+    internal LevelEvent(IntPtr ptr) : base(ptr) { }
+
+    private static Bridge.Table* T => Bridge.Raw;
+    public Level Level => new((IntPtr)Bridge.CallKindPtr(T->EventGetLevel, NativePtr, Kind));
+}
+
+/// <summary>Base class for dimension events, mirroring endstone::DimensionEvent.</summary>
+public abstract unsafe class DimensionEvent : LevelEvent
+{
+    internal DimensionEvent(IntPtr ptr) : base(ptr) { }
+
+    private static Bridge.Table* T => Bridge.Raw;
+    public Dimension Dimension => new((IntPtr)Bridge.CallKindPtr(T->EventGetDimension, NativePtr, Kind));
+}
+
+/// <summary>Base class for chunk events, mirroring endstone::ChunkEvent.</summary>
+public abstract unsafe class ChunkEvent : DimensionEvent
+{
+    internal ChunkEvent(IntPtr ptr) : base(ptr) { }
+
+    private static Bridge.Table* T => Bridge.Raw;
+    public Chunk Chunk => new((IntPtr)Bridge.CallKindPtr(T->EventGetChunk, NativePtr, Kind));
+}
+
+/// <summary>Base class for block events, mirroring endstone::BlockEvent.</summary>
+public abstract unsafe class BlockEvent : Event
+{
+    internal BlockEvent(IntPtr ptr) : base(ptr) { }
+
+    private static Bridge.Table* T => Bridge.Raw;
+    public Block Block => new((IntPtr)Bridge.CallKindPtr(T->EventGetBlock, NativePtr, Kind));
+}
+
+/// <summary>Base class for weather events, mirroring endstone::WeatherEvent.</summary>
+public abstract unsafe class WeatherEvent : Event
+{
+    internal WeatherEvent(IntPtr ptr) : base(ptr) { }
+
+    private static Bridge.Table* T => Bridge.Raw;
+    public Level Level => new((IntPtr)Bridge.CallKindPtr(T->EventGetLevel, NativePtr, Kind));
 }
 
 internal static class EventLocationHelper
@@ -204,7 +278,7 @@ internal static class EventVectorHelper
 
 // ==================== Player events ====================
 
-public sealed unsafe class PlayerJoinEvent : Event
+public sealed unsafe class PlayerJoinEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerJoinEvent(IntPtr ptr) : base(ptr) { }
@@ -220,7 +294,7 @@ public sealed unsafe class PlayerJoinEvent : Event
     }
 }
 
-public sealed unsafe class PlayerQuitEvent : Event
+public sealed unsafe class PlayerQuitEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerQuitEvent(IntPtr ptr) : base(ptr) { }
@@ -236,7 +310,7 @@ public sealed unsafe class PlayerQuitEvent : Event
     }
 }
 
-public sealed unsafe class PlayerLoginEvent : Event
+public sealed unsafe class PlayerLoginEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerLoginEvent(IntPtr ptr) : base(ptr) { }
@@ -248,7 +322,7 @@ public sealed unsafe class PlayerLoginEvent : Event
     }
 }
 
-public sealed unsafe class PlayerChatEvent : Event
+public sealed unsafe class PlayerChatEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerChatEvent(IntPtr ptr) : base(ptr) { }
@@ -266,9 +340,27 @@ public sealed unsafe class PlayerChatEvent : Event
     }
 
     public int RecipientCount => T->ChatGetRecipientCount(NativePtr);
+
+    /// <summary>The players who will receive this message. The native API has
+    /// no recipient setter, so this is a read-only snapshot.</summary>
+    public IReadOnlyList<Player> Recipients
+    {
+        get
+        {
+            var recipients = new Player[RecipientCount];
+            for (var i = 0; i < recipients.Length; i++)
+            {
+                recipients[i] = new Player((IntPtr)T->ChatGetRecipient(NativePtr, i));
+            }
+            return recipients;
+        }
+    }
+
+    /// <summary>Sets the player that this message will display as.</summary>
+    public void SetPlayer(Player player) => T->ChatSetPlayer(NativePtr, (void*)player.NativePtr);
 }
 
-public sealed unsafe class PlayerCommandEvent : Event
+public sealed unsafe class PlayerCommandEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerCommandEvent(IntPtr ptr) : base(ptr) { }
@@ -280,7 +372,7 @@ public sealed unsafe class PlayerCommandEvent : Event
     }
 }
 
-public sealed unsafe class PlayerMoveEvent : Event
+public unsafe class PlayerMoveEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerMoveEvent(IntPtr ptr) : base(ptr) { }
@@ -298,46 +390,22 @@ public sealed unsafe class PlayerMoveEvent : Event
     }
 }
 
-public sealed unsafe class PlayerTeleportEvent : Event
+public unsafe class PlayerTeleportEvent : PlayerMoveEvent
 {
-    private static Bridge.Table* T => Bridge.Raw;
     internal PlayerTeleportEvent(IntPtr ptr) : base(ptr) { }
-
-    public Location From
-    {
-        get => EventLocationHelper.Read(T->MoveGetFrom, T->MoveGetFromDimension, NativePtr);
-        set => EventLocationHelper.Write(T->MoveSetFrom, NativePtr, value);
-    }
-
-    public Location To
-    {
-        get => EventLocationHelper.Read(T->MoveGetTo, T->MoveGetToDimension, NativePtr);
-        set => EventLocationHelper.Write(T->MoveSetTo, NativePtr, value);
-    }
 }
 
-public sealed unsafe class PlayerPortalEvent : Event
+public sealed unsafe class PlayerPortalEvent : PlayerTeleportEvent
 {
-    private static Bridge.Table* T => Bridge.Raw;
     internal PlayerPortalEvent(IntPtr ptr) : base(ptr) { }
-
-    public Location From
-    {
-        get => EventLocationHelper.Read(T->MoveGetFrom, T->MoveGetFromDimension, NativePtr);
-        set => EventLocationHelper.Write(T->MoveSetFrom, NativePtr, value);
-    }
-
-    public Location To
-    {
-        get => EventLocationHelper.Read(T->MoveGetTo, T->MoveGetToDimension, NativePtr);
-        set => EventLocationHelper.Write(T->MoveSetTo, NativePtr, value);
-    }
 }
 
-public sealed unsafe class PlayerDeathEvent : Event
+public sealed unsafe class PlayerDeathEvent : ActorDeathEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerDeathEvent(IntPtr ptr) : base(ptr) { }
+
+    public new Player Player => base.Player ?? throw new InvalidOperationException("Event has no player");
 
     public string? DeathMessage
     {
@@ -350,7 +418,7 @@ public sealed unsafe class PlayerDeathEvent : Event
     }
 }
 
-public sealed unsafe class PlayerInteractEvent : Event
+public sealed unsafe class PlayerInteractEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerInteractEvent(IntPtr ptr) : base(ptr) { }
@@ -395,7 +463,7 @@ public sealed unsafe class PlayerInteractEvent : Event
     public BlockFace BlockFace => (BlockFace)T->InteractGetBlockFace(NativePtr);
 }
 
-public sealed unsafe class PlayerInteractActorEvent : Event
+public sealed unsafe class PlayerInteractActorEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerInteractActorEvent(IntPtr ptr) : base(ptr) { }
@@ -410,12 +478,12 @@ public sealed unsafe class PlayerInteractActorEvent : Event
     }
 }
 
-public sealed unsafe class PlayerRespawnEvent : Event
+public sealed unsafe class PlayerRespawnEvent : PlayerEvent
 {
     internal PlayerRespawnEvent(IntPtr ptr) : base(ptr) { }
 }
 
-public sealed unsafe class PlayerDropItemEvent : Event
+public sealed unsafe class PlayerDropItemEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerDropItemEvent(IntPtr ptr) : base(ptr) { }
@@ -423,7 +491,7 @@ public sealed unsafe class PlayerDropItemEvent : Event
     public ItemStack Item => new((IntPtr)T->DropGetItem(NativePtr));
 }
 
-public sealed unsafe class PlayerGameModeChangeEvent : Event
+public sealed unsafe class PlayerGameModeChangeEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerGameModeChangeEvent(IntPtr ptr) : base(ptr) { }
@@ -431,7 +499,7 @@ public sealed unsafe class PlayerGameModeChangeEvent : Event
     public GameMode NewGameMode => (GameMode)T->GmChangeGetNewMode(NativePtr);
 }
 
-public sealed unsafe class PlayerItemHeldEvent : Event
+public sealed unsafe class PlayerItemHeldEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerItemHeldEvent(IntPtr ptr) : base(ptr) { }
@@ -440,7 +508,7 @@ public sealed unsafe class PlayerItemHeldEvent : Event
     public int NewSlot => T->HeldGetNewSlot(NativePtr);
 }
 
-public sealed unsafe class PlayerItemConsumeEvent : Event
+public sealed unsafe class PlayerItemConsumeEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerItemConsumeEvent(IntPtr ptr) : base(ptr) { }
@@ -449,7 +517,7 @@ public sealed unsafe class PlayerItemConsumeEvent : Event
     public EquipmentSlot Hand => (EquipmentSlot)T->ConsumeGetHand(NativePtr);
 }
 
-public sealed unsafe class PlayerKickEvent : Event
+public sealed unsafe class PlayerKickEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerKickEvent(IntPtr ptr) : base(ptr) { }
@@ -461,7 +529,7 @@ public sealed unsafe class PlayerKickEvent : Event
     }
 }
 
-public sealed unsafe class PlayerPickupItemEvent : Event
+public sealed unsafe class PlayerPickupItemEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerPickupItemEvent(IntPtr ptr) : base(ptr) { }
@@ -472,12 +540,12 @@ public sealed unsafe class PlayerPickupItemEvent : Event
     public Item Item => new((IntPtr)T->PickupGetItem(NativePtr));
 }
 
-public sealed unsafe class PlayerJumpEvent : Event
+public sealed unsafe class PlayerJumpEvent : PlayerMoveEvent
 {
     internal PlayerJumpEvent(IntPtr ptr) : base(ptr) { }
 }
 
-public sealed unsafe class PlayerEmoteEvent : Event
+public sealed unsafe class PlayerEmoteEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerEmoteEvent(IntPtr ptr) : base(ptr) { }
@@ -487,7 +555,7 @@ public sealed unsafe class PlayerEmoteEvent : Event
     public void SetMuted(bool value) => T->EmoteSetMuted(NativePtr, value);
 }
 
-public sealed unsafe class PlayerBedEnterEvent : Event
+public sealed unsafe class PlayerBedEnterEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerBedEnterEvent(IntPtr ptr) : base(ptr) { }
@@ -495,7 +563,7 @@ public sealed unsafe class PlayerBedEnterEvent : Event
     public Block Bed => new((IntPtr)Bridge.CallKindPtr(T->BedGetBed, NativePtr, EventKind.PlayerBedEnterEvent));
 }
 
-public sealed unsafe class PlayerBedLeaveEvent : Event
+public sealed unsafe class PlayerBedLeaveEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerBedLeaveEvent(IntPtr ptr) : base(ptr) { }
@@ -503,16 +571,18 @@ public sealed unsafe class PlayerBedLeaveEvent : Event
     public Block Bed => new((IntPtr)Bridge.CallKindPtr(T->BedGetBed, NativePtr, EventKind.PlayerBedLeaveEvent));
 }
 
-public sealed unsafe class PlayerDimensionChangeEvent : Event
+public sealed unsafe class PlayerDimensionChangeEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerDimensionChangeEvent(IntPtr ptr) : base(ptr) { }
 
     public string From => Bridge.Str(T->DimChangeGetFrom(NativePtr));
     public string To => Bridge.Str(T->DimChangeGetTo(NativePtr));
+    public Dimension FromDimension => new((IntPtr)T->DimChangeGetFromDimension(NativePtr));
+    public Dimension ToDimension => new((IntPtr)T->DimChangeGetToDimension(NativePtr));
 }
 
-public sealed unsafe class PlayerSkinChangeEvent : Event
+public sealed unsafe class PlayerSkinChangeEvent : PlayerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PlayerSkinChangeEvent(IntPtr ptr) : base(ptr) { }
@@ -534,7 +604,7 @@ public sealed unsafe class PlayerSkinChangeEvent : Event
 
 // ==================== Actor events ====================
 
-public sealed unsafe class ActorDamageEvent : Event
+public sealed unsafe class ActorDamageEvent : ActorEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ActorDamageEvent(IntPtr ptr) : base(ptr) { }
@@ -546,17 +616,23 @@ public sealed unsafe class ActorDamageEvent : Event
     }
 
     public DamageSource DamageSource => new((IntPtr)Bridge.CallKindPtr(T->EventGetDamageSource, NativePtr, EventKind.ActorDamageEvent));
+
+    /// <summary>The damaged mob, mirroring ActorDamageEvent::getActor().</summary>
+    public Mob Mob => new((IntPtr)Bridge.CallKindPtr(T->EventGetActor, NativePtr, Kind));
 }
 
-public sealed unsafe class ActorDeathEvent : Event
+public unsafe class ActorDeathEvent : ActorEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ActorDeathEvent(IntPtr ptr) : base(ptr) { }
 
-    public DamageSource DamageSource => new((IntPtr)Bridge.CallKindPtr(T->EventGetDamageSource, NativePtr, EventKind.ActorDeathEvent));
+    public DamageSource DamageSource => new((IntPtr)Bridge.CallKindPtr(T->EventGetDamageSource, NativePtr, Kind));
+
+    /// <summary>The dead mob, mirroring ActorDeathEvent::getActor().</summary>
+    public Mob Mob => new((IntPtr)Bridge.CallKindPtr(T->EventGetActor, NativePtr, Kind));
 }
 
-public sealed unsafe class ActorExplodeEvent : Event
+public sealed unsafe class ActorExplodeEvent : ActorEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ActorExplodeEvent(IntPtr ptr) : base(ptr) { }
@@ -575,6 +651,20 @@ public sealed unsafe class ActorExplodeEvent : Event
 
     public int BlockCount => T->ActorExplodeGetBlockCount(NativePtr);
 
+    /// <summary>Snapshot of the blocks affected by this explosion.</summary>
+    public IReadOnlyList<Block> Blocks
+    {
+        get
+        {
+            var blocks = new Block[BlockCount];
+            for (var i = 0; i < blocks.Length; i++)
+            {
+                blocks[i] = new Block((IntPtr)T->ActorExplodeGetBlock(NativePtr, i));
+            }
+            return blocks;
+        }
+    }
+
     public Block? GetBlock(int index)
     {
         var b = T->ActorExplodeGetBlock(NativePtr, index);
@@ -582,7 +672,7 @@ public sealed unsafe class ActorExplodeEvent : Event
     }
 }
 
-public sealed unsafe class ActorKnockbackEvent : Event
+public sealed unsafe class ActorKnockbackEvent : ActorEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ActorKnockbackEvent(IntPtr ptr) : base(ptr) { }
@@ -601,9 +691,12 @@ public sealed unsafe class ActorKnockbackEvent : Event
         get => EventVectorHelper.Read(T->ActorKnockbackGetVector, NativePtr);
         set => EventVectorHelper.Write(T->ActorKnockbackSetVector, NativePtr, value);
     }
+
+    /// <summary>The mob receiving knockback, mirroring ActorKnockbackEvent::getActor().</summary>
+    public Mob Mob => new((IntPtr)Bridge.CallKindPtr(T->EventGetActor, NativePtr, Kind));
 }
 
-public sealed unsafe class ActorTeleportEvent : Event
+public sealed unsafe class ActorTeleportEvent : ActorEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ActorTeleportEvent(IntPtr ptr) : base(ptr) { }
@@ -621,47 +714,69 @@ public sealed unsafe class ActorTeleportEvent : Event
     }
 }
 
-public sealed unsafe class ActorSpawnEvent : Event
+public sealed unsafe class ActorSpawnEvent : ActorEvent
 {
     internal ActorSpawnEvent(IntPtr ptr) : base(ptr) { }
 }
 
-public sealed unsafe class ActorRemoveEvent : Event
+public sealed unsafe class ActorRemoveEvent : ActorEvent
 {
     internal ActorRemoveEvent(IntPtr ptr) : base(ptr) { }
 }
 
 // ==================== Block events ====================
 
-public sealed unsafe class BlockBreakEvent : Event
+public sealed unsafe class BlockBreakEvent : BlockEvent
 {
     internal BlockBreakEvent(IntPtr ptr) : base(ptr) { }
 }
 
-public sealed unsafe class BlockPlaceEvent : Event
+public sealed unsafe class BlockPlaceEvent : BlockEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal BlockPlaceEvent(IntPtr ptr) : base(ptr) { }
 
     public BlockState PlacedState => new((IntPtr)T->PlaceGetPlacedState(NativePtr));
     public Block BlockAgainst => new((IntPtr)T->PlaceGetAgainst(NativePtr));
+
+    /// <summary>Alias for <see cref="BlockEvent.Block"/>, mirroring
+    /// BlockPlaceEvent::getBlockReplaced().</summary>
+    public Block BlockReplaced => Block;
 }
 
-public sealed unsafe class BlockCookEvent : Event
+public sealed unsafe class BlockCookEvent : BlockEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal BlockCookEvent(IntPtr ptr) : base(ptr) { }
 
     public ItemStack Source => new((IntPtr)T->CookGetSource(NativePtr));
-    public ItemStack Result => new((IntPtr)T->CookGetResult(NativePtr));
+    public ItemStack Result
+    {
+        get => new((IntPtr)T->CookGetResult(NativePtr));
+        set => T->CookSetResult(NativePtr, (void*)value.NativePtr);
+    }
 }
 
-public sealed unsafe class BlockExplodeEvent : Event
+public sealed unsafe class BlockExplodeEvent : BlockEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal BlockExplodeEvent(IntPtr ptr) : base(ptr) { }
 
     public int BlockCount => T->BlockExplodeGetBlockCount(NativePtr);
+
+    /// <summary>Snapshot of the blocks affected by this explosion.</summary>
+    public IReadOnlyList<Block> Blocks
+    {
+        get
+        {
+            var blocks = new Block[BlockCount];
+            for (var i = 0; i < blocks.Length; i++)
+            {
+                blocks[i] = new Block((IntPtr)T->BlockExplodeGetBlock(NativePtr, i));
+            }
+            return blocks;
+        }
+    }
 
     public Block? GetBlock(int index)
     {
@@ -670,23 +785,20 @@ public sealed unsafe class BlockExplodeEvent : Event
     }
 }
 
-public sealed unsafe class BlockFormEvent : Event
+public sealed unsafe class BlockFormEvent : BlockGrowEvent
 {
-    private static Bridge.Table* T => Bridge.Raw;
     internal BlockFormEvent(IntPtr ptr) : base(ptr) { }
-
-    public BlockState NewState => new((IntPtr)Bridge.CallKindPtr(T->GrowGetNewState, NativePtr, EventKind.BlockFormEvent));
 }
 
-public sealed unsafe class BlockGrowEvent : Event
+public unsafe class BlockGrowEvent : BlockEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal BlockGrowEvent(IntPtr ptr) : base(ptr) { }
 
-    public BlockState NewState => new((IntPtr)Bridge.CallKindPtr(T->GrowGetNewState, NativePtr, EventKind.BlockGrowEvent));
+    public BlockState NewState => new((IntPtr)Bridge.CallKindPtr(T->GrowGetNewState, NativePtr, Kind));
 }
 
-public sealed unsafe class BlockFromToEvent : Event
+public sealed unsafe class BlockFromToEvent : BlockEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal BlockFromToEvent(IntPtr ptr) : base(ptr) { }
@@ -694,30 +806,32 @@ public sealed unsafe class BlockFromToEvent : Event
     public Block ToBlock => new((IntPtr)T->FromToGetToBlock(NativePtr));
 }
 
-public sealed unsafe class BlockPistonExtendEvent : Event
+public abstract unsafe class BlockPistonEvent : BlockEvent
 {
+    internal BlockPistonEvent(IntPtr ptr) : base(ptr) { }
+
     private static Bridge.Table* T => Bridge.Raw;
+    public BlockFace Direction => (BlockFace)T->PistonGetDirection(NativePtr);
+}
+
+public sealed unsafe class BlockPistonExtendEvent : BlockPistonEvent
+{
     internal BlockPistonExtendEvent(IntPtr ptr) : base(ptr) { }
-
-    public BlockFace Direction => (BlockFace)T->PistonGetDirection(NativePtr);
 }
 
-public sealed unsafe class BlockPistonRetractEvent : Event
+public sealed unsafe class BlockPistonRetractEvent : BlockPistonEvent
 {
-    private static Bridge.Table* T => Bridge.Raw;
     internal BlockPistonRetractEvent(IntPtr ptr) : base(ptr) { }
-
-    public BlockFace Direction => (BlockFace)T->PistonGetDirection(NativePtr);
 }
 
-public sealed unsafe class LeavesDecayEvent : Event
+public sealed unsafe class LeavesDecayEvent : BlockEvent
 {
     internal LeavesDecayEvent(IntPtr ptr) : base(ptr) { }
 }
 
 // ==================== Chunk events ====================
 
-public sealed unsafe class ChunkLoadEvent : Event
+public sealed unsafe class ChunkLoadEvent : ChunkEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ChunkLoadEvent(IntPtr ptr) : base(ptr) { }
@@ -727,7 +841,7 @@ public sealed unsafe class ChunkLoadEvent : Event
     public string DimensionName => Bridge.Str(Bridge.CallKindStr(T->ChunkGetDimensionName, NativePtr, EventKind.ChunkLoadEvent));
 }
 
-public sealed unsafe class ChunkUnloadEvent : Event
+public sealed unsafe class ChunkUnloadEvent : ChunkEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ChunkUnloadEvent(IntPtr ptr) : base(ptr) { }
@@ -739,7 +853,7 @@ public sealed unsafe class ChunkUnloadEvent : Event
 
 // ==================== Server events ====================
 
-public sealed unsafe class ServerCommandEvent : Event
+public sealed unsafe class ServerCommandEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ServerCommandEvent(IntPtr ptr) : base(ptr) { }
@@ -755,7 +869,7 @@ public sealed unsafe class ServerCommandEvent : Event
     public CommandSender Sender => new((IntPtr)T->ServerCmdGetSender(NativePtr));
 }
 
-public sealed unsafe class ServerLoadEvent : Event
+public sealed unsafe class ServerLoadEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ServerLoadEvent(IntPtr ptr) : base(ptr) { }
@@ -763,7 +877,7 @@ public sealed unsafe class ServerLoadEvent : Event
     public LoadType Type => (LoadType)T->ServerLoadGetType(NativePtr);
 }
 
-public sealed unsafe class BroadcastMessageEvent : Event
+public sealed unsafe class BroadcastMessageEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal BroadcastMessageEvent(IntPtr ptr) : base(ptr) { }
@@ -775,9 +889,25 @@ public sealed unsafe class BroadcastMessageEvent : Event
     }
 
     public int RecipientCount => T->BroadcastGetRecipientCount(NativePtr);
+
+    /// <summary>The command senders who will receive this message. The native
+    /// API has no recipient setter, so this is a read-only snapshot. The
+    /// native unordered_set does not guarantee iteration order.</summary>
+    public IReadOnlyList<CommandSender> Recipients
+    {
+        get
+        {
+            var recipients = new CommandSender[RecipientCount];
+            for (var i = 0; i < recipients.Length; i++)
+            {
+                recipients[i] = new CommandSender((IntPtr)T->BroadcastGetRecipient(NativePtr, i));
+            }
+            return recipients;
+        }
+    }
 }
 
-public sealed unsafe class ServerListPingEvent : Event
+public sealed unsafe class ServerListPingEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ServerListPingEvent(IntPtr ptr) : base(ptr) { }
@@ -807,7 +937,7 @@ public sealed unsafe class ServerListPingEvent : Event
     public void SetGameMode(GameMode value) => T->PingSetGameMode(NativePtr, (int)value);
 }
 
-public sealed unsafe class PacketReceiveEvent : Event
+public sealed unsafe class PacketReceiveEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PacketReceiveEvent(IntPtr ptr) : base(ptr) { }
@@ -852,7 +982,7 @@ public sealed unsafe class PacketReceiveEvent : Event
     public int SubClientId => Bridge.CallKindInt(T->PacketGetSubClientId, NativePtr, EventKind.PacketReceiveEvent);
 }
 
-public sealed unsafe class PacketSendEvent : Event
+public sealed unsafe class PacketSendEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PacketSendEvent(IntPtr ptr) : base(ptr) { }
@@ -897,7 +1027,7 @@ public sealed unsafe class PacketSendEvent : Event
     public int SubClientId => Bridge.CallKindInt(T->PacketGetSubClientId, NativePtr, EventKind.PacketSendEvent);
 }
 
-public sealed unsafe class PluginEnableEvent : Event
+public sealed unsafe class PluginEnableEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PluginEnableEvent(IntPtr ptr) : base(ptr) { }
@@ -908,7 +1038,7 @@ public sealed unsafe class PluginEnableEvent : Event
     public string PluginName => Plugin.Name;
 }
 
-public sealed unsafe class PluginDisableEvent : Event
+public sealed unsafe class PluginDisableEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal PluginDisableEvent(IntPtr ptr) : base(ptr) { }
@@ -919,7 +1049,7 @@ public sealed unsafe class PluginDisableEvent : Event
     public string PluginName => Plugin.Name;
 }
 
-public sealed unsafe class ScriptMessageEvent : Event
+public sealed unsafe class ScriptMessageEvent : ServerEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ScriptMessageEvent(IntPtr ptr) : base(ptr) { }
@@ -927,16 +1057,21 @@ public sealed unsafe class ScriptMessageEvent : Event
     public string MessageId => Bridge.Str(T->ScriptGetMessageId(NativePtr));
     public string Message => Bridge.Str(T->ScriptGetMessage(NativePtr));
     public string SenderName => Bridge.Str(T->ScriptGetSenderName(NativePtr));
+
+    public CommandSender Sender => new((IntPtr)T->EventGetScriptSender(NativePtr));
 }
 
-public sealed unsafe class MapInitializeEvent : Event
+public sealed unsafe class MapInitializeEvent : ServerEvent
 {
+    private static Bridge.Table* T => Bridge.Raw;
     internal MapInitializeEvent(IntPtr ptr) : base(ptr) { }
+
+    public MapView Map => new((IntPtr)T->EventGetMap(NativePtr));
 }
 
 // ==================== Weather events ====================
 
-public sealed unsafe class ThunderChangeEvent : Event
+public sealed unsafe class ThunderChangeEvent : WeatherEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal ThunderChangeEvent(IntPtr ptr) : base(ptr) { }
@@ -944,7 +1079,7 @@ public sealed unsafe class ThunderChangeEvent : Event
     public bool ToThunderState => T->ThunderChangeGetTo(NativePtr);
 }
 
-public sealed unsafe class WeatherChangeEvent : Event
+public sealed unsafe class WeatherChangeEvent : WeatherEvent
 {
     private static Bridge.Table* T => Bridge.Raw;
     internal WeatherChangeEvent(IntPtr ptr) : base(ptr) { }

@@ -531,6 +531,75 @@ void *eventGetActor(void *e, int kind)
     }
 }
 
+const char *eventGetName(void *e) { return strOut(asEvent(e)->getEventName()); }
+bool eventIsAsynchronous(void *e) { return asEvent(e)->isAsynchronous(); }
+
+void *eventGetBlock(void *e, int kind)
+{
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::BlockBreakEvent:
+    case EventKind::BlockPlaceEvent:
+    case EventKind::BlockCookEvent:
+    case EventKind::BlockExplodeEvent:
+    case EventKind::BlockFormEvent:
+    case EventKind::BlockGrowEvent:
+    case EventKind::BlockFromToEvent:
+    case EventKind::BlockPistonExtendEvent:
+    case EventKind::BlockPistonRetractEvent:
+    case EventKind::LeavesDecayEvent:
+        return &static_cast<endstone::BlockEvent *>(e)->getBlock();
+    default:
+        return nullptr;
+    }
+}
+
+void *eventGetLevel(void *e, int kind)
+{
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ChunkLoadEvent:
+        return &static_cast<endstone::ChunkLoadEvent *>(e)->getLevel();
+    case EventKind::ChunkUnloadEvent:
+        return &static_cast<endstone::ChunkUnloadEvent *>(e)->getLevel();
+    case EventKind::ThunderChangeEvent:
+        return &static_cast<endstone::ThunderChangeEvent *>(e)->getLevel();
+    case EventKind::WeatherChangeEvent:
+        return &static_cast<endstone::WeatherChangeEvent *>(e)->getLevel();
+    default:
+        return nullptr;
+    }
+}
+
+void *eventGetDimension(void *e, int kind)
+{
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ChunkLoadEvent:
+        return &static_cast<endstone::ChunkLoadEvent *>(e)->getDimension();
+    case EventKind::ChunkUnloadEvent:
+        return &static_cast<endstone::ChunkUnloadEvent *>(e)->getDimension();
+    default:
+        return nullptr;
+    }
+}
+
+void *eventGetChunk(void *e, int kind)
+{
+    switch (static_cast<EventKind>(kind)) {
+    case EventKind::ChunkLoadEvent:
+        return &static_cast<endstone::ChunkLoadEvent *>(e)->getChunk();
+    case EventKind::ChunkUnloadEvent:
+        return &static_cast<endstone::ChunkUnloadEvent *>(e)->getChunk();
+    default:
+        return nullptr;
+    }
+}
+
+void *eventGetMap(void *e) { return &static_cast<endstone::MapInitializeEvent *>(e)->getMap(); }
+
+void *eventGetScriptSender(void *e)
+{
+    return const_cast<endstone::CommandSender *>(&static_cast<endstone::ScriptMessageEvent *>(e)->getSender());
+}
+
 bool eventIsCancelled(void *e, int kind)
 {
     switch (static_cast<EventKind>(kind)) {
@@ -646,6 +715,19 @@ void chatSetFormat(void *e, const char *fmt) { static_cast<endstone::PlayerChatE
 int chatGetRecipientCount(void *e)
 {
     return static_cast<int>(static_cast<endstone::PlayerChatEvent *>(e)->getRecipients().size());
+}
+void *chatGetRecipient(void *e, int index)
+{
+    auto recipients = static_cast<endstone::PlayerChatEvent *>(e)->getRecipients();
+    return (index >= 0 && static_cast<size_t>(index) < recipients.size())
+               ? static_cast<void *>(recipients[static_cast<size_t>(index)])
+               : nullptr;
+}
+void chatSetPlayer(void *e, void *player)
+{
+    if (player) {
+        static_cast<endstone::PlayerChatEvent *>(e)->setPlayer(*static_cast<endstone::Player *>(player));
+    }
 }
 const char *commandGetCommand(void *e)
 {
@@ -855,6 +937,14 @@ const char *dimChangeGetTo(void *e)
 {
     return strOut(static_cast<endstone::PlayerDimensionChangeEvent *>(e)->getTo().getName());
 }
+void *dimChangeGetFromDimension(void *e)
+{
+    return &static_cast<endstone::PlayerDimensionChangeEvent *>(e)->getFrom();
+}
+void *dimChangeGetToDimension(void *e)
+{
+    return &static_cast<endstone::PlayerDimensionChangeEvent *>(e)->getTo();
+}
 void *dropGetItem(void *e) { return const_cast<endstone::ItemStack *>(&static_cast<endstone::PlayerDropItemEvent *>(e)->getItem()); }
 const char *emoteGetId(void *e) { return strOut(static_cast<endstone::PlayerEmoteEvent *>(e)->getEmoteId()); }
 bool emoteIsMuted(void *e) { return static_cast<endstone::PlayerEmoteEvent *>(e)->isMuted(); }
@@ -903,6 +993,12 @@ void skinChangeSetMessage(void *e, const char *msg)
 
 void *cookGetSource(void *e) { return const_cast<endstone::ItemStack *>(&static_cast<endstone::BlockCookEvent *>(e)->getSource()); }
 void *cookGetResult(void *e) { return const_cast<endstone::ItemStack *>(&static_cast<endstone::BlockCookEvent *>(e)->getResult()); }
+void cookSetResult(void *e, void *item)
+{
+    if (item) {
+        static_cast<endstone::BlockCookEvent *>(e)->setResult(*static_cast<endstone::ItemStack *>(item));
+    }
+}
 int blockExplodeGetBlockCount(void *e)
 {
     return static_cast<int>(static_cast<endstone::BlockExplodeEvent *>(e)->getBlockList().size());
@@ -976,6 +1072,16 @@ void broadcastSetMessage(void *e, const char *msg)
 int broadcastGetRecipientCount(void *e)
 {
     return static_cast<int>(static_cast<endstone::BroadcastMessageEvent *>(e)->getRecipients().size());
+}
+void *broadcastGetRecipient(void *e, int index)
+{
+    const auto &recipients = static_cast<endstone::BroadcastMessageEvent *>(e)->getRecipients();
+    if (index < 0 || static_cast<size_t>(index) >= recipients.size()) {
+        return nullptr;
+    }
+    auto it = recipients.begin();
+    std::advance(it, index);
+    return const_cast<endstone::CommandSender *>(*it);
 }
 int packetGetId(void *e, int kind)
 {
@@ -3331,11 +3437,21 @@ const BridgeTable &getBridgeTable()
         .event_get_actor = &eventGetActor,
         .event_is_cancelled = &eventIsCancelled,
         .event_set_cancelled = &eventSetCancelled,
+        .event_get_name = &eventGetName,
+        .event_is_asynchronous = &eventIsAsynchronous,
+        .event_get_block = &eventGetBlock,
+        .event_get_level = &eventGetLevel,
+        .event_get_dimension = &eventGetDimension,
+        .event_get_chunk = &eventGetChunk,
+        .event_get_map = &eventGetMap,
+        .event_get_script_sender = &eventGetScriptSender,
         .chat_get_message = &chatGetMessage,
         .chat_set_message = &chatSetMessage,
         .chat_get_format = &chatGetFormat,
         .chat_set_format = &chatSetFormat,
         .chat_get_recipient_count = &chatGetRecipientCount,
+        .chat_get_recipient = &chatGetRecipient,
+        .chat_set_player = &chatSetPlayer,
         .command_get_command = &commandGetCommand,
         .command_set_command = &commandSetCommand,
         .server_cmd_get_command = &serverCmdGetCommand,
@@ -3377,6 +3493,8 @@ const BridgeTable &getBridgeTable()
         .bed_get_bed = &bedGetBed,
         .dim_change_get_from = &dimChangeGetFrom,
         .dim_change_get_to = &dimChangeGetTo,
+        .dim_change_get_from_dimension = &dimChangeGetFromDimension,
+        .dim_change_get_to_dimension = &dimChangeGetToDimension,
         .drop_get_item = &dropGetItem,
         .emote_get_id = &emoteGetId,
         .emote_is_muted = &emoteIsMuted,
@@ -3400,6 +3518,7 @@ const BridgeTable &getBridgeTable()
         .skin_change_set_message = &skinChangeSetMessage,
         .cook_get_source = &cookGetSource,
         .cook_get_result = &cookGetResult,
+        .cook_set_result = &cookSetResult,
         .block_explode_get_block_count = &blockExplodeGetBlockCount,
         .block_explode_get_block = &blockExplodeGetBlock,
         .grow_get_new_state = &growGetNewState,
@@ -3413,6 +3532,7 @@ const BridgeTable &getBridgeTable()
         .broadcast_get_message = &broadcastGetMessage,
         .broadcast_set_message = &broadcastSetMessage,
         .broadcast_get_recipient_count = &broadcastGetRecipientCount,
+        .broadcast_get_recipient = &broadcastGetRecipient,
         .packet_get_id = &packetGetId,
         .packet_get_payload = &packetGetPayload,
         .packet_set_payload = &packetSetPayload,

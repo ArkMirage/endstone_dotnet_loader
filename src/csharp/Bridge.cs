@@ -133,6 +133,14 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetActor;
         public delegate* unmanaged[Cdecl]<void*, int, bool> EventIsCancelled;
         public delegate* unmanaged[Cdecl]<void*, int, bool, void> EventSetCancelled;
+        public delegate* unmanaged[Cdecl]<void*, byte*> EventGetName;
+        public delegate* unmanaged[Cdecl]<void*, bool> EventIsAsynchronous;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetBlock;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetLevel;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetDimension;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> EventGetChunk;
+        public delegate* unmanaged[Cdecl]<void*, void*> EventGetMap;
+        public delegate* unmanaged[Cdecl]<void*, void*> EventGetScriptSender;
 
         // ---- events: chat/command ----
         public delegate* unmanaged[Cdecl]<void*, byte*> ChatGetMessage;
@@ -140,6 +148,8 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> ChatGetFormat;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> ChatSetFormat;
         public delegate* unmanaged[Cdecl]<void*, int> ChatGetRecipientCount;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> ChatGetRecipient;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> ChatSetPlayer;
         public delegate* unmanaged[Cdecl]<void*, byte*> CommandGetCommand;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> CommandSetCommand;
         public delegate* unmanaged[Cdecl]<void*, byte*> ServerCmdGetCommand;
@@ -189,6 +199,8 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int, void*> BedGetBed;
         public delegate* unmanaged[Cdecl]<void*, byte*> DimChangeGetFrom;
         public delegate* unmanaged[Cdecl]<void*, byte*> DimChangeGetTo;
+        public delegate* unmanaged[Cdecl]<void*, void*> DimChangeGetFromDimension;
+        public delegate* unmanaged[Cdecl]<void*, void*> DimChangeGetToDimension;
         public delegate* unmanaged[Cdecl]<void*, void*> DropGetItem;
         public delegate* unmanaged[Cdecl]<void*, byte*> EmoteGetId;
         public delegate* unmanaged[Cdecl]<void*, bool> EmoteIsMuted;
@@ -214,6 +226,7 @@ internal static unsafe class Bridge
         // ---- events: block ----
         public delegate* unmanaged[Cdecl]<void*, void*> CookGetSource;
         public delegate* unmanaged[Cdecl]<void*, void*> CookGetResult;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> CookSetResult;
         public delegate* unmanaged[Cdecl]<void*, int> BlockExplodeGetBlockCount;
         public delegate* unmanaged[Cdecl]<void*, int, void*> BlockExplodeGetBlock;
         public delegate* unmanaged[Cdecl]<void*, int, void*> GrowGetNewState;
@@ -231,6 +244,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*> BroadcastGetMessage;
         public delegate* unmanaged[Cdecl]<void*, byte*, void> BroadcastSetMessage;
         public delegate* unmanaged[Cdecl]<void*, int> BroadcastGetRecipientCount;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> BroadcastGetRecipient;
         public delegate* unmanaged[Cdecl]<void*, int, int> PacketGetId;
         public delegate* unmanaged[Cdecl]<void*, int, int*, byte*> PacketGetPayload;
         public delegate* unmanaged[Cdecl]<void*, int, void*, int, void> PacketSetPayload;
