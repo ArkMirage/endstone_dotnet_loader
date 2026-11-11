@@ -79,6 +79,7 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, byte*, void*> ServerGetPlayerByUuid;
         public delegate* unmanaged[Cdecl]<void*, void*> ServerGetConsoleSender;
         public delegate* unmanaged[Cdecl]<void*, void*, byte*, bool> ServerDispatchCommand;
+        public delegate* unmanaged[Cdecl]<void*, void*> ServerGetItemFactory;
 
         // ---- server: info ----
         public delegate* unmanaged[Cdecl]<void*, int, void> ServerSetMaxPlayers;
@@ -322,10 +323,17 @@ internal static unsafe class Bridge
 
         // ---- objects: item / block / damage source ----
         public delegate* unmanaged[Cdecl]<void*, byte*> ItemGetType;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> ItemSetType;
         public delegate* unmanaged[Cdecl]<void*, int> ItemGetAmount;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ItemSetAmount;
         public delegate* unmanaged[Cdecl]<void*, int> ItemGetData;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ItemSetData;
         public delegate* unmanaged[Cdecl]<void*, int> ItemGetMaxStackSize;
         public delegate* unmanaged[Cdecl]<void*, byte*> ItemGetTranslationKey;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool> ItemIsSimilar;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasMeta;
+        public delegate* unmanaged[Cdecl]<void*, void*> ItemGetMeta;
+        public delegate* unmanaged[Cdecl]<void*, void*, bool> ItemSetMeta;
         public delegate* unmanaged[Cdecl]<void*, void*> ItemActorGetItemStack;
         public delegate* unmanaged[Cdecl]<void*, void*, void> ItemActorSetItemStack;
         public delegate* unmanaged[Cdecl]<void*, int> ItemActorGetPickupDelay;
@@ -347,32 +355,77 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int*, byte*> ItemGetNbt;
         public delegate* unmanaged[Cdecl]<void*, byte*, int, void> ItemSetNbt;
         public delegate* unmanaged[Cdecl]<void*, void> NbtFreeBuffer;
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasDisplayName;
-        public delegate* unmanaged[Cdecl]<void*, byte*> ItemGetDisplayName;
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasLore;
-        public delegate* unmanaged[Cdecl]<void*, int> ItemGetLoreCount;
-        public delegate* unmanaged[Cdecl]<void*, int, byte*> ItemGetLoreLine;
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasDamage;
-        public delegate* unmanaged[Cdecl]<void*, int> ItemGetDamage;
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemIsUnbreakable;
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasEnchants;
-        public delegate* unmanaged[Cdecl]<void*, int> ItemGetEnchantCount;
-        public delegate* unmanaged[Cdecl]<void*, int, byte*> ItemGetEnchantName;
-        public delegate* unmanaged[Cdecl]<void*, int, int> ItemGetEnchantLevel;
-        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemHasEnchant;
-        public delegate* unmanaged[Cdecl]<void*, byte*, int> ItemGetEnchantLevelById;
-        public delegate* unmanaged[Cdecl]<void*, byte*, int, bool, bool> ItemAddEnchant;
-        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemRemoveEnchant;
-        public delegate* unmanaged[Cdecl]<void*, byte*, void> ItemRemoveEnchants;
-        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemHasConflictingEnchant;
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasRepairCost;
-        public delegate* unmanaged[Cdecl]<void*, int> ItemGetRepairCost;
-        public delegate* unmanaged[Cdecl]<void*, int> ItemGetMetaType;
-        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemSetDisplayName;
-        public delegate* unmanaged[Cdecl]<void*, byte**, int, bool> ItemSetLore;
-        public delegate* unmanaged[Cdecl]<void*, int, bool> ItemSetDamage;
-        public delegate* unmanaged[Cdecl]<void*, bool, bool> ItemSetUnbreakable;
-        public delegate* unmanaged[Cdecl]<void*, int, bool> ItemSetRepairCost;
+
+        // ---- objects: item meta ----
+        public delegate* unmanaged[Cdecl]<void*, void> ItemMetaDelete;
+        public delegate* unmanaged[Cdecl]<void*, void*> ItemMetaClone;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetType;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasDisplayName;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ItemMetaGetDisplayName;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> ItemMetaSetDisplayName;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasLore;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetLoreCount;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*> ItemMetaGetLoreLine;
+        public delegate* unmanaged[Cdecl]<void*, byte**, int, void> ItemMetaSetLore;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasEnchants;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetEnchantCount;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*> ItemMetaGetEnchantName;
+        public delegate* unmanaged[Cdecl]<void*, int, int> ItemMetaGetEnchantLevel;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemMetaHasEnchant;
+        public delegate* unmanaged[Cdecl]<void*, byte*, int> ItemMetaGetEnchantLevelById;
+        public delegate* unmanaged[Cdecl]<void*, byte*, int, bool, bool> ItemMetaAddEnchant;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemMetaRemoveEnchant;
+        public delegate* unmanaged[Cdecl]<void*, void> ItemMetaRemoveEnchants;
+        public delegate* unmanaged[Cdecl]<void*, byte*, bool> ItemMetaHasConflictingEnchant;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaIsUnbreakable;
+        public delegate* unmanaged[Cdecl]<void*, bool, void> ItemMetaSetUnbreakable;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasDamage;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetDamage;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ItemMetaSetDamage;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasRepairCost;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetRepairCost;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ItemMetaSetRepairCost;
+
+        // ---- objects: item meta: writable book ----
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasPages;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetPageCount;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*> ItemMetaGetPage;
+        public delegate* unmanaged[Cdecl]<void*, int, byte*, void> ItemMetaSetPage;
+        public delegate* unmanaged[Cdecl]<void*, byte**, int, void> ItemMetaSetPages;
+        public delegate* unmanaged[Cdecl]<void*, byte**, int, void> ItemMetaAddPages;
+
+        // ---- objects: item meta: book ----
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasTitle;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ItemMetaGetTitle;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> ItemMetaSetTitle;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasAuthor;
+        public delegate* unmanaged[Cdecl]<void*, byte*> ItemMetaGetAuthor;
+        public delegate* unmanaged[Cdecl]<void*, byte*, void> ItemMetaSetAuthor;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasGeneration;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetGeneration;
+        public delegate* unmanaged[Cdecl]<void*, int, void> ItemMetaSetGeneration;
+
+        // ---- objects: item meta: crossbow ----
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasChargedProjectiles;
+        public delegate* unmanaged[Cdecl]<void*, int> ItemMetaGetChargedProjectileCount;
+        public delegate* unmanaged[Cdecl]<void*, int, void*> ItemMetaGetChargedProjectile;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> ItemMetaAddChargedProjectile;
+        public delegate* unmanaged[Cdecl]<void*, void**, int, void> ItemMetaSetChargedProjectiles;
+        public delegate* unmanaged[Cdecl]<void*, void> ItemMetaClearChargedProjectiles;
+
+        // ---- objects: item meta: map ----
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasMapId;
+        public delegate* unmanaged[Cdecl]<void*, long> ItemMetaGetMapId;
+        public delegate* unmanaged[Cdecl]<void*, long, void> ItemMetaSetMapId;
+        public delegate* unmanaged[Cdecl]<void*, bool> ItemMetaHasMapView;
+        public delegate* unmanaged[Cdecl]<void*, void*> ItemMetaGetMapView;
+        public delegate* unmanaged[Cdecl]<void*, void*, void> ItemMetaSetMapView;
+
+        // ---- objects: item factory ----
+        public delegate* unmanaged[Cdecl]<void*, byte*, void*> ItemFactoryGetMeta;
+        public delegate* unmanaged[Cdecl]<void*, void*, byte*, bool> ItemFactoryIsApplicable;
+        public delegate* unmanaged[Cdecl]<void*, void*, void*, bool> ItemFactoryEquals;
+        public delegate* unmanaged[Cdecl]<void*, void*, byte*, void*> ItemFactoryAsMetaFor;
         public delegate* unmanaged[Cdecl]<void*, byte*> BlockGetType;
         public delegate* unmanaged[Cdecl]<void*, int> BlockGetX;
         public delegate* unmanaged[Cdecl]<void*, int> BlockGetY;
@@ -559,10 +612,6 @@ internal static unsafe class Bridge
         public delegate* unmanaged[Cdecl]<void*, int> SkinGetCapeImageWidth;
         public delegate* unmanaged[Cdecl]<void*, int> SkinGetCapeImageHeight;
         public delegate* unmanaged[Cdecl]<void*, int*, byte*> SkinGetCapeImageData;
-
-        public delegate* unmanaged[Cdecl]<void*, bool> ItemHasMapView;
-        public delegate* unmanaged[Cdecl]<void*, void*> ItemGetMapView;
-        public delegate* unmanaged[Cdecl]<void*, void*, bool> ItemSetMapView;
 
         // ---- objects: inventory ----
         public delegate* unmanaged[Cdecl]<void*, void*> PlayerGetInventory;
@@ -1018,6 +1067,51 @@ internal static unsafe class Bridge
         fixed (byte* p = buf)
         {
             return fn(obj, p);
+        }
+    }
+
+    /// <summary>Passes a nullable string to a void-returning native setter; a null
+    /// pointer selects the native "clear" branch.</summary>
+    internal static void CallVoidStrOrNull(delegate* unmanaged[Cdecl]<void*, byte*, void> fn, void* obj, string? s)
+    {
+        if (s == null)
+        {
+            fn(obj, null);
+            return;
+        }
+        var buf = ToUtf8(s);
+        fixed (byte* p = buf)
+        {
+            fn(obj, p);
+        }
+    }
+
+    /// <summary>Passes a managed string list as a native <c>const char* const*</c>.
+    /// A null or empty list passes a null pointer, matching the native clear path.</summary>
+    internal static void CallVoidStrArray(delegate* unmanaged[Cdecl]<void*, byte**, int, void> fn, void* obj,
+                                         IReadOnlyList<string>? values)
+    {
+        if (values == null || values.Count == 0)
+        {
+            fn(obj, null, 0);
+            return;
+        }
+        var strings = new string[values.Count];
+        for (var i = 0; i < strings.Length; i++)
+        {
+            strings[i] = values[i];
+        }
+        using var pinned = new PinnedUtf8Array(strings);
+        fn(obj, pinned.Pointers, pinned.Length);
+    }
+
+    internal static void CallVoidIntStr(delegate* unmanaged[Cdecl]<void*, int, byte*, void> fn, void* obj, int i,
+                                        string s)
+    {
+        var buf = ToUtf8(s);
+        fixed (byte* p = buf)
+        {
+            fn(obj, i, p);
         }
     }
 

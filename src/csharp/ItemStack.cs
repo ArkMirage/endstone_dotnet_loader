@@ -1,19 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using Endstone.Loader.Nbt;
 
 namespace Endstone.Loader;
-
-/// <summary>Kind of metadata an item stack carries (endstone::ItemMeta::Type).</summary>
-public enum ItemMetaType
-{
-    Item = 0,
-    Book = 1,
-    Crossbow = 2,
-    Map = 3,
-    WritableBook = 4,
-}
 
 /// <summary>Wraps a native endstone::ItemStack. When created via
 /// ItemStack.Create or ItemType.CreateItemStack, Dispose() frees the native
@@ -54,137 +43,47 @@ public sealed unsafe class ItemStack : IDisposable
         }
     }
 
-    public string Type => Bridge.Str(T->ItemGetType(_ptr));
-    public int Amount => T->ItemGetAmount(_ptr);
-    public int Data => T->ItemGetData(_ptr);
+    public string Type
+    {
+        get => Bridge.Str(T->ItemGetType(_ptr));
+        set => Bridge.Call1(T->ItemSetType, _ptr, value);
+    }
+
+    public int Amount
+    {
+        get => T->ItemGetAmount(_ptr);
+        set => T->ItemSetAmount(_ptr, value);
+    }
+
+    public int Data
+    {
+        get => T->ItemGetData(_ptr);
+        set => T->ItemSetData(_ptr, value);
+    }
+
     public int MaxStackSize => T->ItemGetMaxStackSize(_ptr);
     public string TranslationKey => Bridge.Str(T->ItemGetTranslationKey(_ptr));
 
-    /// <summary>ItemMeta: display name, or empty when unset.
-    /// Setting null or an empty string clears it. The native side reports whether
-    /// the change was applied; a property setter cannot surface that.</summary>
-    public bool HasDisplayName => T->ItemHasDisplayName(_ptr);
-    [AllowNull]
-    public string DisplayName
-    {
-        get => Bridge.Str(T->ItemGetDisplayName(_ptr));
-        set => Bridge.CallBoolStrOrNull(T->ItemSetDisplayName, _ptr, value);
-    }
+    /// <summary>Whether the two stacks are equal ignoring amount
+    /// (endstone::ItemStack::isSimilar).</summary>
+    public bool IsSimilar(ItemStack other) => T->ItemIsSimilar(_ptr, (void*)other.NativePtr);
 
-    public bool HasLore => T->ItemHasLore(_ptr);
-    public int LoreCount => T->ItemGetLoreCount(_ptr);
-    public string GetLoreLine(int index) => Bridge.Str(T->ItemGetLoreLine(_ptr, index));
+    /// <summary>Whether this stack carries any ItemMeta data.</summary>
+    public bool HasItemMeta => T->ItemHasMeta(_ptr);
 
-    /// <summary>All lore lines as a snapshot (empty when no lore is set). Setting
-    /// null or an empty list clears the lore.</summary>
-    [AllowNull]
-    public IReadOnlyList<string> Lore
-    {
-        get
-        {
-            var lines = new List<string>(LoreCount);
-            for (var i = 0; i < LoreCount; i++)
-            {
-                lines.Add(GetLoreLine(i));
-            }
-            return lines;
-        }
-        set => Bridge.CallItemSetLore(T->ItemSetLore, _ptr, value);
-    }
+    /// <summary>Gets a copy of this stack's ItemMeta. The native side always
+    /// returns a type-appropriate meta (use <see cref="HasItemMeta"/> to check
+    /// whether it actually carries data). The returned wrapper owns the copy;
+    /// dispose it (or let it be collected).</summary>
+    public ItemMeta GetItemMeta() => ItemMeta.Wrap((IntPtr)T->ItemGetMeta(_ptr));
 
-    public bool HasDamage => T->ItemHasDamage(_ptr);
-    public int Damage
-    {
-        get => T->ItemGetDamage(_ptr);
-        set => T->ItemSetDamage(_ptr, value);
-    }
+    /// <summary>Applies the given meta to this stack. A null meta clears it.
+    /// Returns whether the native side accepted the meta.</summary>
+    public bool SetItemMeta(ItemMeta? meta)
+        => T->ItemSetMeta(_ptr, meta == null ? null : (void*)meta.NativePtr);
 
-    public bool IsUnbreakable
-    {
-        get => T->ItemIsUnbreakable(_ptr);
-        set => T->ItemSetUnbreakable(_ptr, value);
-    }
-
-    /// <summary>Whether the item carries a repair penalty.</summary>
-    public bool HasRepairCost => T->ItemHasRepairCost(_ptr);
-
-    /// <summary>The repair penalty, or 0 when unset.</summary>
-    public int RepairCost
-    {
-        get => T->ItemGetRepairCost(_ptr);
-        set => T->ItemSetRepairCost(_ptr, value);
-    }
-
-    /// <summary>Kind of metadata the item carries, or null when it carries none.</summary>
-    public ItemMetaType? MetaType
-    {
-        get
-        {
-            var type = T->ItemGetMetaType(_ptr);
-            return type < 0 ? null : (ItemMetaType)type;
-        }
-    }
-
-    public bool HasEnchants => T->ItemHasEnchants(_ptr);
-    public int EnchantCount => T->ItemGetEnchantCount(_ptr);
-    public string GetEnchantName(int index) => Bridge.Str(T->ItemGetEnchantName(_ptr, index));
-    public int GetEnchantLevel(int index) => T->ItemGetEnchantLevel(_ptr, index);
-
-    /// <summary>Whether the item carries the given enchantment (id like "minecraft:sharpness").</summary>
-    public bool HasEnchant(string id) => Bridge.CallBoolStr(T->ItemHasEnchant, _ptr, id);
-
-    /// <summary>Gets the level of the given enchantment, or 0 when absent.</summary>
-    public int GetEnchantLevel(string id) => Bridge.CallIntStr(T->ItemGetEnchantLevelById, _ptr, id);
-
-    /// <summary>Adds the enchantment at the given level. When force is false the
-    /// level must be within the enchantment's start..max range. Conflicts with
-    /// existing enchantments are not checked; use HasConflictingEnchant first.</summary>
-    public bool AddEnchant(string id, int level, bool force = false)
-        => Bridge.CallBoolStrInt(T->ItemAddEnchant, _ptr, id, level, force);
-
-    /// <summary>Removes the enchantment if present. Returns true if it was removed.</summary>
-    public bool RemoveEnchant(string id) => Bridge.CallBoolStr(T->ItemRemoveEnchant, _ptr, id);
-
-    /// <summary>Removes all enchantments from the item.</summary>
-    public void RemoveEnchants() => Bridge.CallVoidStr(T->ItemRemoveEnchants, _ptr, "");
-
-    /// <summary>Whether any enchantment on the item conflicts with the given one.</summary>
-    public bool HasConflictingEnchant(string id)
-        => Bridge.CallBoolStr(T->ItemHasConflictingEnchant, _ptr, id);
-
-    /// <summary>All enchantments applied to the item, as (enchantment, level) pairs.</summary>
-    public IReadOnlyList<ItemEnchantment> Enchantments
-    {
-        get
-        {
-            var list = new List<ItemEnchantment>(EnchantCount);
-            for (var i = 0; i < EnchantCount; i++)
-            {
-                var id = GetEnchantName(i);
-                if (Enchantment.Get(id) is { } enchant)
-                {
-                    list.Add(new ItemEnchantment(enchant, GetEnchantLevel(i)));
-                }
-            }
-            return list;
-        }
-    }
-
-    /// <summary>Map meta: whether this item is a map bound to a server map view.</summary>
-    public bool HasMapView => T->ItemHasMapView(_ptr);
-
-    /// <summary>Gets the map view bound to this map item, or null.</summary>
-    public MapView? MapView
-    {
-        get
-        {
-            var m = T->ItemGetMapView(_ptr);
-            return m == null ? null : new MapView((IntPtr)m);
-        }
-    }
-
-    /// <summary>Binds this map item to the given map view (only works on map item stacks).</summary>
-    public bool SetMapView(MapView map) => T->ItemSetMapView(_ptr, (void*)map.NativePtr);
+    /// <summary>Convenience accessor for <see cref="GetItemMeta"/>.</summary>
+    public ItemMeta Meta => GetItemMeta();
 
     /// <summary>Gets the item's NBT compound tag, or null when the item has no NBT.
     /// The native side hands back already-serialized CBOR; we decode it into the

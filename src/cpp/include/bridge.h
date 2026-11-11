@@ -144,6 +144,7 @@ struct BridgeTable {
     void *(*server_get_player_by_uuid)(void *, const uint8_t *);
     void *(*server_get_console_sender)(void *);
     bool (*server_dispatch_command)(void *, void *, const char *);
+    void *(*server_get_item_factory)(void *);
 
     // ---- server: info ----
     void (*server_set_max_players)(void *, int);
@@ -163,7 +164,8 @@ struct BridgeTable {
     void *(*server_get_plugin_manager)(void *);
     void *(*plugin_manager_get_plugin)(void *, const char *);
     int (*plugin_manager_get_plugins)(void *, void **, int);
-    bool (*plugin_manager_is_plugin_enabled)(void *, const char *);    void (*plugin_manager_enable_plugin)(void *, void *);
+    bool (*plugin_manager_is_plugin_enabled)(void *, const char *);
+    void (*plugin_manager_enable_plugin)(void *, void *);
     void (*plugin_manager_disable_plugin)(void *, void *);
     void *(*plugin_manager_load_plugin)(void *, const char *);
     int (*plugin_manager_load_plugins_dir)(void *, const char *, void **, int);
@@ -392,10 +394,21 @@ struct BridgeTable {
 
     // ---- objects: item / block / damage source ----
     const char *(*item_get_type)(void *);
+    void (*item_set_type)(void *, const char *);
     int (*item_get_amount)(void *);
+    void (*item_set_amount)(void *, int);
     int (*item_get_data)(void *);
+    void (*item_set_data)(void *, int);
     int (*item_get_max_stack_size)(void *);
     const char *(*item_get_translation_key)(void *);
+    bool (*item_is_similar)(void *, void *);
+    // ItemMeta is exposed as a managed-owned holder (item_get_meta), freed with
+    // item_meta_delete. ItemStack::getItemMeta() always returns a
+    // type-appropriate copy; item_has_meta reports whether any data is set, and
+    // item_set_meta(nullptr) clears it.
+    bool (*item_has_meta)(void *);
+    void *(*item_get_meta)(void *);
+    bool (*item_set_meta)(void *, void *);
     // Item actor (dropped item entity) API.
     void *(*item_actor_get_item_stack)(void *);
     void (*item_actor_set_item_stack)(void *, void *);
@@ -425,38 +438,81 @@ struct BridgeTable {
     // Frees the buffer returned by item_get_nbt (the managed side is the caller,
     // so it owns and releases the allocation).
     void (*nbt_free_buffer)(void *);
-    bool (*item_has_display_name)(void *);
-    const char *(*item_get_display_name)(void *);
-    bool (*item_has_lore)(void *);
-    int (*item_get_lore_count)(void *);
-    const char *(*item_get_lore_line)(void *, int);
-    bool (*item_has_damage)(void *);
-    int (*item_get_damage)(void *);
-    bool (*item_is_unbreakable)(void *);
-    bool (*item_has_enchants)(void *);
-    int (*item_get_enchant_count)(void *);
-    const char *(*item_get_enchant_name)(void *, int);
-    int (*item_get_enchant_level)(void *, int);
-    bool (*item_has_enchant)(void *, const char *);
-    int (*item_get_enchant_level_by_id)(void *, const char *);
-    bool (*item_add_enchant)(void *, const char *, int, bool);
-    bool (*item_remove_enchant)(void *, const char *);
-    void (*item_remove_enchants)(void *);
-    bool (*item_has_conflicting_enchant)(void *, const char *);
-    // ItemMeta extras. ItemStack::getItemMeta() hands out a copy, so every
-    // setter mutates that copy and writes it back with setItemMeta; the return
-    // value is false when there is no metadata and otherwise whether the change
-    // was applied (a no-op counts as applied). item_get_meta_type returns -1
-    // when the stack has no metadata. A nullptr name clears the display name; a
-    // null array or count <= 0 clears the lore.
-    bool (*item_has_repair_cost)(void *);
-    int (*item_get_repair_cost)(void *);
-    int (*item_get_meta_type)(void *);
-    bool (*item_set_display_name)(void *, const char *);
-    bool (*item_set_lore)(void *, const char *const *, int);
-    bool (*item_set_damage)(void *, int);
-    bool (*item_set_unbreakable)(void *, bool);
-    bool (*item_set_repair_cost)(void *, int);
+
+    // ---- objects: item meta ----
+    // Holders are managed-owned. Subclass accessors return false/0/nullptr when
+    // the holder's concrete type does not match (mirrors ItemMeta::as<T>()).
+    // A nullptr string clears display name/title/author; a null array or count
+    // <= 0 clears lore/pages; -1 generation clears it.
+    void (*item_meta_delete)(void *);
+    void *(*item_meta_clone)(void *);
+    int (*item_meta_get_type)(void *);
+    bool (*item_meta_has_display_name)(void *);
+    const char *(*item_meta_get_display_name)(void *);
+    void (*item_meta_set_display_name)(void *, const char *);
+    bool (*item_meta_has_lore)(void *);
+    int (*item_meta_get_lore_count)(void *);
+    const char *(*item_meta_get_lore_line)(void *, int);
+    void (*item_meta_set_lore)(void *, const char *const *, int);
+    bool (*item_meta_has_enchants)(void *);
+    int (*item_meta_get_enchant_count)(void *);
+    const char *(*item_meta_get_enchant_name)(void *, int);
+    int (*item_meta_get_enchant_level)(void *, int);
+    bool (*item_meta_has_enchant)(void *, const char *);
+    int (*item_meta_get_enchant_level_by_id)(void *, const char *);
+    bool (*item_meta_add_enchant)(void *, const char *, int, bool);
+    bool (*item_meta_remove_enchant)(void *, const char *);
+    void (*item_meta_remove_enchants)(void *);
+    bool (*item_meta_has_conflicting_enchant)(void *, const char *);
+    bool (*item_meta_is_unbreakable)(void *);
+    void (*item_meta_set_unbreakable)(void *, bool);
+    bool (*item_meta_has_damage)(void *);
+    int (*item_meta_get_damage)(void *);
+    void (*item_meta_set_damage)(void *, int);
+    bool (*item_meta_has_repair_cost)(void *);
+    int (*item_meta_get_repair_cost)(void *);
+    void (*item_meta_set_repair_cost)(void *, int);
+
+    // ---- objects: item meta: writable book ----
+    bool (*item_meta_has_pages)(void *);
+    int (*item_meta_get_page_count)(void *);
+    const char *(*item_meta_get_page)(void *, int);
+    void (*item_meta_set_page)(void *, int, const char *);
+    void (*item_meta_set_pages)(void *, const char *const *, int);
+    void (*item_meta_add_pages)(void *, const char *const *, int);
+
+    // ---- objects: item meta: book ----
+    bool (*item_meta_has_title)(void *);
+    const char *(*item_meta_get_title)(void *);
+    void (*item_meta_set_title)(void *, const char *);
+    bool (*item_meta_has_author)(void *);
+    const char *(*item_meta_get_author)(void *);
+    void (*item_meta_set_author)(void *, const char *);
+    bool (*item_meta_has_generation)(void *);
+    int (*item_meta_get_generation)(void *);
+    void (*item_meta_set_generation)(void *, int);
+
+    // ---- objects: item meta: crossbow ----
+    bool (*item_meta_has_charged_projectiles)(void *);
+    int (*item_meta_get_charged_projectile_count)(void *);
+    void *(*item_meta_get_charged_projectile)(void *, int);
+    void (*item_meta_add_charged_projectile)(void *, void *);
+    void (*item_meta_set_charged_projectiles)(void *, void *const *, int);
+    void (*item_meta_clear_charged_projectiles)(void *);
+
+    // ---- objects: item meta: map ----
+    bool (*item_meta_has_map_id)(void *);
+    int64_t (*item_meta_get_map_id)(void *);
+    void (*item_meta_set_map_id)(void *, int64_t);
+    bool (*item_meta_has_map_view)(void *);
+    void *(*item_meta_get_map_view)(void *);
+    void (*item_meta_set_map_view)(void *, void *);
+
+    // ---- objects: item factory ----
+    void *(*item_factory_get_meta)(void *, const char *);
+    bool (*item_factory_is_applicable)(void *, void *, const char *);
+    bool (*item_factory_equals)(void *, void *, void *);
+    void *(*item_factory_as_meta_for)(void *, void *, const char *);
     const char *(*block_get_type)(void *);
     int (*block_get_x)(void *);
     int (*block_get_y)(void *);
@@ -663,11 +719,6 @@ struct BridgeTable {
     int (*skin_get_cape_image_width)(void *);
     int (*skin_get_cape_image_height)(void *);
     const char *(*skin_get_cape_image_data)(void *, int *);
-
-    // item map meta
-    bool (*item_has_map_view)(void *);
-    void *(*item_get_map_view)(void *);
-    bool (*item_set_map_view)(void *, void *);
 
     // ---- objects: inventory ----
     void *(*player_get_inventory)(void *);
@@ -907,7 +958,8 @@ struct BridgeTable {
     int64_t (*ban_entry_get_expiration)(void *);
     void (*ban_entry_set_expiration)(void *, int64_t);
     const char *(*ban_entry_get_reason)(void *);
-    void (*ban_entry_set_reason)(void *, const char *);};
+    void (*ban_entry_set_reason)(void *, const char *);
+};
 
 }  // namespace dotnet_loader
 

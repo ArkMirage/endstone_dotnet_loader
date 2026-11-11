@@ -229,6 +229,7 @@ bool serverDispatchCommand(void *p, void *sender, const char *cmd)
 {
     return asServer(p)->dispatchCommand(*static_cast<endstone::CommandSender *>(sender), cmd);
 }
+void *serverGetItemFactory(void *p) { return &asServer(p)->getItemFactory(); }
 
 // ---- server: info ----
 
@@ -1665,32 +1666,6 @@ const char *skinGetCapeImageData(void *s, int *len)
     return data.data();
 }
 
-bool itemHasMapView(void *i)
-{
-    const auto meta = itemMeta(i);
-    const auto *map_meta = meta ? meta->as<endstone::MapMeta>() : nullptr;
-    return map_meta && map_meta->hasMapView();
-}
-void *itemGetMapView(void *i)
-{
-    const auto meta = itemMeta(i);
-    const auto *map_meta = meta ? meta->as<endstone::MapMeta>() : nullptr;
-    return map_meta && map_meta->hasMapView() ? map_meta->getMapView() : nullptr;
-}
-bool itemSetMapView(void *i, void *map)
-{
-    if (!map) {
-        return false;
-    }
-    auto meta = itemMeta(i);
-    auto *map_meta = meta ? meta->as<endstone::MapMeta>() : nullptr;
-    if (!map_meta) {
-        return false;
-    }
-    map_meta->setMapView(static_cast<endstone::MapView *>(map));
-    return asItem(i)->setItemMeta(meta.get());
-}
-
 void *playerGetInventory(void *p) { return &asPlayer(p)->getInventory(); }
 void *playerGetEnderChest(void *p) { return &asPlayer(p)->getEnderChest(); }
 
@@ -1905,10 +1880,28 @@ const char *itemGetType(void *i)
     const auto &type = asItem(i)->getType();
     return strOut(static_cast<std::string>(type.getId()));
 }
+void itemSetType(void *i, const char *type)
+{
+    if (!type) {
+        return;
+    }
+    try {
+        asItem(i)->setType(endstone::ItemTypeId{std::string(type)});
+    }
+    catch (const std::exception &) {
+        // An unknown item id leaves the stack unchanged.
+    }
+}
 int itemGetAmount(void *i) { return asItem(i)->getAmount(); }
+void itemSetAmount(void *i, int amount) { asItem(i)->setAmount(amount); }
 int itemGetData(void *i) { return asItem(i)->getData(); }
+void itemSetData(void *i, int data) { asItem(i)->setData(data); }
 int itemGetMaxStackSize(void *i) { return asItem(i)->getMaxStackSize(); }
 const char *itemGetTranslationKey(void *i) { return strOut(asItem(i)->getTranslationKey()); }
+bool itemIsSimilar(void *i, void *other)
+{
+    return other && asItem(i)->isSimilar(*asItem(other));
+}
 void *itemActorGetItemStack(void *i)
 {
     return itemSnapshot(std::optional<endstone::ItemStack>(asItemActor(i)->getItemStack()));
@@ -1967,222 +1960,371 @@ void *itemTypeCreateItemStack(void *t, int amount)
     return new endstone::ItemStack(asItemType(t)->createItemStack(amount));
 }
 
-std::unique_ptr<endstone::ItemMeta> itemMeta(void *i);
-
-bool itemHasDisplayName(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta && meta->hasDisplayName();
-}
-const char *itemGetDisplayName(void *i)
-{
-    const auto meta = itemMeta(i);
-    return (meta && meta->hasDisplayName()) ? strOut(meta->getDisplayName()) : nullptr;
-}
-bool itemHasLore(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta && meta->hasLore();
-}
-int itemGetLoreCount(void *i)
-{
-    const auto meta = itemMeta(i);
-    return (meta && meta->hasLore()) ? static_cast<int>(meta->getLore().size()) : 0;
-}
-const char *itemGetLoreLine(void *i, int index)
-{
-    const auto meta = itemMeta(i);
-    if (meta && meta->hasLore()) {
-        const auto &lore = meta->getLore();
-        if (index >= 0 && index < static_cast<int>(lore.size())) {
-            return strOut(lore[index]);
-        }
-    }
-    return nullptr;
-}
-bool itemHasDamage(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta && meta->hasDamage();
-}
-int itemGetDamage(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta ? meta->getDamage() : 0;
-}
-bool itemIsUnbreakable(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta && meta->isUnbreakable();
-}
-bool itemHasEnchants(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta && meta->hasEnchants();
-}
-int itemGetEnchantCount(void *i)
-{
-    const auto meta = itemMeta(i);
-    return meta ? static_cast<int>(meta->getEnchants().size()) : 0;
-}
-const char *itemGetEnchantName(void *i, int index)
-{
-    const auto meta = itemMeta(i);
-    if (meta) {
-        const auto &enchants = meta->getEnchants();
-        if (index >= 0 && index < static_cast<int>(enchants.size())) {
-            return strOut(static_cast<std::string>(std::next(enchants.begin(), index)->first->getId()));
-        }
-    }
-    return nullptr;
-}
-int itemGetEnchantLevel(void *i, int index)
-{
-    const auto meta = itemMeta(i);
-    if (meta) {
-        const auto &enchants = meta->getEnchants();
-        if (index >= 0 && index < static_cast<int>(enchants.size())) {
-            return std::next(enchants.begin(), index)->second;
-        }
-    }
-    return 0;
-}
-
 // Enchantment ids are "namespace:key" strings; a bare key implies the minecraft namespace.
 endstone::EnchantmentId enchantId(const char *text) { return endstone::EnchantmentId{text ? text : ""}; }
 
-bool itemHasEnchant(void *i, const char *id)
+endstone::ItemMeta *asItemMeta(void *m) { return static_cast<endstone::ItemMeta *>(m); }
+
+template <typename T>
+T *asMetaType(void *m)
 {
-    const auto meta = itemMeta(i);
-    return meta && meta->hasEnchant(enchantId(id));
-}
-int itemGetEnchantLevelById(void *i, const char *id)
-{
-    const auto meta = itemMeta(i);
-    return meta ? meta->getEnchantLevel(enchantId(id)) : 0;
-}
-bool itemAddEnchant(void *i, const char *id, int level, bool force)
-{
-    const auto meta = itemMeta(i);
-    if (!meta) {
-        return false;
-    }
-    const bool changed = meta->addEnchant(enchantId(id), level, force);
-    return changed && asItem(i)->setItemMeta(meta.get());
-}
-bool itemRemoveEnchant(void *i, const char *id)
-{
-    const auto meta = itemMeta(i);
-    if (!meta) {
-        return false;
-    }
-    const bool changed = meta->removeEnchant(enchantId(id));
-    return changed && asItem(i)->setItemMeta(meta.get());
-}
-void itemRemoveEnchants(void *i)
-{
-    const auto meta = itemMeta(i);
-    if (meta && meta->hasEnchants()) {
-        meta->removeEnchants();
-        asItem(i)->setItemMeta(meta.get());
-    }
-}
-bool itemHasConflictingEnchant(void *i, const char *id)
-{
-    const auto meta = itemMeta(i);
-    return meta && meta->hasConflictingEnchant(enchantId(id));
+    auto *meta = asItemMeta(m);
+    return meta && meta->getType() == T::MetaType ? static_cast<T *>(meta) : nullptr;
 }
 
-// ItemMeta extras. ItemStack::getItemMeta() hands out a copy, so a change only
-// reaches the stack through setItemMeta on the mutated copy. Every setter
-// returns false when the stack has no meta at all, true when nothing needed
-// changing, and otherwise whether that write was applied.
-bool itemHasRepairCost(void *i)
+std::vector<std::string> toStrVector(const char *const *items, int count)
 {
-    const auto meta = itemMeta(i);
-    return meta && meta->hasRepairCost();
+    std::vector<std::string> result;
+    if (!items || count <= 0) {
+        return result;
+    }
+    result.reserve(static_cast<size_t>(count));
+    for (int i = 0; i < count; ++i) {
+        result.emplace_back(items[i] ? items[i] : "");
+    }
+    return result;
 }
-int itemGetRepairCost(void *i)
+
+// ---- item meta: ItemStack integration ----
+
+bool itemHasMeta(void *i) { return asItem(i)->hasItemMeta(); }
+void *itemGetMeta(void *i) { return itemMeta(i).release(); }
+bool itemSetMeta(void *i, void *meta)
 {
-    const auto meta = itemMeta(i);
-    return meta ? meta->getRepairCost() : 0;
+    return asItem(i)->setItemMeta(meta ? asItemMeta(meta) : nullptr);
 }
-int itemGetMetaType(void *i)
+
+// ---- item meta: common ----
+
+void itemMetaDelete(void *m) { delete asItemMeta(m); }
+void *itemMetaClone(void *m) { return asItemMeta(m)->clone().release(); }
+int itemMetaGetType(void *m) { return static_cast<int>(asItemMeta(m)->getType()); }
+
+bool itemMetaHasDisplayName(void *m) { return asItemMeta(m)->hasDisplayName(); }
+const char *itemMetaGetDisplayName(void *m) { return strOut(asItemMeta(m)->getDisplayName()); }
+void itemMetaSetDisplayName(void *m, const char *name)
 {
-    const auto meta = itemMeta(i);
-    return meta ? static_cast<int>(meta->getType()) : -1;
+    asItemMeta(m)->setDisplayName(name ? std::optional<std::string>(name) : std::nullopt);
 }
-bool itemSetDisplayName(void *i, const char *name)
+
+bool itemMetaHasLore(void *m) { return asItemMeta(m)->hasLore(); }
+int itemMetaGetLoreCount(void *m) { return static_cast<int>(asItemMeta(m)->getLore().size()); }
+const char *itemMetaGetLoreLine(void *m, int index)
 {
-    const auto meta = itemMeta(i);
-    if (!meta) {
-        return false;
+    const auto &lore = asItemMeta(m)->getLore();
+    if (index >= 0 && index < static_cast<int>(lore.size())) {
+        return strOut(lore[static_cast<size_t>(index)]);
     }
-    const std::string value = name ? name : "";
-    // getDisplayName() is the stored string, so this covers both "already
-    // unset" and "already equal".
-    if (meta->getDisplayName() == value) {
-        return true;
-    }
-    meta->setDisplayName(name ? std::optional<std::string>(value) : std::nullopt);
-    return asItem(i)->setItemMeta(meta.get());
+    return nullptr;
 }
-bool itemSetLore(void *i, const char *const *lines, int count)
+void itemMetaSetLore(void *m, const char *const *lines, int count)
 {
-    const auto meta = itemMeta(i);
-    if (!meta) {
-        return false;
-    }
-    std::vector<std::string> lore;
-    for (int k = 0; lines && k < count; ++k) {
-        lore.emplace_back(lines[k] ? lines[k] : "");
-    }
-    if (meta->getLore() == lore) {
-        return true;
-    }
+    auto lore = toStrVector(lines, count);
     if (lore.empty()) {
-        meta->setLore(std::nullopt);
+        asItemMeta(m)->setLore(std::nullopt);
     }
     else {
-        meta->setLore(std::move(lore));
+        asItemMeta(m)->setLore(std::move(lore));
     }
-    return asItem(i)->setItemMeta(meta.get());
 }
-bool itemSetDamage(void *i, int damage)
+
+bool itemMetaHasEnchants(void *m) { return asItemMeta(m)->hasEnchants(); }
+int itemMetaGetEnchantCount(void *m) { return static_cast<int>(asItemMeta(m)->getEnchants().size()); }
+const char *itemMetaGetEnchantName(void *m, int index)
 {
-    const auto meta = itemMeta(i);
-    if (!meta) {
+    const auto enchants = asItemMeta(m)->getEnchants();
+    if (index >= 0 && index < static_cast<int>(enchants.size())) {
+        auto it = enchants.begin();
+        std::advance(it, index);
+        return strOut(static_cast<std::string>(it->first->getId()));
+    }
+    return nullptr;
+}
+int itemMetaGetEnchantLevel(void *m, int index)
+{
+    const auto enchants = asItemMeta(m)->getEnchants();
+    if (index >= 0 && index < static_cast<int>(enchants.size())) {
+        auto it = enchants.begin();
+        std::advance(it, index);
+        return it->second;
+    }
+    return 0;
+}
+bool itemMetaHasEnchant(void *m, const char *id)
+{
+    return asItemMeta(m)->hasEnchant(enchantId(id));
+}
+int itemMetaGetEnchantLevelById(void *m, const char *id)
+{
+    return asItemMeta(m)->getEnchantLevel(enchantId(id));
+}
+bool itemMetaAddEnchant(void *m, const char *id, int level, bool force)
+{
+    return asItemMeta(m)->addEnchant(enchantId(id), level, force);
+}
+bool itemMetaRemoveEnchant(void *m, const char *id)
+{
+    return asItemMeta(m)->removeEnchant(enchantId(id));
+}
+void itemMetaRemoveEnchants(void *m) { asItemMeta(m)->removeEnchants(); }
+bool itemMetaHasConflictingEnchant(void *m, const char *id)
+{
+    return asItemMeta(m)->hasConflictingEnchant(enchantId(id));
+}
+
+bool itemMetaIsUnbreakable(void *m) { return asItemMeta(m)->isUnbreakable(); }
+void itemMetaSetUnbreakable(void *m, bool unbreakable) { asItemMeta(m)->setUnbreakable(unbreakable); }
+bool itemMetaHasDamage(void *m) { return asItemMeta(m)->hasDamage(); }
+int itemMetaGetDamage(void *m) { return asItemMeta(m)->getDamage(); }
+void itemMetaSetDamage(void *m, int damage) { asItemMeta(m)->setDamage(damage); }
+bool itemMetaHasRepairCost(void *m) { return asItemMeta(m)->hasRepairCost(); }
+int itemMetaGetRepairCost(void *m) { return asItemMeta(m)->getRepairCost(); }
+void itemMetaSetRepairCost(void *m, int cost) { asItemMeta(m)->setRepairCost(cost); }
+
+// ---- item meta: writable book ----
+
+bool itemMetaHasPages(void *m)
+{
+    auto *book = asMetaType<endstone::WritableBookMeta>(m);
+    return book && book->hasPages();
+}
+int itemMetaGetPageCount(void *m)
+{
+    auto *book = asMetaType<endstone::WritableBookMeta>(m);
+    return book ? book->getPageCount() : 0;
+}
+const char *itemMetaGetPage(void *m, int page)
+{
+    auto *book = asMetaType<endstone::WritableBookMeta>(m);
+    if (!book || page < 1 || page > book->getPageCount()) {
+        return nullptr;
+    }
+    return strOut(book->getPage(page));
+}
+void itemMetaSetPage(void *m, int page, const char *data)
+{
+    auto *book = asMetaType<endstone::WritableBookMeta>(m);
+    if (book && page >= 1 && page <= book->getPageCount()) {
+        book->setPage(page, data ? data : "");
+    }
+}
+void itemMetaSetPages(void *m, const char *const *pages, int count)
+{
+    auto *book = asMetaType<endstone::WritableBookMeta>(m);
+    if (book) {
+        book->setPages(toStrVector(pages, count));
+    }
+}
+void itemMetaAddPages(void *m, const char *const *pages, int count)
+{
+    auto *book = asMetaType<endstone::WritableBookMeta>(m);
+    if (book) {
+        book->addPage(toStrVector(pages, count));
+    }
+}
+
+// ---- item meta: book ----
+
+bool itemMetaHasTitle(void *m)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    return book && book->hasTitle();
+}
+const char *itemMetaGetTitle(void *m)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    return book ? strOut(book->getTitle()) : nullptr;
+}
+void itemMetaSetTitle(void *m, const char *title)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    if (book) {
+        book->setTitle(title ? std::optional<std::string>(title) : std::nullopt);
+    }
+}
+bool itemMetaHasAuthor(void *m)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    return book && book->hasAuthor();
+}
+const char *itemMetaGetAuthor(void *m)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    return book ? strOut(book->getAuthor()) : nullptr;
+}
+void itemMetaSetAuthor(void *m, const char *author)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    if (book) {
+        book->setAuthor(author ? std::optional<std::string>(author) : std::nullopt);
+    }
+}
+bool itemMetaHasGeneration(void *m)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    return book && book->hasGeneration();
+}
+int itemMetaGetGeneration(void *m)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    if (!book) {
+        return -1;
+    }
+    const auto generation = book->getGeneration();
+    return generation ? static_cast<int>(*generation) : -1;
+}
+void itemMetaSetGeneration(void *m, int generation)
+{
+    auto *book = asMetaType<endstone::BookMeta>(m);
+    if (!book) {
+        return;
+    }
+    if (generation < 0) {
+        book->setGeneration(std::nullopt);
+    }
+    else {
+        book->setGeneration(static_cast<endstone::BookMeta::Generation>(generation));
+    }
+}
+
+// ---- item meta: crossbow ----
+
+bool itemMetaHasChargedProjectiles(void *m)
+{
+    auto *crossbow = asMetaType<endstone::CrossbowMeta>(m);
+    return crossbow && crossbow->hasChargedProjectiles();
+}
+int itemMetaGetChargedProjectileCount(void *m)
+{
+    auto *crossbow = asMetaType<endstone::CrossbowMeta>(m);
+    return crossbow ? static_cast<int>(crossbow->getChargedProjectiles().size()) : 0;
+}
+void *itemMetaGetChargedProjectile(void *m, int index)
+{
+    auto *crossbow = asMetaType<endstone::CrossbowMeta>(m);
+    if (!crossbow) {
+        return nullptr;
+    }
+    const auto projectiles = crossbow->getChargedProjectiles();
+    if (index < 0 || index >= static_cast<int>(projectiles.size())) {
+        return nullptr;
+    }
+    return new endstone::ItemStack(projectiles[static_cast<size_t>(index)]);
+}
+void itemMetaAddChargedProjectile(void *m, void *item)
+{
+    auto *crossbow = asMetaType<endstone::CrossbowMeta>(m);
+    if (crossbow && item) {
+        crossbow->addChargedProjectile(*asItem(item));
+    }
+}
+void itemMetaSetChargedProjectiles(void *m, void *const *items, int count)
+{
+    auto *crossbow = asMetaType<endstone::CrossbowMeta>(m);
+    if (!crossbow) {
+        return;
+    }
+    std::vector<endstone::ItemStack> projectiles;
+    if (items) {
+        projectiles.reserve(static_cast<size_t>(std::max(count, 0)));
+        for (int i = 0; i < count; ++i) {
+            if (items[i]) {
+                projectiles.push_back(*asItem(items[i]));
+            }
+        }
+    }
+    crossbow->setChargedProjectiles(std::move(projectiles));
+}
+void itemMetaClearChargedProjectiles(void *m)
+{
+    auto *crossbow = asMetaType<endstone::CrossbowMeta>(m);
+    if (crossbow) {
+        crossbow->setChargedProjectiles({});
+    }
+}
+
+// ---- item meta: map ----
+
+bool itemMetaHasMapId(void *m)
+{
+    auto *map = asMetaType<endstone::MapMeta>(m);
+    return map && map->hasMapId();
+}
+int64_t itemMetaGetMapId(void *m)
+{
+    auto *map = asMetaType<endstone::MapMeta>(m);
+    return map ? map->getMapId() : 0;
+}
+void itemMetaSetMapId(void *m, int64_t id)
+{
+    auto *map = asMetaType<endstone::MapMeta>(m);
+    if (map) {
+        map->setMapId(id);
+    }
+}
+bool itemMetaHasMapView(void *m)
+{
+    auto *map = asMetaType<endstone::MapMeta>(m);
+    return map && map->hasMapView();
+}
+void *itemMetaGetMapView(void *m)
+{
+    auto *map = asMetaType<endstone::MapMeta>(m);
+    return map && map->hasMapView() ? map->getMapView() : nullptr;
+}
+void itemMetaSetMapView(void *m, void *view)
+{
+    auto *map = asMetaType<endstone::MapMeta>(m);
+    if (map) {
+        map->setMapView(static_cast<const endstone::MapView *>(view));
+    }
+}
+
+// ---- item factory ----
+
+const endstone::ItemFactory *asItemFactory(const void *f)
+{
+    return static_cast<const endstone::ItemFactory *>(f);
+}
+
+void *itemFactoryGetMeta(void *f, const char *type)
+{
+    if (!type) {
+        return nullptr;
+    }
+    try {
+        return asItemFactory(f)->getItemMeta(endstone::ItemTypeId{std::string(type)}).release();
+    }
+    catch (const std::exception &) {
+        return nullptr;
+    }
+}
+bool itemFactoryIsApplicable(void *f, void *meta, const char *type)
+{
+    if (!type) {
         return false;
     }
-    if (meta->getDamage() == damage) {
-        return true;
-    }
-    meta->setDamage(damage);
-    return asItem(i)->setItemMeta(meta.get());
+    return asItemFactory(f)->isApplicable(meta ? asItemMeta(meta) : nullptr,
+                                         endstone::ItemTypeId{std::string(type)});
 }
-bool itemSetUnbreakable(void *i, bool unbreakable)
+bool itemFactoryEquals(void *f, void *first, void *second)
 {
-    const auto meta = itemMeta(i);
-    if (!meta) {
-        return false;
-    }
-    if (meta->isUnbreakable() == unbreakable) {
-        return true;
-    }
-    meta->setUnbreakable(unbreakable);
-    return asItem(i)->setItemMeta(meta.get());
+    return asItemFactory(f)->equals(first ? asItemMeta(first) : nullptr,
+                                    second ? asItemMeta(second) : nullptr);
 }
-bool itemSetRepairCost(void *i, int cost)
+void *itemFactoryAsMetaFor(void *f, void *meta, const char *type)
 {
-    const auto meta = itemMeta(i);
-    if (!meta) {
-        return false;
+    if (!type) {
+        return nullptr;
     }
-    if (meta->getRepairCost() == cost) {
-        return true;
+    try {
+        return asItemFactory(f)
+            ->asMetaFor(meta ? asItemMeta(meta) : nullptr, endstone::ItemTypeId{std::string(type)})
+            .release();
     }
-    meta->setRepairCost(cost);
-    return asItem(i)->setItemMeta(meta.get());
+    catch (const std::exception &) {
+        return nullptr;
+    }
 }
 
 const endstone::Enchantment *asEnchantment(const void *e) { return static_cast<const endstone::Enchantment *>(e); }
@@ -3398,6 +3540,7 @@ const BridgeTable &getBridgeTable()
         .server_get_player_by_uuid = &serverGetPlayerByUuid,
         .server_get_console_sender = &serverGetConsoleSender,
         .server_dispatch_command = &serverDispatchCommand,
+        .server_get_item_factory = &serverGetItemFactory,
         .server_set_max_players = &serverSetMaxPlayers,
         .server_get_port = &serverGetPort,
         .server_get_port_v6 = &serverGetPortV6,
@@ -3605,10 +3748,17 @@ const BridgeTable &getBridgeTable()
         .dimension_get_block_at = &dimensionGetBlockAt,
         .actor_spawn_actor = &actorSpawnActor,
         .item_get_type = &itemGetType,
+        .item_set_type = &itemSetType,
         .item_get_amount = &itemGetAmount,
+        .item_set_amount = &itemSetAmount,
         .item_get_data = &itemGetData,
+        .item_set_data = &itemSetData,
         .item_get_max_stack_size = &itemGetMaxStackSize,
         .item_get_translation_key = &itemGetTranslationKey,
+        .item_is_similar = &itemIsSimilar,
+        .item_has_meta = &itemHasMeta,
+        .item_get_meta = &itemGetMeta,
+        .item_set_meta = &itemSetMeta,
         .item_actor_get_item_stack = &itemActorGetItemStack,
         .item_actor_set_item_stack = &itemActorSetItemStack,
         .item_actor_get_pickup_delay = &itemActorGetPickupDelay,
@@ -3627,32 +3777,65 @@ const BridgeTable &getBridgeTable()
         .item_get_nbt = &itemGetNbt,
         .item_set_nbt = &itemSetNbt,
         .nbt_free_buffer = &nbtFreeBuffer,
-        .item_has_display_name = &itemHasDisplayName,
-        .item_get_display_name = &itemGetDisplayName,
-        .item_has_lore = &itemHasLore,
-        .item_get_lore_count = &itemGetLoreCount,
-        .item_get_lore_line = &itemGetLoreLine,
-        .item_has_damage = &itemHasDamage,
-        .item_get_damage = &itemGetDamage,
-        .item_is_unbreakable = &itemIsUnbreakable,
-        .item_has_enchants = &itemHasEnchants,
-        .item_get_enchant_count = &itemGetEnchantCount,
-        .item_get_enchant_name = &itemGetEnchantName,
-        .item_get_enchant_level = &itemGetEnchantLevel,
-        .item_has_enchant = &itemHasEnchant,
-        .item_get_enchant_level_by_id = &itemGetEnchantLevelById,
-        .item_add_enchant = &itemAddEnchant,
-        .item_remove_enchant = &itemRemoveEnchant,
-        .item_remove_enchants = &itemRemoveEnchants,
-        .item_has_conflicting_enchant = &itemHasConflictingEnchant,
-        .item_has_repair_cost = &itemHasRepairCost,
-        .item_get_repair_cost = &itemGetRepairCost,
-        .item_get_meta_type = &itemGetMetaType,
-        .item_set_display_name = &itemSetDisplayName,
-        .item_set_lore = &itemSetLore,
-        .item_set_damage = &itemSetDamage,
-        .item_set_unbreakable = &itemSetUnbreakable,
-        .item_set_repair_cost = &itemSetRepairCost,
+        .item_meta_delete = &itemMetaDelete,
+        .item_meta_clone = &itemMetaClone,
+        .item_meta_get_type = &itemMetaGetType,
+        .item_meta_has_display_name = &itemMetaHasDisplayName,
+        .item_meta_get_display_name = &itemMetaGetDisplayName,
+        .item_meta_set_display_name = &itemMetaSetDisplayName,
+        .item_meta_has_lore = &itemMetaHasLore,
+        .item_meta_get_lore_count = &itemMetaGetLoreCount,
+        .item_meta_get_lore_line = &itemMetaGetLoreLine,
+        .item_meta_set_lore = &itemMetaSetLore,
+        .item_meta_has_enchants = &itemMetaHasEnchants,
+        .item_meta_get_enchant_count = &itemMetaGetEnchantCount,
+        .item_meta_get_enchant_name = &itemMetaGetEnchantName,
+        .item_meta_get_enchant_level = &itemMetaGetEnchantLevel,
+        .item_meta_has_enchant = &itemMetaHasEnchant,
+        .item_meta_get_enchant_level_by_id = &itemMetaGetEnchantLevelById,
+        .item_meta_add_enchant = &itemMetaAddEnchant,
+        .item_meta_remove_enchant = &itemMetaRemoveEnchant,
+        .item_meta_remove_enchants = &itemMetaRemoveEnchants,
+        .item_meta_has_conflicting_enchant = &itemMetaHasConflictingEnchant,
+        .item_meta_is_unbreakable = &itemMetaIsUnbreakable,
+        .item_meta_set_unbreakable = &itemMetaSetUnbreakable,
+        .item_meta_has_damage = &itemMetaHasDamage,
+        .item_meta_get_damage = &itemMetaGetDamage,
+        .item_meta_set_damage = &itemMetaSetDamage,
+        .item_meta_has_repair_cost = &itemMetaHasRepairCost,
+        .item_meta_get_repair_cost = &itemMetaGetRepairCost,
+        .item_meta_set_repair_cost = &itemMetaSetRepairCost,
+        .item_meta_has_pages = &itemMetaHasPages,
+        .item_meta_get_page_count = &itemMetaGetPageCount,
+        .item_meta_get_page = &itemMetaGetPage,
+        .item_meta_set_page = &itemMetaSetPage,
+        .item_meta_set_pages = &itemMetaSetPages,
+        .item_meta_add_pages = &itemMetaAddPages,
+        .item_meta_has_title = &itemMetaHasTitle,
+        .item_meta_get_title = &itemMetaGetTitle,
+        .item_meta_set_title = &itemMetaSetTitle,
+        .item_meta_has_author = &itemMetaHasAuthor,
+        .item_meta_get_author = &itemMetaGetAuthor,
+        .item_meta_set_author = &itemMetaSetAuthor,
+        .item_meta_has_generation = &itemMetaHasGeneration,
+        .item_meta_get_generation = &itemMetaGetGeneration,
+        .item_meta_set_generation = &itemMetaSetGeneration,
+        .item_meta_has_charged_projectiles = &itemMetaHasChargedProjectiles,
+        .item_meta_get_charged_projectile_count = &itemMetaGetChargedProjectileCount,
+        .item_meta_get_charged_projectile = &itemMetaGetChargedProjectile,
+        .item_meta_add_charged_projectile = &itemMetaAddChargedProjectile,
+        .item_meta_set_charged_projectiles = &itemMetaSetChargedProjectiles,
+        .item_meta_clear_charged_projectiles = &itemMetaClearChargedProjectiles,
+        .item_meta_has_map_id = &itemMetaHasMapId,
+        .item_meta_get_map_id = &itemMetaGetMapId,
+        .item_meta_set_map_id = &itemMetaSetMapId,
+        .item_meta_has_map_view = &itemMetaHasMapView,
+        .item_meta_get_map_view = &itemMetaGetMapView,
+        .item_meta_set_map_view = &itemMetaSetMapView,
+        .item_factory_get_meta = &itemFactoryGetMeta,
+        .item_factory_is_applicable = &itemFactoryIsApplicable,
+        .item_factory_equals = &itemFactoryEquals,
+        .item_factory_as_meta_for = &itemFactoryAsMetaFor,
         .block_get_type = &blockGetType,
         .block_get_x = &blockGetX,
         .block_get_y = &blockGetY,
@@ -3815,9 +3998,6 @@ const BridgeTable &getBridgeTable()
         .skin_get_cape_image_width = &skinGetCapeImageWidth,
         .skin_get_cape_image_height = &skinGetCapeImageHeight,
         .skin_get_cape_image_data = &skinGetCapeImageData,
-        .item_has_map_view = &itemHasMapView,
-        .item_get_map_view = &itemGetMapView,
-        .item_set_map_view = &itemSetMapView,
         .player_get_inventory = &playerGetInventory,
         .player_get_ender_chest = &playerGetEnderChest,
         .inventory_get_size = &inventoryGetSize,

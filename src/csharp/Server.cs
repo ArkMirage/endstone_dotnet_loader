@@ -95,6 +95,9 @@ public sealed unsafe class Server
     /// loaded plugins (both .NET and native).</summary>
     public PluginManager PluginManager => new((IntPtr)T->ServerGetPluginManager(_ptr));
 
+    /// <summary>Gets the item factory used to create and compare ItemMeta.</summary>
+    public ItemFactory ItemFactory => new((IntPtr)T->ServerGetItemFactory(_ptr));
+
     public bool DispatchCommand(string commandLine)
     {
         var console = T->ServerGetConsoleSender(_ptr);
